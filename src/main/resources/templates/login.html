@@ -1,10 +1,148 @@
-<!--
-  ============================================================
-  AQUI VA TODO LO DE INICIAR SESION
-  ============================================================
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <th:block
+      th:replace="~{fragmentos :: cabecera('Iniciar sesión | Hotel Macondo')}"
+    ></th:block>
+  </head>
 
-  Vista del formulario de inicio de sesion. Debe reusar los fragmentos
-  comunes (cabecera, navbar, footer, scripts) igual que las demas vistas, y
-  llevar un formulario con th:action="@{/login}" method="post" con los campos
-  correo y clave, mas el bloque th:if="${error}" para el mensaje de error.
--->
+  <body class="login-pagina">
+    <!-- NAVBAR -->
+    <nav th:replace="~{fragmentos :: navbar}"></nav>
+
+    <!-- CONTENIDO PRINCIPAL LOGIN -->
+    <main class="login-main">
+      <!-- SECCIÓN IZQUIERDA (VISUAL Y TEXTOS) -->
+      <section
+        class="login-visual d-flex flex-column justify-content-between p-4 p-md-5"
+      >
+        <div>
+          <a
+            th:href="@{/}"
+            class="login-volver d-inline-flex align-items-center gap-2 mb-5"
+          >
+            <span
+              class="login-volver-icono d-flex align-items-center justify-content-center"
+              >←</span
+            >
+            <span>Volver al inicio</span>
+          </a>
+        </div>
+
+        <div class="login-visual-contenido my-auto">
+          <h1 class="display-4 fw-bold mb-3 text-white">
+            Descubre el arte de recordar
+          </h1>
+          <p class="login-cita fst-italic mb-4">
+            "La vida no es la que uno vivió, sino la que recuerda y cómo la
+            recuerda para contarla."
+          </p>
+          <p class="login-descripcion text-white-50">
+            Inicia sesión para acceder a tu santuario personal, gestionar tus
+            reservas y sumergirte en el Caribe más mágico de Cartagena de
+            Indias.
+          </p>
+        </div>
+
+        <div
+          class="d-flex justify-content-between align-items-center small text-white-50 pt-4"
+        >
+          <span>&copy; 2026 Hotel Macondo</span>
+          <span class="fst-italic text-dorado">Cartagena, Colombia</span>
+        </div>
+      </section>
+
+      <!-- SECCIÓN DERECHA (FORMULARIO) -->
+      <section
+        class="login-contenido d-flex align-items-center justify-content-center p-4 p-md-5"
+      >
+        <div class="card card-login p-4 p-sm-5 w-100">
+          <div class="text-center mb-4">
+            <div th:replace="~{fragmentos :: logo}"></div>
+            <h2 class="h3 mt-3 mb-1">Hotel Macondo</h2>
+            <p class="seccion-etiqueta">Santuario del Caribe</p>
+          </div>
+
+          <form th:action="@{/login}" method="post">
+            <div class="mb-3">
+              <label for="username" class="form-label login-label"
+                >Correo electrónico</label
+              >
+              <div class="input-group">
+                <span
+                  class="input-group-text bg-transparent border-end-0 text-muted"
+                >
+                  <i class="bi bi-envelope"></i>
+                </span>
+                <input
+                  type="email"
+                  class="form-control border-start-0 ps-0"
+                  id="username"
+                  name="username"
+                  placeholder="ejemplo@macondo.co"
+                  required
+                />
+              </div>
+            </div>
+
+            <div class="mb-2">
+              <label for="password" class="form-label login-label"
+                >Contraseña</label
+              >
+              <div class="input-group">
+                <span
+                  class="input-group-text bg-transparent border-end-0 text-muted"
+                >
+                  <i class="bi bi-lock"></i>
+                </span>
+                <input
+                  type="password"
+                  class="form-control border-start-0 border-end-0 ps-0 pe-0"
+                  id="password"
+                  name="password"
+                  placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"
+                  required
+                />
+                <span
+                  class="input-group-text bg-transparent border-start-0 text-muted cursor-pointer"
+                >
+                  <i class="bi bi-eye"></i>
+                </span>
+              </div>
+            </div>
+
+            <div class="text-end mb-4">
+              <a
+                href="#"
+                class="small text-decoration-none text-azul hover-underline"
+                >¿Olvidaste tu contraseña?</a
+              >
+            </div>
+
+            <button type="submit" class="btn btn-dorado w-100 py-2 fw-semibold">
+              Iniciar Sesión
+            </button>
+          </form>
+
+          <div class="login-separador text-center my-4">
+            <span>o</span>
+          </div>
+
+          <div class="text-center small">
+            <span class="text-muted">¿Aún no eres miembro?</span>
+            <a
+              th:href="@{/registro}"
+              class="fw-bold text-azul text-decoration-none ms-1"
+              >Registrarse</a
+            >
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- FOOTER -->
+    <footer th:replace="~{fragmentos :: footer}"></footer>
+
+    <th:block th:replace="~{fragmentos :: scripts}"></th:block>
+  </body>
+</html>
