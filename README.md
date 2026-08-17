@@ -1,25 +1,41 @@
 # Hotel Macondo
 
-Landing page y sistema de reservas del Hotel Macondo, construido con Spring Boot + Thymeleaf + Bootstrap 5.
+## La idea
+
+Hotel Macondo es un hotel boutique de lujo imaginado en la costa caribeña de
+Colombia, en Cartagena de Indias, inspirado en el pueblo de *Cien años de
+soledad*. La promesa de marca es la del lema: **"donde el realismo mágico
+encuentra el mar"**. No se vende una habitación, se vende una estadía que se
+recuerda como un cuento.
+
+Eso manda sobre todas las decisiones del sitio:
+
+- **Primero la emoción, después el precio.** Al entrar solo se ve la foto de la
+  playa al atardecer a pantalla completa, el nombre y el lema. La tarifa
+  aparece más abajo, cuando el visitante ya se enamoró del lugar.
+- **Reservar siempre a un clic.** La caja de disponibilidad monta sobre el hero
+  y el botón dorado "Reservar" vive fijo en el navbar, así el huésped puede
+  cotizar desde cualquier punto de la página sin devolverse.
+- **Cuatro niveles de experiencia.** Normal, Executive, VIP y Luxury, cada una
+  con su etiqueta (ACOGEDORA, POPULAR, EXCLUSIVA, ÚNICO) para que el visitante
+  se ubique de una sola pasada.
+- **Prueba social al final.** Los testimonios cierran el recorrido, justo antes
+  del llamado a reservar.
+
+La identidad visual acompaña esa idea: la mariposa amarilla (la de Mauricio
+Babilonia) como logo, el dorado del atardecer, el azul del Caribe y el crema de
+la arena, con una serif de alto contraste para los títulos que le da el aire
+literario.
 
 ## Cómo ejecutar
 
 ```bash
-./mvnw spring-boot:run
+mvn spring-boot:run
 ```
 
 Y abrir http://localhost:8080
 
-## Tecnologías (las mismas de los repos del curso)
-
-| Repo del curso | Qué se usa aquí |
-|---|---|
-| 1.HTML-CSS | HTML semántico y CSS propio (`static/css/styles.css`) |
-| 2.JS-FORMS | JavaScript de manipulación del DOM (`static/js/script.js`) y formularios |
-| 3.2.Bootstrap | Bootstrap 5.3.5 por CDN, Bootstrap Icons, Google Fonts, navbar, carousel, cards |
-| 4.SpringBootThymeleaf | Spring Boot 3.5.4, Thymeleaf, fragmentos, capas controller / service / repository / entities, Lombok |
-
-### Dependencias del `pom.xml` (las 4 del profe)
+## Dependencias del `pom.xml`
 
 - `spring-boot-starter-web`
 - `spring-boot-devtools`
@@ -28,7 +44,8 @@ Y abrir http://localhost:8080
 
 (más `spring-boot-starter-test` para las pruebas)
 
-No hay base de datos: los repositorios usan `Map` en memoria, igual que `StudentRepository`.
+No hay base de datos: los repositorios guardan los datos en un `Map` en
+memoria, así el proyecto se levanta sin instalar ni configurar nada.
 
 ## Rutas
 
@@ -39,27 +56,6 @@ No hay base de datos: los repositorios usan `Map` en memoria, igual que `Student
 | `/habitaciones?personas=4` | Filtro por capacidad |
 | `/habitaciones/{id}` | Detalle de una habitación |
 
-### Pendiente por implementar
-
-La lógica de **iniciar sesión, registrarse y reservar** está borrada a propósito.
-Los archivos siguen ahí, vacíos y comentados con lo que debe ir en cada uno:
-
-```
-controller/AuthController.java        login y registro
-controller/ReservaController.java     CRUD de reservas
-service/UsuarioService(+Impl).java
-service/ReservaService(+Impl).java
-repository/UsuarioRepository.java
-repository/ReservaRepository.java
-entities/Usuario.java
-entities/Reserva.java
-templates/login.html, registro.html, bienvenida.html
-templates/reservar.html, reservas.html, detalle_reserva.html
-```
-
-Mientras tanto los botones "Iniciar Sesión", "Registrarse" y "Reservar" y el
-formulario de disponibilidad quedan maquetados pero apuntando a `#`.
-
 ## Estructura
 
 ```
@@ -67,16 +63,19 @@ src/main/java/com/hotel/macondo
 ├── MacondoApplication.java
 ├── controller/   HomeController, HabitacionController, ReservaController, AuthController
 ├── service/      HotelService, ReservaService, UsuarioService (+ Impl)
-├── repository/   Habitacion, Servicio, Testimonio, Reserva, Usuario (Map en memoria)
+├── repository/   Habitacion, Servicio, Testimonio, Reserva, Usuario
 └── entities/     Habitacion, Servicio, Testimonio, Reserva, Usuario (Lombok)
 
 src/main/resources
-├── templates/    fragmentos.html + 9 vistas
-└── static/       css/styles.css, js/script.js, images/*.avif
+├── templates/    fragmentos.html + las vistas
+└── static/       css/styles.css, js/script.js, images/
 ```
+
+Los archivos de reservas y de usuarios están vacíos y comentados por dentro con
+lo que debe ir en cada uno.
 
 ## Pruebas
 
 ```bash
-./mvnw test
+mvn test
 ```

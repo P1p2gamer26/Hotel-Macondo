@@ -81,12 +81,15 @@
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="menuMacondo">
+          <!-- Los cuatro enlaces del menu apuntan a una seccion de la landing
+               (no a otra pagina) para que todos bajen con el mismo
+               desplazamiento suave y no con una recarga. -->
           <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
             <li class="nav-item">
-              <a class="nav-link" th:href="@{/}">Inicio</a>
+              <a class="nav-link" href="/#inicio">Inicio</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" th:href="@{/habitaciones}">Habitaciones</a>
+              <a class="nav-link" href="/#habitaciones">Habitaciones</a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="/#servicios">Servicios</a>

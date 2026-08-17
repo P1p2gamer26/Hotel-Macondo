@@ -15,6 +15,27 @@
   --texto: #4a4a4a;
 }
 
+/* Desplazamiento suave para los enlaces del menu que apuntan a una seccion
+   (#inicio, #habitaciones, #servicios, #contacto). Es una propiedad nativa
+   del CSS, no hace falta JavaScript.
+   scroll-margin-top frena el scroll unos pixeles antes para que el navbar
+   fijo no le quede encima al titulo de la seccion. */
+html {
+  scroll-behavior: smooth;
+}
+
+section[id],
+header[id] {
+  scroll-margin-top: 90px;
+}
+
+/* Si el usuario pidio en su sistema operativo menos animaciones, se respeta */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
 /* Questrial para el texto corrido y Playfair Display para los titulos:
    asi el sitio se ve igual al diseno de las capturas */
 body {
