@@ -1,0 +1,206 @@
+﻿<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Fragmentos</title>
+  </head>
+  <body>
+    <!-- Todo este archivo son fragmentos reutilizables: se centralizan aqui
+         para no repetir el navbar, el footer ni los enlaces de Bootstrap en
+         cada vista. Se llaman con th:replace="~{fragmentos :: nombre}". -->
+
+    <!-- ===== CABECERA: los <link> comunes de todas las páginas =====
+         Se llama "cabecera" y no "head" porque Thymeleaf confundia el nombre
+         del fragmento con la etiqueta <head> de este mismo archivo. -->
+    <th:block th:fragment="cabecera(titulo)">
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <title th:text="${titulo}">Hotel Macondo</title>
+      <!-- El mismo logo sirve de favicon (icono de la pestana). Se declara
+           como PNG en vez de .ico porque ya lo tenemos con transparencia y
+           todos los navegadores actuales lo aceptan. -->
+      <link rel="icon" type="image/png" th:href="@{/images/logo.png}" />
+      <!--Bootstrap-->
+      <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+        integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7"
+        crossorigin="anonymous"
+      />
+      <!--icons-->
+      <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
+      />
+      <!--Google fonts-->
+      <!-- Las dos tipografias del diseno original:
+           Playfair Display (serif de alto contraste) para todos los titulos y
+           Questrial (geometrica, 'a' de un solo piso) para el texto corrido.
+           Questrial solo trae un peso, el navegador simula la negrita. -->
+      <link rel="preconnect" href="https://fonts.googleapis.com" />
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+      <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Questrial&display=swap"
+        rel="stylesheet"
+      />
+      <!--styles-->
+      <link rel="stylesheet" type="text/css" th:href="@{/css/styles.css}" />
+    </th:block>
+
+    <!-- ===== LOGO: mariposa de Macondo =====
+         El logo oficial (PNG con fondo transparente) vive en
+         /static/images/logo.png y se envuelve en un fragmento para
+         reutilizarlo en el navbar, el hero, el footer y el cierre sin repetir
+         la ruta. El tamano lo decide el CSS de cada seccion. -->
+    <img
+      th:fragment="logo"
+      class="logo-mariposa"
+      th:src="@{/images/logo.png}"
+      alt="Logo Hotel Macondo"
+    />
+
+    <!-- ===== NAVBAR ===== -->
+    <nav
+      th:fragment="navbar"
+      class="navbar navbar-expand-lg navbar-macondo sticky-top py-3"
+    >
+      <div class="container">
+        <a class="navbar-brand d-flex align-items-center gap-2" th:href="@{/}">
+          <th:block th:replace="~{fragmentos :: logo}"></th:block>
+          Hotel Macondo
+        </a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#menuMacondo"
+          aria-controls="menuMacondo"
+          aria-expanded="false"
+          aria-label="Abrir menú"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="menuMacondo">
+          <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a class="nav-link" th:href="@{/}">Inicio</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" th:href="@{/habitaciones}">Habitaciones</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/#servicios">Servicios</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/#contacto">Contacto</a>
+            </li>
+          </ul>
+          <!-- Los tres botones quedan sin destino: la logica de iniciar
+               sesion, registrarse y reservar todavia no esta implementada.
+               Cuando exista, aqui vuelven @{/login}, @{/registro} y
+               @{/reservas/add}. -->
+          <div class="d-flex gap-2">
+            <a class="btn btn-borde-azul" href="#">Iniciar Sesión</a>
+            <a class="btn btn-borde-gris" href="#">Registrarse</a>
+            <a class="btn btn-dorado" href="#">Reservar</a>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- ===== FOOTER ===== -->
+    <footer th:fragment="footer" class="footer-macondo pt-5 pb-4" id="contacto">
+      <div class="container">
+        <div class="row g-4">
+          <!-- Marca -->
+          <div class="col-md-3">
+            <div class="d-flex align-items-center gap-2 mb-3">
+              <th:block th:replace="~{fragmentos :: logo}"></th:block>
+              <span class="titulo fs-4 text-azul">Hotel Macondo</span>
+            </div>
+            <p>
+              Un refugio de magia y lujo en la costa caribeña de Colombia, donde
+              cada noche es un cuento que vale la pena vivir.
+            </p>
+            <div class="redes">
+              <a href="#" aria-label="Instagram"><i class="bi bi-instagram"></i></a>
+              <a href="#" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
+              <a href="#" aria-label="TikTok"><i class="bi bi-music-note"></i></a>
+            </div>
+          </div>
+
+          <!-- Enlaces -->
+          <div class="col-md-3">
+            <h5 class="mb-3">Enlaces Rápidos</h5>
+            <ul class="list-unstyled">
+              <li><a th:href="@{/}">Inicio</a></li>
+              <li><a th:href="@{/habitaciones}">Habitaciones</a></li>
+              <li><a href="/#servicios">Servicios</a></li>
+              <li><a href="#contacto">Contacto</a></li>
+              <!-- Pendiente: enlazar a @{/reservas/add} cuando exista la reserva -->
+              <li><a href="#">Reservar Ahora</a></li>
+              <li><a href="#contacto">Política de Privacidad</a></li>
+            </ul>
+          </div>
+
+          <!-- Habitaciones -->
+          <div class="col-md-3">
+            <h5 class="mb-3">Habitaciones</h5>
+            <ul class="list-unstyled">
+              <li><a th:href="@{/habitaciones/1}">Normal</a></li>
+              <li><a th:href="@{/habitaciones/2}">Executive</a></li>
+              <li><a th:href="@{/habitaciones/3}">VIP</a></li>
+              <li><a th:href="@{/habitaciones/4}">Luxury</a></li>
+              <li><a th:href="@{/habitaciones}">Suites Especiales</a></li>
+            </ul>
+          </div>
+
+          <!-- Contacto -->
+          <div class="col-md-3">
+            <h5 class="mb-3">Contáctanos</h5>
+            <p class="mb-2">
+              <i class="bi bi-geo-alt-fill text-dorado me-2"></i>
+              Av. El Malecón #12-34, Cartagena de Indias, Colombia
+            </p>
+            <p class="mb-2">
+              <i class="bi bi-telephone-fill text-dorado me-2"></i>
+              +57 305 341 9585
+            </p>
+            <p class="mb-2">
+              <i class="bi bi-envelope-fill text-dorado me-2"></i>
+              contacto@hmacondo.com
+            </p>
+            <p class="mb-0">
+              <i class="bi bi-clock-fill text-dorado me-2"></i>
+              Recepción 24 horas
+            </p>
+          </div>
+        </div>
+
+        <hr class="my-4" />
+
+        <div class="row align-items-center">
+          <div class="col-md-6">
+            <small>&copy; 2026 Hotel Macondo. Todos los derechos reservados.</small>
+          </div>
+          <div class="col-md-6 text-md-end">
+            <small class="frase-garcia">
+              "La vida no es la que uno vivió, sino la que uno recuerda" —
+              Gabriel García Márquez
+            </small>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <!-- ===== SCRIPTS ===== -->
+    <th:block th:fragment="scripts">
+      <script
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq"
+        crossorigin="anonymous"
+      ></script>
+      <script th:src="@{/js/script.js}"></script>
+    </th:block>
+  </body>
+</html>

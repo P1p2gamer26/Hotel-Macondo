@@ -1,0 +1,238 @@
+﻿<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+  <head th:replace="~{fragmentos :: cabecera('Hotel Macondo | Donde el realismo mágico encuentra el mar')}"></head>
+  <body>
+    <!--NAVBAR-->
+    <nav th:replace="~{fragmentos :: navbar}"></nav>
+
+    <!--HERO
+        Ocupa toda la altura de la pantalla (min-height: 100vh en el CSS) para
+        que la foto de la playa sea lo primero y lo unico que se ve al entrar.-->
+    <header class="hero d-flex flex-column justify-content-center align-items-center text-center">
+      <div th:replace="~{fragmentos :: logo}"></div>
+      <h1 class="mt-4 mb-3">Hotel Macondo</h1>
+      <p class="lema mb-4">Donde el realismo mágico encuentra el mar</p>
+      <!-- Sin destino: la reserva todavia no esta implementada -->
+      <a class="btn btn-dorado btn-lg" href="#">Reservar Ahora</a>
+    </header>
+
+    <!--CONSULTAR DISPONIBILIDAD
+        El formulario queda maquetado pero sin action: AQUI VA TODO LO DE
+        RESERVAR. Cuando exista, este form debe enviar por GET a
+        @{/reservas/add} las fechas, el tipo de habitacion y las personas.-->
+    <section class="container">
+      <div class="caja-disponibilidad p-4 p-lg-5">
+        <p class="seccion-etiqueta text-center mb-4">Consultar disponibilidad</p>
+        <form class="row g-3 align-items-end" action="#" method="get">
+          <div class="col-lg-3 col-md-6">
+            <label class="form-label" for="fechaEntrada">Fecha de entrada</label>
+            <input class="form-control" type="date" id="fechaEntrada" name="fechaEntrada" required />
+          </div>
+          <div class="col-lg-3 col-md-6">
+            <label class="form-label" for="fechaSalida">Fecha de salida</label>
+            <input class="form-control" type="date" id="fechaSalida" name="fechaSalida" required />
+          </div>
+          <div class="col-lg-2 col-md-6">
+            <label class="form-label" for="tipoHabitacion">Tipo de habitación</label>
+            <select class="form-select" id="tipoHabitacion" name="tipoHabitacion">
+              <option value="">Seleccionar...</option>
+              <option
+                th:each="habitacion : ${habitaciones}"
+                th:value="${habitacion.nombre}"
+                th:text="${habitacion.nombre}"
+              ></option>
+            </select>
+          </div>
+          <div class="col-lg-2 col-md-6">
+            <label class="form-label" for="personas">Personas</label>
+            <select class="form-select" id="personas" name="personas">
+              <option value="1">1 persona</option>
+              <option value="2">2 personas</option>
+              <option value="3">3 personas</option>
+              <option value="4">4 personas</option>
+              <option value="6">6 personas</option>
+            </select>
+          </div>
+          <div class="col-lg-2">
+            <button class="btn btn-azul w-100" type="submit">
+              Consultar Disponibilidad
+            </button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!--HABITACIONES-->
+    <section class="bg-crema py-5 mt-5" id="habitaciones">
+      <div class="container py-4">
+        <div class="text-center mb-5">
+          <p class="seccion-etiqueta">Hospedaje</p>
+          <h2 class="display-4">Nuestras Habitaciones</h2>
+          <p class="seccion-texto">
+            Cada espacio es un portal a otro mundo, diseñado para que el tiempo
+            se detenga y la magia comience.
+          </p>
+        </div>
+
+        <div class="row g-4">
+          <!--TARJETA DE HABITACIÓN-->
+          <div class="col-lg-3 col-md-6" th:each="habitacion : ${habitaciones}">
+            <div class="card card-habitacion h-100 position-relative">
+              <img
+                th:src="@{${habitacion.imagen}}"
+                class="card-img-top"
+                th:alt="${habitacion.nombre}"
+              />
+              <span class="etiqueta-habitacion" th:text="${habitacion.etiqueta}"></span>
+              <div class="card-body d-flex flex-column">
+                <h3 class="h4" th:text="${habitacion.nombre}"></h3>
+                <p class="flex-grow-1" th:text="${habitacion.descripcion}"></p>
+                <div class="d-flex justify-content-between align-items-end">
+                  <div>
+                    <small class="text-uppercase text-muted">Desde</small><br />
+                    <!-- formatInteger con 'POINT' pone los puntos de miles:
+                         350000 se muestra como 350.000 -->
+                    <span class="precio" th:text="'$' + ${#numbers.formatInteger(habitacion.precio, 1, 'POINT')}"></span>
+                    <small>/noche</small>
+                  </div>
+                  <a
+                    class="btn btn-borde-azul"
+                    th:href="@{/habitaciones/{id}(id=${habitacion.id})}"
+                    >Ver más</a
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+          <!--FIN TARJETA DE HABITACIÓN-->
+        </div>
+      </div>
+    </section>
+
+    <!--SERVICIOS-->
+    <section class="py-5" id="servicios">
+      <div class="container py-4">
+        <div class="text-center mb-5">
+          <p class="seccion-etiqueta">Experiencias</p>
+          <h2 class="display-4">Nuestros Servicios</h2>
+          <p class="seccion-texto">
+            En Macondo, cada detalle ha sido pensado para que tu estancia supere
+            cualquier sueño.
+          </p>
+        </div>
+
+        <!--CAROUSEL
+            Los servicios salen del modelo, asi que el numero de slides puede
+            cambiar. Por eso el primer slide se marca activo con
+            th:classappend y los indicadores se generan con JS contando los
+            slides que existan, en vez de escribirlos a mano.-->
+        <div id="carruselServicios" class="carousel slide" data-bs-ride="carousel">
+          <!--BOTONES INFERIORES-->
+          <div class="carousel-indicators" id="indicadoresServicios">
+            <!--CONTENIDO GENERADO CON JS-->
+          </div>
+
+          <div class="carousel-inner px-5">
+            <div
+              class="carousel-item"
+              th:each="servicio, estado : ${servicios}"
+              th:classappend="${estado.first} ? 'active'"
+            >
+              <div class="row justify-content-center">
+                <div class="col-lg-8">
+                  <div class="card-servicio">
+                    <img th:src="@{${servicio.imagen}}" th:alt="${servicio.nombre}" />
+                    <span
+                      class="etiqueta-habitacion"
+                      style="left: auto; right: 14px"
+                      th:if="${servicio.destacado}"
+                      >DESTACADO</span
+                    >
+                    <div class="texto-servicio">
+                      <h3 th:text="${servicio.nombre}"></h3>
+                      <p class="mb-0" th:text="${servicio.descripcion}"></p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <button
+            class="carousel-control-prev"
+            type="button"
+            data-bs-target="#carruselServicios"
+            data-bs-slide="prev"
+          >
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Anterior</span>
+          </button>
+          <button
+            class="carousel-control-next"
+            type="button"
+            data-bs-target="#carruselServicios"
+            data-bs-slide="next"
+          >
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Siguiente</span>
+          </button>
+        </div>
+        <!--FIN CAROUSEL-->
+      </div>
+    </section>
+
+    <!--TESTIMONIOS-->
+    <section class="bg-crema py-5">
+      <div class="container py-4">
+        <div class="text-center mb-5">
+          <p class="seccion-etiqueta">Nuestros huéspedes</p>
+          <h2 class="display-4">Historias que perduran</h2>
+        </div>
+
+        <div class="row g-4 justify-content-center">
+          <div class="col-lg-4 col-md-6" th:each="testimonio : ${testimonios}">
+            <div class="card card-testimonio h-100 p-4">
+              <span class="comilla">&rdquo;</span>
+              <p th:text="${testimonio.texto}"></p>
+              <div class="d-flex align-items-center gap-3 mt-3">
+                <img th:src="@{${testimonio.imagen}}" th:alt="${testimonio.nombre}" />
+                <div>
+                  <strong th:text="${testimonio.nombre}"></strong><br />
+                  <small th:text="${testimonio.ciudad}"></small><br />
+                  <span class="text-dorado">
+                    <i
+                      class="bi bi-star-fill"
+                      th:each="estrella : ${#numbers.sequence(1, testimonio.estrellas)}"
+                    ></i>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!--LLAMADO FINAL-->
+    <section class="cta-final text-center py-5">
+      <div class="container py-5">
+        <div th:replace="~{fragmentos :: logo}"></div>
+        <h2 class="mt-4 mb-3">¿Listo para tu escapada?</h2>
+        <p class="seccion-texto mb-4">
+          El mar te espera. Déjate envolver por la magia del Caribe colombiano en
+          un hotel que nació de los sueños de García Márquez.
+        </p>
+        <div class="d-flex justify-content-center gap-3 flex-wrap">
+          <a class="btn btn-azul btn-lg" th:href="@{/habitaciones}">Ver Habitaciones</a>
+          <!-- Sin destino: la reserva todavia no esta implementada -->
+          <a class="btn btn-dorado btn-lg" href="#">Reservar Ahora</a>
+        </div>
+      </div>
+    </section>
+
+    <!--FOOTER-->
+    <footer th:replace="~{fragmentos :: footer}"></footer>
+
+    <th:block th:replace="~{fragmentos :: scripts}"></th:block>
+  </body>
+</html>
