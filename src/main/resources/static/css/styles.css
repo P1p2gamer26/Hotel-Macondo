@@ -175,10 +175,8 @@ h5,
    mismo background-image) porque el texto blanco no se leia sobre la foto. */
 .hero {
   min-height: 100vh;
-  background-image: linear-gradient(
-      rgba(10, 25, 45, 0.55),
-      rgba(10, 25, 45, 0.85)
-    ),
+  background-image:
+    linear-gradient(rgba(10, 25, 45, 0.55), rgba(10, 25, 45, 0.85)),
     url("/images/Playa.avif");
   background-size: cover;
   background-position: center;
@@ -236,7 +234,9 @@ h5,
   overflow: hidden;
   background-color: #ffffff;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
 }
 
 .card-habitacion:hover {
@@ -417,3 +417,128 @@ h5,
   background-color: var(--crema);
   padding: 3.5rem 0;
 }
+
+/* ===== Pantalla de Login ===== */
+.login-main {
+  min-height: calc(100vh - 76px);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background-color: var(--crema);
+}
+
+/* Responsivo para pantallas medianas/pequeñas */
+@media (max-width: 991px) {
+  .login-main {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Panel Visual Izquierdo */
+.login-visual {
+  min-height: 100vh;
+  background-image:
+    linear-gradient(rgba(8, 26, 42, 0.65), rgba(8, 26, 42, 0.85)),
+    url("/images/Playa.avif");
+  background-size: cover;
+  background-position: center;
+  color: #ffffff;
+}
+
+.login-volver {
+  color: #ffffff;
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: opacity 0.2s ease;
+}
+
+.login-volver:hover {
+  color: var(--dorado);
+}
+
+.login-volver-icono {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(4px);
+}
+
+.login-visual-contenido {
+  max-width: 480px;
+}
+
+.login-cita {
+  font-family: "Playfair Display", serif;
+  font-size: 1.25rem;
+  color: var(--dorado);
+  line-height: 1.6;
+}
+
+.login-descripcion {
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+/* Card del Formulario Derecho */
+.login-contenido {
+  background-color: var(--crema-claro);
+}
+
+.card-login {
+  max-width: 440px;
+  border: none;
+  border-radius: 20px;
+  background-color: #ffffff;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+}
+
+.login-label {
+  color: var(--azul);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  margin-bottom: 0.4rem;
+}
+
+.card-login .input-group-text,
+.card-login .form-control {
+  background-color: #fafafa;
+  border-color: #e5e5e5;
+  padding-top: 0.65rem;
+  padding-bottom: 0.65rem;
+}
+
+.card-login .form-control:focus {
+  background-color: #ffffff;
+  box-shadow: none;
+  border-color: var(--azul);
+}
+
+.card-login .input-group:focus-within .input-group-text {
+  border-color: var(--azul);
+}
+
+/* Divisor horizontal con la 'o' */
+.login-separador {
+  position: relative;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.login-separador span {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #ffffff;
+  padding: 0 10px;
+  color: #a0a0a0;
+  font-size: 0.85rem;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+/* ===== Fin pantalla de login =====*/
