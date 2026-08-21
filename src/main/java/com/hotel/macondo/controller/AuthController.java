@@ -1,14 +1,12 @@
 package com.hotel.macondo.controller;
 
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-
 /*
  * ============================================================
  * AQUI VA TODO LO DE INICIAR SESION Y REGISTRARSE
  * ============================================================
  *
- * Este controlador se encarga de la autenticacion.
+ * Este controlador se encarga de la autenticacion. Por ahora esta vacio a
+ * proposito: la landing page funciona sin el.
  *
  * Cuando se implemente, aqui van:
  *
@@ -21,11 +19,6 @@ import org.springframework.web.bind.annotation.GetMapping;
  * Debe usar UsuarioService (nunca el repositorio directo, para no saltarse
  * capas) y devolver las vistas login.html, registro.html y bienvenida.html.
  */
-@Controller
 public class AuthController {
 
-    @GetMapping("/login")
-    public String mostrarLogin() {
-        return "login";
-    }
 }
