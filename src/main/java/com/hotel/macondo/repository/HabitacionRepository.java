@@ -18,6 +18,7 @@ public class HabitacionRepository {
     // a la mas costosa, igual que en el diseño.
     private Map<Integer, Habitacion> data = new LinkedHashMap<>();
 
+    /** Carga las habitaciones de prueba del catalogo. */
     public HabitacionRepository() {
         data.put(1, new Habitacion(1, "Normal", "ACOGEDORA",
                 "Refugio íntimo con vista al jardín tropical. Cama queen, aire acondicionado y todo el confort que necesitas.",
@@ -33,14 +34,17 @@ public class HabitacionRepository {
                 1800000, 6, "/images/HabitacionLuxury.avif"));
     }
 
+    /** Retorna todas las habitaciones del catalogo. */
     public Collection<Habitacion> findAll() {
         return data.values();
     }
 
+    /** Busca una habitacion por identificador. */
     public Habitacion findById(Integer id) {
         return data.get(id);
     }
 
+    /** Busca una habitacion por nombre. */
     public Habitacion findByNombre(String nombre) {
         for (Habitacion habitacion : data.values()) {
             if (habitacion.getNombre().equalsIgnoreCase(nombre)) {
@@ -50,6 +54,7 @@ public class HabitacionRepository {
         return null;
     }
 
+    /** Filtra habitaciones por capacidad minima. */
     public Collection<Habitacion> findByPersonas(int personas) {
         Collection<Habitacion> result = new ArrayList<>();
         for (Habitacion habitacion : data.values()) {

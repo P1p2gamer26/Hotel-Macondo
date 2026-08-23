@@ -18,7 +18,7 @@ package com.hotel.macondo.controller;
  *   GET  /reservas/update/{id} -> editar una reserva existente
  *   GET  /reservas/delete/{id} -> eliminar una reserva
  *
- * Debe usar ReservaService y HotelService (para la lista de habitaciones del
+ * Debe usar ReservaService y HabitacionService (para la lista de habitaciones del
  * combo) y devolver las vistas reservar.html, reservas.html y
  * detalle_reserva.html.
  */

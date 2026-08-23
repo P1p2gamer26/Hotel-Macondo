@@ -13,6 +13,7 @@ public class ServicioRepository {
 
     private Map<Integer, Servicio> data = new LinkedHashMap<>();
 
+    /** Carga los servicios de prueba del catalogo. */
     public ServicioRepository() {
         data.put(1, new Servicio(1, "Spa & Bienestar",
                 "Rituales caribeños, masajes frente al mar y un silencio que cura. El cuerpo descansa y el tiempo se detiene.",
@@ -34,10 +35,12 @@ public class ServicioRepository {
                 "/images/Eventos.avif", false));
     }
 
+    /** Retorna todos los servicios del catalogo. */
     public Collection<Servicio> findAll() {
         return data.values();
     }
 
+    /** Busca un servicio por identificador. */
     public Servicio findById(Integer id) {
         return data.get(id);
     }
