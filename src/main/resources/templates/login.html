@@ -1,10 +1,188 @@
-<!--
-  ============================================================
-  AQUI VA TODO LO DE INICIAR SESION
-  ============================================================
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <th:block
+      th:replace="~{fragmentos :: cabecera('Iniciar sesión | Hotel Macondo')}"
+    ></th:block>
+  </head>
 
-  Vista del formulario de inicio de sesion. Debe reusar los fragmentos
-  comunes (cabecera, navbar, footer, scripts) igual que las demas vistas, y
-  llevar un formulario con th:action="@{/login}" method="post" con los campos
-  correo y clave, mas el bloque th:if="${error}" para el mensaje de error.
--->
+  <!-- Se aplica color de fondo y texto base inyectando paleta oficial -->
+  <body class="bg-[var(--crema)] text-[var(--texto)] font-sans">
+    <!-- NAVBAR -->
+    <nav th:replace="~{fragmentos :: navbar}"></nav>
+
+    <!-- CONTENIDO PRINCIPAL LOGIN -->
+    <!-- Se implementa CSS Grid de 1 columna en movil y 2 en PC, ocupando el alto restante de la pantalla -->
+    <main class="grid grid-cols-1 lg:grid-cols-2 min-h-[calc(100vh-76px)]">
+      <!-- SECCION IZQUIERDA (VISUAL Y TEXTOS) -->
+      <!-- Fondo con gradiente y centrado mediante flexbox -->
+      <section
+        class="flex flex-col justify-between p-8 md:p-12 bg-cover bg-center text-white"
+        style="
+          background-image:
+            linear-gradient(rgba(8, 26, 42, 0.65), rgba(8, 26, 42, 0.85)),
+            url(&quot;/images/Playa.avif&quot;);
+        "
+      >
+        <div>
+          <a
+            th:href="@{/}"
+            class="inline-flex items-center gap-2 mb-10 text-white hover:text-[var(--dorado)] transition font-medium text-sm"
+          >
+            <!-- Icono de volver estilizado con fondo translucido -->
+            <span
+              class="w-8 h-8 rounded-full bg-white/15 backdrop-blur-sm flex items-center justify-center"
+              >←</span
+            >
+            <span>Volver al inicio</span>
+          </a>
+        </div>
+
+        <div class="max-w-md my-auto">
+          <h1 class="!text-6xl md:text-5xl font-bold mb-4 !text-white">
+            Descubre el arte de recordar
+          </h1>
+          <p
+            class="font-serif italic text-xl text-[var(--dorado)] leading-relaxed mb-6"
+          >
+            "La vida no es la que uno vivió, sino la que recuerda y cómo la
+            recuerda para contarla."
+          </p>
+          <p class="text-white/70 text-[0.95rem] leading-relaxed">
+            Inicia sesión para acceder a tu santuario personal, gestionar tus
+            reservas y sumergirte en el Caribe más mágico de Cartagena de
+            Indias.
+          </p>
+        </div>
+
+        <div
+          class="flex justify-between items-center text-xs text-white/50 pt-8"
+        >
+          <span>&copy; 2026 Hotel Macondo</span>
+          <span class="font-serif italic text-[var(--dorado)]"
+            >Cartagena, Colombia</span
+          >
+        </div>
+      </section>
+
+      <!-- SECCION DERECHA (FORMULARIO) -->
+      <!-- Contenedor alineado al centro -->
+      <section
+        class="bg-[var(--crema-claro)] flex items-center justify-center p-6 md:p-12"
+      >
+        <!-- Tarjeta principal del login con sombras y bordes redondeados -->
+        <div
+          class="w-full max-w-[440px] bg-white rounded-[20px] shadow-[0_10px_30px_rgba(0,0,0,0.05)] p-8 md:p-10"
+        >
+          <div class="text-center mb-8 flex flex-col items-center">
+            <th:block th:replace="~{fragmentos :: logo}"></th:block>
+            <h2
+              class="text-2xl font-serif font-bold text-[var(--azul-oscuro)] mt-4 mb-1"
+            >
+              Hotel Macondo
+            </h2>
+            <p
+              class="text-[var(--azul)] text-[0.72rem] font-bold tracking-[1.5px] uppercase block"
+            >
+              Santuario del Caribe
+            </p>
+          </div>
+
+          <form th:action="@{/login}" method="post">
+            <div class="mb-5">
+              <label
+                for="username"
+                class="text-[var(--azul)] text-[0.72rem] font-bold tracking-[1.2px] uppercase mb-2 block"
+                >Correo electrónico</label
+              >
+              <!-- Agrupacion de icono e input mediante flexbox -->
+              <div
+                class="flex items-center bg-gray-50 border border-gray-200 rounded-lg focus-within:border-[var(--azul)] transition px-3"
+              >
+                <span class="text-gray-400 pl-2">
+                  <i class="bi bi-envelope"></i>
+                </span>
+                <input
+                  type="email"
+                  class="w-full bg-transparent px-3 py-3 text-[var(--texto)] focus:outline-none"
+                  id="username"
+                  name="username"
+                  placeholder="ejemplo@macondo.co"
+                  required
+                />
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label
+                for="password"
+                class="text-[var(--azul)] text-[0.72rem] font-bold tracking-[1.2px] uppercase mb-2 block"
+                >Contraseña</label
+              >
+              <!-- Agrupacion de icono e input interactivo mediante flexbox -->
+              <div
+                class="flex items-center bg-gray-50 border border-gray-200 rounded-lg focus-within:border-[var(--azul)] transition px-3"
+              >
+                <span class="text-gray-400 pl-2">
+                  <i class="bi bi-lock"></i>
+                </span>
+                <input
+                  type="password"
+                  class="w-full bg-transparent px-3 py-3 text-[var(--texto)] focus:outline-none"
+                  id="password"
+                  name="password"
+                  placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"
+                  required
+                />
+                <span
+                  class="text-gray-400 pr-2 cursor-pointer hover:text-[var(--azul)] transition"
+                >
+                  <i class="bi bi-eye"></i>
+                </span>
+              </div>
+            </div>
+
+            <div class="text-right mb-6">
+              <a
+                href="#"
+                class="text-sm text-[var(--azul)] font-medium hover:underline"
+                >¿Olvidaste tu contraseña?</a
+              >
+            </div>
+
+            <!-- Boton de accion principal inyectando variables de color dorado -->
+            <button
+              type="submit"
+              class="w-full bg-[var(--dorado)] text-[var(--azul-oscuro)] font-bold rounded-lg py-3 border-2 border-[var(--dorado)] hover:bg-[var(--dorado-oscuro)] hover:border-[var(--dorado-oscuro)] transition"
+            >
+              Iniciar Sesión
+            </button>
+          </form>
+
+          <!-- Separador visual horizontal implementado con bordes relativos -->
+          <div class="relative my-8 text-center">
+            <hr class="border-gray-200" />
+            <span
+              class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white px-3 text-gray-400 text-sm"
+              >o</span
+            >
+          </div>
+
+          <div class="text-center text-sm">
+            <span class="text-gray-500">¿Aún no eres miembro?</span>
+            <a
+              th:href="@{/registro}"
+              class="font-bold text-[var(--azul)] hover:underline ml-1"
+              >Registrarse</a
+            >
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- FOOTER -->
+    <footer th:replace="~{fragmentos :: footer}"></footer>
+
+    <th:block th:replace="~{fragmentos :: scripts}"></th:block>
+  </body>
+</html>
