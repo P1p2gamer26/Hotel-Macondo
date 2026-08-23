@@ -1,43 +1,110 @@
 ﻿<!doctype html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-  <head th:replace="~{fragmentos :: cabecera('Hotel Macondo | Donde el realismo mágico encuentra el mar')}"></head>
-  <body>
+  <head
+    th:replace="~{fragmentos :: cabecera('Hotel Macondo | Donde el realismo mágico encuentra el mar')}"
+  ></head>
+
+  <!-- Se agrega bg-white y la variable de texto para asegurar que toda la base siga la paleta del hotel -->
+  <body class="bg-white text-[var(--texto)] font-sans">
     <!--NAVBAR-->
     <nav th:replace="~{fragmentos :: navbar}"></nav>
 
-    <!--HERO
-        Ocupa toda la altura de la pantalla (min-height: 100vh en el CSS) para
-        que la foto de la playa sea lo primero y lo unico que se ve al entrar.-->
+    <!--HERO-->
+    <!-- Se reemplazan las clases de Bootstrap por utilidades nativas de Tailwind. El background-image se pone en linea para respetar el degradado oscuro sobre la foto de la playa -->
     <header
       id="inicio"
-      class="hero d-flex flex-column justify-content-center align-items-center text-center"
+      class="min-h-screen flex flex-col justify-center items-center text-center relative bg-cover bg-center"
+      style="
+        background-image:
+          linear-gradient(rgba(10, 25, 45, 0.55), rgba(10, 25, 45, 0.85)),
+          url(&quot;/images/Playa.avif&quot;);
+      "
     >
-      <div th:replace="~{fragmentos :: logo}"></div>
-      <h1 class="mt-4 mb-3">Hotel Macondo</h1>
-      <p class="lema mb-4">Donde el realismo mágico encuentra el mar</p>
-      <!-- Sin destino: la reserva todavia no esta implementada -->
-      <a class="btn btn-dorado btn-lg" href="#">Reservar Ahora</a>
+      <!-- Se ajusta el tamano del logo y del titulo principal H1, forzando el color blanco y tamanos mas grandes para respetar el diseno original -->
+      <div
+        class="[&>img]:w-20 [&>img]:h-20 md:[&>img]:w-24 md:[&>img]:h-24 mb-4 mx-auto"
+      >
+        <th:block th:replace="~{fragmentos :: logo}"></th:block>
+      </div>
+
+      <h1
+        class="mb-3 text-6xl md:text-[6.5rem] font-serif font-bold text-white tracking-wide"
+      >
+        Hotel Macondo
+      </h1>
+      <p
+        class="font-serif italic text-2xl md:text-3xl text-[var(--dorado)] mb-10"
+      >
+        Donde el realismo mágico encuentra el mar
+      </p>
+
+      <!-- Uso directo de la paleta de colores inyectada en utilidades de Tailwind -->
+      <a
+        class="bg-[var(--dorado)] text-[var(--azul-oscuro)] font-bold px-8 py-3 rounded-lg border-2 border-[var(--dorado)] shadow-lg hover:bg-[var(--dorado-oscuro)] hover:border-[var(--dorado-oscuro)] transition text-lg"
+        href="#"
+      >
+        Reservar Ahora
+      </a>
     </header>
 
-    <!--CONSULTAR DISPONIBILIDAD
-        El formulario queda maquetado pero sin action: AQUI VA TODO LO DE
-        RESERVAR. Cuando exista, este form debe enviar por GET a
-        @{/reservas/add} las fechas, el tipo de habitacion y las personas.-->
-    <section class="container">
-      <div class="caja-disponibilidad p-4 p-lg-5">
-        <p class="seccion-etiqueta text-center mb-4">Consultar disponibilidad</p>
-        <form class="row g-3 align-items-end" action="#" method="get">
-          <div class="col-lg-3 col-md-6">
-            <label class="form-label" for="fechaEntrada">Fecha de entrada</label>
-            <input class="form-control" type="date" id="fechaEntrada" name="fechaEntrada" required />
+    <!--CONSULTAR DISPONIBILIDAD-->
+    <!-- El contenedor usa container mx-auto px-4 de Tailwind -->
+    <section class="container mx-auto px-4">
+      <!-- Para lograr el efecto de caja montada sobre el hero se usa -mt-[70px] y relative z-10 -->
+      <div
+        class="bg-white rounded-[18px] shadow-2xl -mt-[70px] relative z-10 p-6 lg:p-10 mx-auto max-w-6xl"
+      >
+        <p
+          class="text-[var(--azul)] text-xs font-bold tracking-[1.5px] uppercase text-center mb-6"
+        >
+          Consultar disponibilidad
+        </p>
+
+        <!-- Se usa grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 en lugar de los row y col de Bootstrap para una distribucion limpia -->
+        <form
+          class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 items-end"
+          action="#"
+          method="get"
+        >
+          <div>
+            <label
+              class="text-[var(--azul)] text-[0.72rem] font-bold tracking-[1.5px] uppercase mb-2 block"
+              for="fechaEntrada"
+              >Fecha de entrada</label
+            >
+            <input
+              class="w-full rounded-lg px-4 py-3 border border-gray-300 focus:outline-none focus:border-[var(--azul)] bg-gray-50 text-[var(--texto)]"
+              type="date"
+              id="fechaEntrada"
+              name="fechaEntrada"
+              required
+            />
           </div>
-          <div class="col-lg-3 col-md-6">
-            <label class="form-label" for="fechaSalida">Fecha de salida</label>
-            <input class="form-control" type="date" id="fechaSalida" name="fechaSalida" required />
+          <div>
+            <label
+              class="text-[var(--azul)] text-[0.72rem] font-bold tracking-[1.5px] uppercase mb-2 block"
+              for="fechaSalida"
+              >Fecha de salida</label
+            >
+            <input
+              class="w-full rounded-lg px-4 py-3 border border-gray-300 focus:outline-none focus:border-[var(--azul)] bg-gray-50 text-[var(--texto)]"
+              type="date"
+              id="fechaSalida"
+              name="fechaSalida"
+              required
+            />
           </div>
-          <div class="col-lg-2 col-md-6">
-            <label class="form-label" for="tipoHabitacion">Tipo de habitación</label>
-            <select class="form-select" id="tipoHabitacion" name="tipoHabitacion">
+          <div>
+            <label
+              class="text-[var(--azul)] text-[0.72rem] font-bold tracking-[1.5px] uppercase mb-2 block"
+              for="tipoHabitacion"
+              >Tipo de habitación</label
+            >
+            <select
+              class="w-full rounded-lg px-4 py-3 border border-gray-300 focus:outline-none focus:border-[var(--azul)] bg-gray-50 text-[var(--texto)]"
+              id="tipoHabitacion"
+              name="tipoHabitacion"
+            >
               <option value="">Seleccionar...</option>
               <option
                 th:each="habitacion : ${habitaciones}"
@@ -46,9 +113,17 @@
               ></option>
             </select>
           </div>
-          <div class="col-lg-2 col-md-6">
-            <label class="form-label" for="personas">Personas</label>
-            <select class="form-select" id="personas" name="personas">
+          <div>
+            <label
+              class="text-[var(--azul)] text-[0.72rem] font-bold tracking-[1.5px] uppercase mb-2 block"
+              for="personas"
+              >Personas</label
+            >
+            <select
+              class="w-full rounded-lg px-4 py-3 border border-gray-300 focus:outline-none focus:border-[var(--azul)] bg-gray-50 text-[var(--texto)]"
+              id="personas"
+              name="personas"
+            >
               <option value="1">1 persona</option>
               <option value="2">2 personas</option>
               <option value="3">3 personas</option>
@@ -56,8 +131,11 @@
               <option value="6">6 personas</option>
             </select>
           </div>
-          <div class="col-lg-2">
-            <button class="btn btn-azul w-100" type="submit">
+          <div>
+            <button
+              class="w-full bg-[var(--azul)] text-white font-bold rounded-lg px-4 py-3 border-2 border-[var(--azul)] hover:bg-[var(--azul-oscuro)] hover:border-[var(--azul-oscuro)] transition"
+              type="submit"
+            >
               Consultar Disponibilidad
             </button>
           </div>
@@ -66,169 +144,233 @@
     </section>
 
     <!--HABITACIONES-->
-    <section class="bg-crema py-5 mt-5" id="habitaciones">
-      <div class="container py-4">
-        <div class="text-center mb-5">
-          <p class="seccion-etiqueta">Hospedaje</p>
-          <h2 class="display-4">Nuestras Habitaciones</h2>
-          <p class="seccion-texto">
+    <!-- Inyectamos el color de fondo bg-[var(--crema)] directamente de la paleta -->
+    <section class="bg-[var(--crema)] py-20 mt-16" id="habitaciones">
+      <div class="container mx-auto px-4">
+        <div class="text-center mb-16">
+          <p
+            class="text-[var(--azul)] text-[0.8rem] font-bold tracking-[3px] uppercase block mb-2"
+          >
+            Hospedaje
+          </p>
+          <h2
+            class="text-4xl md:text-5xl font-serif font-bold text-[var(--azul-oscuro)] mb-4"
+          >
+            Nuestras Habitaciones
+          </h2>
+          <p class="max-w-2xl mx-auto text-[var(--texto)]">
             Cada espacio es un portal a otro mundo, diseñado para que el tiempo
             se detenga y la magia comience.
           </p>
         </div>
 
-        <div class="row g-4">
-          <!--TARJETA DE HABITACIÓN-->
-          <div class="col-lg-3 col-md-6" th:each="habitacion : ${habitaciones}">
-            <div class="card card-habitacion h-100 position-relative">
-              <img
-                th:src="@{${habitacion.imagen}}"
-                class="card-img-top"
-                th:alt="${habitacion.nombre}"
-              />
-              <span class="etiqueta-habitacion" th:text="${habitacion.etiqueta}"></span>
-              <div class="card-body d-flex flex-column">
-                <h3 class="h4" th:text="${habitacion.nombre}"></h3>
-                <p class="flex-grow-1" th:text="${habitacion.descripcion}"></p>
-                <div class="d-flex justify-content-between align-items-end">
-                  <div>
-                    <small class="text-uppercase text-muted">Desde</small><br />
-                    <!-- formatInteger con 'POINT' pone los puntos de miles:
-                         350000 se muestra como 350.000 -->
-                    <span class="precio" th:text="'$' + ${#numbers.formatInteger(habitacion.precio, 1, 'POINT')}"></span>
-                    <small>/noche</small>
-                  </div>
-                  <a
-                    class="btn btn-borde-azul"
-                    th:href="@{/habitaciones/{id}(id=${habitacion.id})}"
-                    >Ver más</a
-                  >
+        <!-- Se reemplaza el row/col de Bootstrap por una cuadricula adaptable de Tailwind -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <!--TARJETA DE HABITACION-->
+          <!-- Uso de la etiqueta semantica article, mejor que un div generico para las tarjetas de informacion -->
+          <article
+            class="bg-white rounded-[16px] overflow-hidden shadow-[0_8px_24px_rgba(0,0,0,0.08)] hover:shadow-[0_16px_34px_rgba(0,0,0,0.16)] hover:-translate-y-2 transition-all duration-300 relative flex flex-col h-full"
+            th:each="habitacion : ${habitaciones}"
+          >
+            <img
+              th:src="@{${habitacion.imagen}}"
+              class="h-[200px] w-full object-cover"
+              th:alt="${habitacion.nombre}"
+            />
+            <!-- Etiqueta sobre la imagen -->
+            <span
+              class="absolute top-[14px] left-[14px] bg-[var(--dorado)] text-[var(--azul-oscuro)] text-[0.7rem] font-bold tracking-[1px] px-[0.8rem] py-[0.3rem] rounded-[20px]"
+              th:text="${habitacion.etiqueta}"
+            ></span>
+
+            <div class="p-5 flex flex-col flex-grow">
+              <h3
+                class="font-serif text-xl font-bold text-[var(--azul-oscuro)] mb-2"
+                th:text="${habitacion.nombre}"
+              ></h3>
+              <p
+                class="text-[var(--texto)] flex-grow mb-6 text-[0.95rem]"
+                th:text="${habitacion.descripcion}"
+              ></p>
+
+              <div class="flex justify-between items-end mt-auto">
+                <div>
+                  <small class="uppercase text-gray-400 text-xs font-bold"
+                    >Desde</small
+                  ><br />
+                  <span
+                    class="font-serif text-[1.4rem] font-bold text-[var(--azul-oscuro)]"
+                    th:text="'$' + ${#numbers.formatInteger(habitacion.precio, 1, 'POINT')}"
+                  ></span>
+                  <small class="text-gray-400 text-xs">/noche</small>
                 </div>
+                <!-- Reemplazo de .btn-borde-azul -->
+                <a
+                  class="border-2 border-[var(--azul)] text-[var(--azul)] font-bold rounded-[10px] px-4 py-2 hover:bg-[var(--azul)] hover:text-white transition text-sm"
+                  th:href="@{/habitaciones/{id}(id=${habitacion.id})}"
+                  >Ver más</a
+                >
               </div>
             </div>
-          </div>
-          <!--FIN TARJETA DE HABITACIÓN-->
+          </article>
+          <!--FIN TARJETA DE HABITACION-->
         </div>
       </div>
     </section>
 
     <!--SERVICIOS-->
-    <section class="py-5" id="servicios">
-      <div class="container py-4">
-        <div class="text-center mb-5">
-          <p class="seccion-etiqueta">Experiencias</p>
-          <h2 class="display-4">Nuestros Servicios</h2>
-          <p class="seccion-texto">
+    <section class="py-20" id="servicios">
+      <div class="container mx-auto px-4">
+        <div class="text-center mb-16">
+          <p
+            class="text-[var(--azul)] text-[0.8rem] font-bold tracking-[3px] uppercase block mb-2"
+          >
+            Experiencias
+          </p>
+          <h2
+            class="text-4xl md:text-5xl font-serif font-bold text-[var(--azul-oscuro)] mb-4"
+          >
+            Nuestros Servicios
+          </h2>
+          <p class="max-w-2xl mx-auto text-[var(--texto)]">
             En Macondo, cada detalle ha sido pensado para que tu estancia supere
             cualquier sueño.
           </p>
         </div>
 
-        <!--CAROUSEL
-            Los servicios salen del modelo, asi que el numero de slides puede
-            cambiar. Por eso el primer slide se marca activo con
-            th:classappend y los indicadores se generan con JS contando los
-            slides que existan, en vez de escribirlos a mano.-->
-        <div id="carruselServicios" class="carousel slide" data-bs-ride="carousel">
-          <!--BOTONES INFERIORES-->
-          <div class="carousel-indicators" id="indicadoresServicios">
-            <!--CONTENIDO GENERADO CON JS-->
-          </div>
+        <!--CARRUSEL-->
+        <!-- Ya no dependemos de Bootstrap JS. Usamos flex con overflow-x-auto y snap-x para un carrusel 100% nativo y fluido -->
+        <div
+          class="flex overflow-x-auto snap-x snap-mandatory gap-6 pb-8"
+          style="scrollbar-width: none"
+        >
+          <!-- Items del Carrusel -->
+          <div
+            class="min-w-[90%] md:min-w-[60%] lg:min-w-[45%] snap-center relative rounded-[16px] overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.15)] flex-shrink-0"
+            th:each="servicio : ${servicios}"
+          >
+            <img
+              class="w-full h-[380px] object-cover"
+              th:src="@{${servicio.imagen}}"
+              th:alt="${servicio.nombre}"
+            />
 
-          <div class="carousel-inner px-5">
-            <div
-              class="carousel-item"
-              th:each="servicio, estado : ${servicios}"
-              th:classappend="${estado.first} ? 'active'"
+            <span
+              class="absolute top-[14px] right-[14px] bg-[var(--dorado)] text-[var(--azul-oscuro)] text-[0.7rem] font-bold tracking-[1px] px-[0.8rem] py-[0.3rem] rounded-[20px]"
+              th:if="${servicio.destacado}"
+              >DESTACADO</span
             >
-              <div class="row justify-content-center">
-                <div class="col-lg-8">
-                  <div class="card-servicio">
-                    <img th:src="@{${servicio.imagen}}" th:alt="${servicio.nombre}" />
-                    <span
-                      class="etiqueta-habitacion"
-                      style="left: auto; right: 14px"
-                      th:if="${servicio.destacado}"
-                      >DESTACADO</span
-                    >
-                    <div class="texto-servicio">
-                      <h3 th:text="${servicio.nombre}"></h3>
-                      <p class="mb-0" th:text="${servicio.descripcion}"></p>
-                    </div>
-                  </div>
-                </div>
-              </div>
+
+            <!-- Degradado sobre la imagen para que el texto sea legible -->
+            <div
+              class="absolute inset-x-0 bottom-0 p-6 bg-gradient-to-t from-black/90 via-black/50 to-transparent text-white"
+            >
+              <h3
+                class="font-serif text-2xl font-bold mb-2 text-white"
+                th:text="${servicio.nombre}"
+              ></h3>
+              <p
+                class="text-[0.95rem] text-gray-200"
+                th:text="${servicio.descripcion}"
+              ></p>
             </div>
           </div>
-
-          <button
-            class="carousel-control-prev"
-            type="button"
-            data-bs-target="#carruselServicios"
-            data-bs-slide="prev"
-          >
-            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Anterior</span>
-          </button>
-          <button
-            class="carousel-control-next"
-            type="button"
-            data-bs-target="#carruselServicios"
-            data-bs-slide="next"
-          >
-            <span class="carousel-control-next-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Siguiente</span>
-          </button>
         </div>
         <!--FIN CAROUSEL-->
       </div>
     </section>
 
     <!--TESTIMONIOS-->
-    <section class="bg-crema py-5">
-      <div class="container py-4">
-        <div class="text-center mb-5">
-          <p class="seccion-etiqueta">Nuestros huéspedes</p>
-          <h2 class="display-4">Historias que perduran</h2>
+    <!-- Paleta inyectada al bg y padding adaptado al formato de Tailwind -->
+    <section class="bg-[var(--crema)] py-20">
+      <div class="container mx-auto px-4">
+        <div class="text-center mb-16">
+          <p
+            class="text-[var(--azul)] text-[0.8rem] font-bold tracking-[3px] uppercase block mb-2"
+          >
+            Nuestros huéspedes
+          </p>
+          <h2
+            class="text-4xl md:text-5xl font-serif font-bold text-[var(--azul-oscuro)]"
+          >
+            Historias que perduran
+          </h2>
         </div>
 
-        <div class="row g-4 justify-content-center">
-          <div class="col-lg-4 col-md-6" th:each="testimonio : ${testimonios}">
-            <div class="card card-testimonio h-100 p-4">
-              <span class="comilla">&rdquo;</span>
-              <p th:text="${testimonio.texto}"></p>
-              <div class="d-flex align-items-center gap-3 mt-3">
-                <img th:src="@{${testimonio.imagen}}" th:alt="${testimonio.nombre}" />
-                <div>
-                  <strong th:text="${testimonio.nombre}"></strong><br />
-                  <small th:text="${testimonio.ciudad}"></small><br />
-                  <span class="text-dorado">
-                    <i
-                      class="bi bi-star-fill"
-                      th:each="estrella : ${#numbers.sequence(1, testimonio.estrellas)}"
-                    ></i>
-                  </span>
+        <div
+          class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 justify-center"
+        >
+          <article
+            class="bg-white rounded-[16px] p-8 shadow-[0_8px_24px_rgba(0,0,0,0.07)] relative"
+            th:each="testimonio : ${testimonios}"
+          >
+            <span
+              class="font-serif text-[3rem] leading-none text-[var(--dorado)] absolute top-4 left-6"
+              >&rdquo;</span
+            >
+            <p
+              class="italic text-[var(--texto)] mb-6 mt-6 relative z-10"
+              th:text="${testimonio.texto}"
+            ></p>
+
+            <div class="flex items-center gap-4 pt-4">
+              <img
+                class="w-[46px] h-[46px] rounded-full object-cover"
+                th:src="@{${testimonio.imagen}}"
+                th:alt="${testimonio.nombre}"
+              />
+              <div>
+                <strong
+                  class="text-[var(--azul-oscuro)] block font-bold"
+                  th:text="${testimonio.nombre}"
+                ></strong>
+                <small
+                  class="text-gray-500 block text-[0.8rem]"
+                  th:text="${testimonio.ciudad}"
+                ></small>
+                <div class="text-[var(--dorado)] text-sm mt-1">
+                  <i
+                    class="bi bi-star-fill"
+                    th:each="estrella : ${#numbers.sequence(1, testimonio.estrellas)}"
+                  ></i>
                 </div>
               </div>
             </div>
-          </div>
+          </article>
         </div>
       </div>
     </section>
 
     <!--LLAMADO FINAL-->
-    <section class="cta-final text-center py-5">
-      <div class="container py-5">
-        <div th:replace="~{fragmentos :: logo}"></div>
-        <h2 class="mt-4 mb-3">¿Listo para tu escapada?</h2>
-        <p class="seccion-texto mb-4">
-          El mar te espera. Déjate envolver por la magia del Caribe colombiano en
-          un hotel que nació de los sueños de García Márquez.
+    <!-- Reemplazamos el gradiente de tu CSS manual por utilidades directas -->
+    <section
+      class="text-center py-24 bg-gradient-to-b from-[#fffdf6] to-[var(--dorado)]"
+    >
+      <div class="container mx-auto px-4 flex flex-col items-center">
+        <div class="[&>img]:w-[60px] [&>img]:h-[60px] mb-4">
+          <th:block th:replace="~{fragmentos :: logo}"></th:block>
+        </div>
+        <h2
+          class="mt-4 mb-4 text-4xl md:text-[4rem] font-serif font-bold text-[var(--azul-oscuro)]"
+        >
+          ¿Listo para tu escapada?
+        </h2>
+        <p class="max-w-xl mx-auto text-[var(--azul-oscuro)] mb-8 text-lg">
+          El mar te espera. Déjate envolver por la magia del Caribe colombiano
+          en un hotel que nació de los sueños de García Márquez.
         </p>
-        <div class="d-flex justify-content-center gap-3 flex-wrap">
-          <a class="btn btn-azul btn-lg" th:href="@{/habitaciones}">Ver Habitaciones</a>
-          <!-- Sin destino: la reserva todavia no esta implementada -->
-          <a class="btn btn-dorado btn-lg" href="#">Reservar Ahora</a>
+
+        <div class="flex justify-center gap-4 flex-wrap">
+          <a
+            class="bg-[var(--azul)] text-white font-bold rounded-[10px] px-8 py-3 border-2 border-[var(--azul)] hover:bg-[var(--azul-oscuro)] hover:border-[var(--azul-oscuro)] transition text-lg"
+            th:href="@{/habitaciones}"
+            >Ver Habitaciones</a
+          >
+          <a
+            class="bg-transparent text-[var(--azul-oscuro)] font-bold px-8 py-3 rounded-[10px] border-2 border-[var(--azul-oscuro)] hover:bg-white hover:text-[var(--azul-oscuro)] transition text-lg"
+            href="#"
+            >Reservar Ahora</a
+          >
         </div>
       </div>
     </section>
