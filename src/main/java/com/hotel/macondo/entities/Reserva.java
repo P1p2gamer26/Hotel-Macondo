@@ -3,12 +3,12 @@ package com.hotel.macondo.entities;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 
 @Data
 @AllArgsConstructor
@@ -22,19 +22,17 @@ public class Reserva {
     private String estado;
     private BigDecimal total;
 
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
-    private Cliente cliente;
+    private List<Habitacion> habitaciones = new ArrayList<>();
 
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
-    private Habitacion habitacion;
-
-    private TipoHabitacion tipoHabitacion;
-
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
-    private Cuenta cuenta;
+    /**
+     * Agrega una habitacion a la reserva y actualiza el total de la estadia.
+     */
+    public void agregarHabitacion(Habitacion habitacion) {
+        if (habitacion != null && !habitaciones.contains(habitacion)) {
+            habitaciones.add(habitacion);
+            recalcularTotal();
+        }
+    }
 
     /**
      * Cancela una reserva que todavia no ha iniciado.
@@ -62,10 +60,11 @@ public class Reserva {
 
         fechaInicio = nuevaFechaInicio;
         fechaFin = nuevaFechaFin;
-        tipoHabitacion = nuevoTipo;
         cantidadPersonas = personas;
         long noches = ChronoUnit.DAYS.between(fechaInicio, fechaFin);
-        total = nuevoTipo.calcularCosto(noches);
+        total = habitaciones.isEmpty()
+                ? nuevoTipo.calcularCosto(noches)
+                : calcularTotalHabitaciones(noches);
         return true;
     }
 
@@ -81,13 +80,31 @@ public class Reserva {
     }
 
     /**
-     * Finaliza la reserva cuando la cuenta asociada esta saldada.
+     * Finaliza la reserva cuando el servicio de checkout confirma que no hay saldo.
      */
-    public boolean finalizar() {
-        if (cuenta != null && cuenta.estaSaldada()) {
+    public boolean finalizar(boolean cuentaSaldada) {
+        if (cuentaSaldada) {
             estado = "FINALIZADA";
             return true;
         }
         return false;
+    }
+
+    private void recalcularTotal() {
+        if (fechaInicio == null || fechaFin == null
+                || !fechaInicio.isBefore(fechaFin)) {
+            total = BigDecimal.ZERO;
+            return;
+        }
+
+        long noches = ChronoUnit.DAYS.between(fechaInicio, fechaFin);
+        total = calcularTotalHabitaciones(noches);
+    }
+
+    private BigDecimal calcularTotalHabitaciones(long noches) {
+        return habitaciones.stream()
+                .filter(habitacion -> habitacion != null)
+                .map(habitacion -> habitacion.calcularCosto(noches))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 }

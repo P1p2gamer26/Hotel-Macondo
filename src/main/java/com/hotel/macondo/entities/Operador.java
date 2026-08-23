@@ -33,6 +33,6 @@ public class Operador {
      */
     public boolean realizarCheckout(Reserva reserva, Cuenta cuenta) {
         return Boolean.TRUE.equals(activo) && reserva != null && cuenta != null
-                && cuenta.estaSaldada() && reserva.finalizar();
+                && cuenta.estaSaldada() && reserva.finalizar(cuenta.estaSaldada());
     }
 }

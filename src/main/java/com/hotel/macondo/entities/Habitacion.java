@@ -2,12 +2,8 @@ package com.hotel.macondo.entities;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
 
 // lombok: getters, setters, toString, equals
 @Data
@@ -24,10 +20,6 @@ public class Habitacion {
     private String estado;
     private Integer piso;
     private TipoHabitacion tipoHabitacion;
-
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
-    private List<Reserva> reservas = new ArrayList<>();
 
     /**
      * Conserva el constructor usado por los datos de la interfaz actual.
@@ -78,7 +70,17 @@ public class Habitacion {
     }
 
     /**
-     * Indica si no existe una reserva que se cruce con el periodo solicitado.
+     * Calcula el costo de la habitacion para una cantidad de noches.
+     */
+    public BigDecimal calcularCosto(long noches) {
+        return tipoHabitacion == null ? BigDecimal.ZERO : tipoHabitacion.calcularCosto(noches);
+    }
+
+    /**
+     * Indica si la habitacion esta habilitada para el periodo solicitado.
+     *
+     * La validacion de cruces entre reservas pertenece al servicio de reservas:
+     * la habitacion no mantiene una referencia inversa a ellas.
      */
     public boolean estaDisponible(LocalDate fechaInicio, LocalDate fechaFin) {
         if (!"DISPONIBLE".equals(estado) || fechaInicio == null || fechaFin == null
@@ -86,18 +88,6 @@ public class Habitacion {
             return false;
         }
 
-        return reservas.stream()
-                .filter(reserva -> !"CANCELADA".equals(reserva.getEstado()))
-                .noneMatch(reserva -> fechaInicio.isBefore(reserva.getFechaFin())
-                        && fechaFin.isAfter(reserva.getFechaInicio()));
-    }
-
-    /**
-     * Registra una reserva dentro del calendario de la habitacion.
-     */
-    public void agregarReserva(Reserva reserva) {
-        if (reserva != null && !reservas.contains(reserva)) {
-            reservas.add(reserva);
-        }
+        return true;
     }
 }

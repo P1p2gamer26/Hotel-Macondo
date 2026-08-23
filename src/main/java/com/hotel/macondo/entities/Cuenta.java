@@ -39,13 +39,24 @@ public class Cuenta {
      * Agrega un servicio activo y recalcula el total de la cuenta.
      */
     public DetalleCuenta agregarItem(Servicio servicio, int cantidad) {
-        if (!"ABIERTA".equals(estado) || servicio == null || !servicio.isActivo()
-                || servicio.getPrecio() == null || cantidad <= 0) {
+        return agregarItem(servicio == null ? List.of() : List.of(servicio), cantidad);
+    }
+
+    /**
+     * Agrega un detalle compuesto por varios servicios activos.
+     */
+    public DetalleCuenta agregarItem(List<Servicio> servicios, int cantidad) {
+        if (!"ABIERTA".equals(estado) || servicios == null || servicios.isEmpty()
+                || cantidad <= 0 || servicios.stream().anyMatch(servicio -> servicio == null
+                        || !servicio.isActivo() || servicio.getPrecio() == null)) {
             return null;
         }
 
+        BigDecimal precio = servicios.stream()
+                .map(Servicio::getPrecio)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
         DetalleCuenta detalle = new DetalleCuenta(detalles.size() + 1, cantidad,
-                servicio.getPrecio(), LocalDateTime.now(), servicio);
+                precio, LocalDateTime.now(), new ArrayList<>(servicios));
         detalles.add(detalle);
         recalcularTotal();
         return detalle;

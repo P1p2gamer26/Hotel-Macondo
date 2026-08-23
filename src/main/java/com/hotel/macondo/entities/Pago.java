@@ -22,6 +22,13 @@ public class Pago {
      * Marca el pago como confirmado.
      */
     public void confirmar() {
-        estado = "CONFIRMADO";
+        this.estado = "CONFIRMADO";
+    }
+
+    /**
+     * Marca el pago como rechazado.
+     */
+    public void rechazar() {
+        this.estado = "RECHAZADO";
     }
 }
