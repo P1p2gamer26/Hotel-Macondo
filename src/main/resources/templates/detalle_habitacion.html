@@ -1,57 +1,112 @@
 ﻿<!doctype html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-  <head th:replace="~{fragmentos :: cabecera('Habitación | Hotel Macondo')}"></head>
-  <body>
+  <head
+    th:replace="~{fragmentos :: cabecera('Habitación | Hotel Macondo')}"
+  ></head>
+
+  <!-- Inyeccion de color base y tipografia global para el body -->
+  <body class="bg-white text-[var(--texto)] font-sans">
     <nav th:replace="~{fragmentos :: navbar}"></nav>
 
-    <main class="container py-5">
-      <div class="row g-5 align-items-center">
-        <div class="col-lg-6">
+    <!-- Contenedor principal sustituyendo la clase py-5 por utilidades nativas -->
+    <main class="container mx-auto px-4 py-16 lg:py-24">
+      <!-- Reemplazo de row y col-lg-6 por CSS Grid adaptativo (1 columna en movil, 2 en PC) -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+        <!-- Columna de imagen -->
+        <div>
+          <!-- Se eliminan img-fluid y shadow de Bootstrap por utilidades avanzadas de Tailwind -->
           <img
-            class="img-fluid rounded-4 shadow"
+            class="w-full h-auto rounded-[20px] shadow-[0_20px_50px_rgba(0,0,0,0.15)] object-cover"
             th:src="@{${habitacion.imagen}}"
             th:alt="${habitacion.nombre}"
           />
         </div>
-        <div class="col-lg-6">
-          <p class="seccion-etiqueta" th:text="${habitacion.etiqueta}"></p>
-          <h1 class="display-5 mb-3" th:text="${habitacion.nombre}"></h1>
-          <p class="fs-5" th:text="${habitacion.descripcion}"></p>
 
-          <ul class="list-unstyled my-4">
-            <li class="mb-2">
-              <i class="bi bi-people-fill text-dorado me-2"></i>
-              Hasta <span th:text="${habitacion.capacidad}"></span> huéspedes
+        <!-- Columna de informacion y detalles -->
+        <div>
+          <!-- Etiqueta superior con la paleta inyectada -->
+          <p
+            class="text-[var(--azul)] text-[0.85rem] font-bold tracking-[3px] uppercase mb-3 block"
+            th:text="${habitacion.etiqueta}"
+          ></p>
+
+          <!-- Titulo h1 escalable segun dispositivo -->
+          <h1
+            class="text-4xl md:text-5xl font-serif font-bold text-[var(--azul-oscuro)] mb-6"
+            th:text="${habitacion.nombre}"
+          ></h1>
+
+          <p
+            class="text-lg text-[var(--texto)] mb-8 leading-relaxed"
+            th:text="${habitacion.descripcion}"
+          ></p>
+
+          <!-- Sustitucion de list-unstyled por utilidades flex y space-y para espaciado vertical -->
+          <ul class="space-y-4 mb-10 text-[var(--texto)] text-lg">
+            <li class="flex items-center">
+              <i
+                class="bi bi-people-fill text-[var(--dorado)] text-2xl mr-4"
+              ></i>
+              <span
+                >Hasta
+                <strong
+                  class="font-bold text-[var(--azul-oscuro)]"
+                  th:text="${habitacion.capacidad}"
+                ></strong>
+                huéspedes</span
+              >
             </li>
-            <li class="mb-2">
-              <i class="bi bi-wifi text-dorado me-2"></i> WiFi de alta velocidad
+            <li class="flex items-center">
+              <i class="bi bi-wifi text-[var(--dorado)] text-2xl mr-4"></i> WiFi
+              de alta velocidad
             </li>
-            <li class="mb-2">
-              <i class="bi bi-cup-hot-fill text-dorado me-2"></i> Desayuno
-              caribeño incluido
+            <li class="flex items-center">
+              <i
+                class="bi bi-cup-hot-fill text-[var(--dorado)] text-2xl mr-4"
+              ></i>
+              Desayuno caribeño incluido
             </li>
-            <li class="mb-2">
-              <i class="bi bi-water text-dorado me-2"></i> Acceso a playa privada
-              y piscina infinity
+            <li class="flex items-center">
+              <i class="bi bi-water text-[var(--dorado)] text-2xl mr-4"></i>
+              Acceso a playa privada y piscina infinity
             </li>
           </ul>
 
-          <p class="mb-4">
-            <small class="text-uppercase text-muted">Desde</small><br />
+          <!-- Seccion de precios -->
+          <div
+            class="mb-10 p-6 bg-[var(--crema-claro)] rounded-[16px] inline-block border border-gray-100"
+          >
+            <small
+              class="uppercase text-gray-500 text-xs font-bold tracking-widest block mb-1"
+              >Desde</small
+            >
             <span
-              class="precio fs-2"
+              class="font-serif text-4xl font-bold text-[var(--azul-oscuro)]"
               th:text="'$' + ${#numbers.formatInteger(habitacion.precio, 1, 'POINT')}"
             ></span>
-            <small>/noche</small>
-          </p>
+            <small class="text-gray-500 font-medium ml-1">/noche</small>
+          </div>
 
           <!-- AQUI VA TODO LO DE RESERVAR: este boton debe llevar a
                @{/reservas/add(tipoHabitacion=${habitacion.nombre})} para que
                el formulario llegue con la habitacion ya seleccionada. -->
-          <a class="btn btn-dorado btn-lg" href="#">Reservar Ahora</a>
-          <a class="btn btn-borde-azul btn-lg ms-2" th:href="@{/habitaciones}"
-            >Volver</a
-          >
+
+          <!-- Contenedor flex para alinear los botones interactivos -->
+          <div class="flex flex-wrap gap-4 mt-2">
+            <!-- Boton primario (Dorado) -->
+            <a
+              class="bg-[var(--dorado)] text-[var(--azul-oscuro)] font-bold rounded-[10px] px-8 py-3 border-2 border-[var(--dorado)] hover:bg-[var(--dorado-oscuro)] hover:border-[var(--dorado-oscuro)] transition text-lg inline-block text-center"
+              href="#"
+              >Reservar Ahora</a
+            >
+
+            <!-- Boton secundario (Borde Azul) -->
+            <a
+              class="border-2 border-[var(--azul)] text-[var(--azul)] font-bold rounded-[10px] px-8 py-3 hover:bg-[var(--azul)] hover:text-white transition text-lg inline-block text-center"
+              th:href="@{/habitaciones}"
+              >Volver</a
+            >
+          </div>
         </div>
       </div>
     </main>
