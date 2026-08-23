@@ -1,17 +1,18 @@
-﻿<!doctype html>
+﻿<!-- Todo este archivo son fragmentos reutilizables: se centralizan aqui
+    para no repetir el navbar, el footer ni los enlaces de Bootstrap en
+    cada vista. Se llaman con th:replace="~{fragmentos :: nombre}". -->
+
+<!doctype html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
   <head>
     <meta charset="UTF-8" />
     <title>Fragmentos</title>
   </head>
   <body>
-    <!-- Todo este archivo son fragmentos reutilizables: se centralizan aqui
-         para no repetir el navbar, el footer ni los enlaces de Bootstrap en
-         cada vista. Se llaman con th:replace="~{fragmentos :: nombre}". -->
-
     <!-- ===== CABECERA: los <link> comunes de todas las páginas =====
          Se llama "cabecera" y no "head" porque Thymeleaf confundia el nombre
          del fragmento con la etiqueta <head> de este mismo archivo. -->
+
     <th:block th:fragment="cabecera(titulo)">
       <meta charset="UTF-8" />
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -20,18 +21,6 @@
            como PNG en vez de .ico porque ya lo tenemos con transparencia y
            todos los navegadores actuales lo aceptan. -->
       <link rel="icon" type="image/png" th:href="@{/images/logo.png}" />
-      <!--Bootstrap-->
-      <link
-        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css"
-        rel="stylesheet"
-        integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7"
-        crossorigin="anonymous"
-      />
-      <!--icons-->
-      <link
-        rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
-      />
       <!--Google fonts-->
       <!-- Las dos tipografias del diseno original:
            Playfair Display (serif de alto contraste) para todos los titulos y
@@ -43,6 +32,14 @@
         href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Questrial&display=swap"
         rel="stylesheet"
       />
+      <!-- Bootstrap Icons (NO es Bootstrao es solo una fuente de iconos) -->
+      <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
+      />
+      <script
+        src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"
+      ></script>
       <!--styles-->
       <link rel="stylesheet" type="text/css" th:href="@{/css/styles.css}" />
     </th:block>
@@ -54,151 +51,277 @@
          la ruta. El tamano lo decide el CSS de cada seccion. -->
     <img
       th:fragment="logo"
-      class="logo-mariposa"
+      class="w-12 h-auto object-contain"
       th:src="@{/images/logo.png}"
       alt="Logo Hotel Macondo"
     />
 
     <!-- ===== NAVBAR ===== -->
-    <nav
-      th:fragment="navbar"
-      class="navbar navbar-expand-lg navbar-macondo sticky-top py-3"
-    >
-      <div class="container">
-        <a class="navbar-brand d-flex align-items-center gap-2" th:href="@{/}">
+    <!-- Toco reemplazar todos los componentes 'navbar navbar-expand-lg' de Bootstrap 
+     por Flexbox de Tailwind ('flex', 'justify-between', 'items-center') para distribuir el espacio.
+     También 'sticky top-0 z-50' se reemplazó a 'sticky-top' para mantener el menu fijo arriba. -->
+    <nav th:fragment="navbar" class="bg-white shadow-md sticky top-0 z-50 py-4">
+      <div
+        class="container mx-auto px-4 flex flex-wrap justify-between items-center"
+      >
+        <a
+          class="flex items-center gap-3 font-serif text-xl font-bold text-[var(--azul)]"
+          th:href="@{/}"
+        >
           <th:block th:replace="~{fragmentos :: logo}"></th:block>
           Hotel Macondo
         </a>
-        <button
-          class="navbar-toggler"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#menuMacondo"
-          aria-controls="menuMacondo"
-          aria-expanded="false"
-          aria-label="Abrir menú"
-        >
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="menuMacondo">
-          <!-- Los cuatro enlaces del menu apuntan a una seccion de la landing
-               (no a otra pagina) para que todos bajen con el mismo
-               desplazamiento suave y no con una recarga. -->
-          <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
-            <li class="nav-item">
-              <a class="nav-link" href="/#inicio">Inicio</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="/#habitaciones">Habitaciones</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="/#servicios">Servicios</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="/#contacto">Contacto</a>
-            </li>
-          </ul>
-          <!-- Los tres botones quedan sin destino: la logica de iniciar
-               sesion, registrarse y reservar todavia no esta implementada.
-               Cuando exista, aqui vuelven @{/login}, @{/registro} y
-               @{/reservas/add}. -->
-          <div class="d-flex gap-2">
-            <a class="btn btn-borde-azul" th:href="@{/login}">Iniciar Sesión</a>
-            <a class="btn btn-borde-gris" href="#">Registrarse</a>
-            <a class="btn btn-dorado" href="#">Reservar</a>
-          </div>
+
+        <!-- Para respetar el responsive que tenia bootstrap, en lugar del 'collapse navbar-collapse',
+         ahora se ocultam el menu en moviles con 'hidden' y lo mostramos en pantallas medianas o mayores
+        usando el breakpoint 'md:flex -->
+        <ul class="hidden md:flex gap-6 font-sans text-[var(--texto)]">
+          <!-- Agregamos interactividad visual reemplazando tu clase 'nav-link' por 'hover:text-[var(--azul)]',
+           que en Tailwind detecta automáticamente el mouse por encima del elemento y respeta tu paleta -->
+          <li>
+            <a
+              class="font-medium hover:text-[var(--azul)] transition"
+              href="/#inicio"
+              >Inicio</a
+            >
+          </li>
+          <li>
+            <a
+              class="font-medium hover:text-[var(--azul)] transition"
+              href="/#habitaciones"
+              >Habitaciones</a
+            >
+          </li>
+          <li>
+            <a
+              class="font-medium hover:text-[var(--azul)] transition"
+              href="/#servicios"
+              >Servicios</a
+            >
+          </li>
+          <li>
+            <a
+              class="font-medium hover:text-[var(--azul)] transition"
+              href="/#contacto"
+              >Contacto</a
+            >
+          </li>
+        </ul>
+
+        <!-- Toca reemplazar las clases personalizadas del CSS (.btn-dorado, .btn-borde-azul) 
+         por utilidades directas inyectando las variables de colores. -->
+        <div class="hidden md:flex items-center gap-3 font-sans text-sm">
+          <!-- Botón Iniciar Sesión (.btn-borde-azul) -->
+          <a
+            class="border-2 border-[var(--azul)] text-[var(--azul)] font-semibold px-4 py-2 rounded-md hover:bg-[var(--azul)] hover:text-white transition"
+            th:href="@{/login}"
+            >Iniciar Sesión</a
+          >
+          <!-- Botón Registrarse (.btn-borde-gris) -->
+          <a
+            class="border border-gray-300 text-[var(--texto)] font-medium px-4 py-2 rounded-md hover:bg-gray-100 transition"
+            href="#"
+            >Registrarse</a
+          >
+          <!-- Botón Reservar (.btn-dorado) -->
+          <a
+            class="bg-[var(--dorado)] text-[var(--azul-oscuro)] font-semibold px-4 py-2 rounded-md border-2 border-[var(--dorado)] shadow hover:bg-[var(--dorado-oscuro)] hover:border-[var(--dorado-oscuro)] transition"
+            href="#"
+            >Reservar</a
+          >
         </div>
+
+        <!-- Reemplazar el boton 'navbar-toggler' de Bootstrap
+         Ahora se usa 'md:hidden' para que este pequeño icono solo aparezca en celulares -->
+        <button
+          class="md:hidden text-2xl text-[var(--azul-oscuro)] focus:outline-none"
+        >
+          <i class="bi bi-list"></i>
+        </button>
       </div>
     </nav>
 
     <!-- ===== FOOTER ===== -->
-    <footer th:fragment="footer" class="footer-macondo pt-5 pb-4" id="contacto">
-      <div class="container">
-        <div class="row g-4">
-          <!-- Marca -->
-          <div class="col-md-3">
-            <div class="d-flex align-items-center gap-2 mb-3">
+    <footer
+      th:fragment="footer"
+      class="bg-white pt-16 pb-8 border-t border-gray-200 font-sans"
+      id="contacto"
+    >
+      <div class="container mx-auto px-4">
+        <!-- Elimine la clase 'row' de Bootstrap, porque ahora usamos 'grid' nativo de Tailwind
+             Con 'grid-cols-1 md:grid-cols-2 lg:grid-cols-4' hacemos que haya 1 columna en celular,
+             2 en tablets y 4 en PC, solucionando el responsive sin esfuerzo -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <!-- Elimine los 'col-md-3' de Bootstrap porque la etiqueta padre 
+           (el grid que pusimos arriba) ya controla el ancho de estas columnas -->
+          <div>
+            <div class="flex items-center gap-3 mb-4">
               <th:block th:replace="~{fragmentos :: logo}"></th:block>
-              <span class="titulo fs-4 text-azul">Hotel Macondo</span>
+              <span class="font-serif text-2xl font-bold text-[var(--azul)]"
+                >Hotel Macondo</span
+              >
             </div>
-            <p>
+            <p class="text-[var(--texto)] text-sm leading-relaxed mb-4">
               Un refugio de magia y lujo en la costa caribeña de Colombia, donde
               cada noche es un cuento que vale la pena vivir.
             </p>
-            <div class="redes">
-              <a href="#" aria-label="Instagram"
+            <div class="flex gap-2 text-xl">
+              <a
+                href="#"
+                class="w-10 h-10 rounded-full bg-[var(--crema)] text-[var(--azul)] flex items-center justify-center hover:bg-[var(--dorado)] hover:text-[var(--azul-oscuro)] transition"
                 ><i class="bi bi-instagram"></i
               ></a>
-              <a href="#" aria-label="Facebook"
+              <a
+                href="#"
+                class="w-10 h-10 rounded-full bg-[var(--crema)] text-[var(--azul)] flex items-center justify-center hover:bg-[var(--dorado)] hover:text-[var(--azul-oscuro)] transition"
                 ><i class="bi bi-facebook"></i
               ></a>
-              <a href="#" aria-label="TikTok"
+              <a
+                href="#"
+                class="w-10 h-10 rounded-full bg-[var(--crema)] text-[var(--azul)] flex items-center justify-center hover:bg-[var(--dorado)] hover:text-[var(--azul-oscuro)] transition"
                 ><i class="bi bi-music-note"></i
               ></a>
             </div>
           </div>
 
           <!-- Enlaces -->
-          <div class="col-md-3">
-            <h5 class="mb-3">Enlaces Rápidos</h5>
-            <ul class="list-unstyled">
-              <li><a th:href="@{/}">Inicio</a></li>
-              <li><a th:href="@{/habitaciones}">Habitaciones</a></li>
-              <li><a href="/#servicios">Servicios</a></li>
-              <li><a href="#contacto">Contacto</a></li>
-              <!-- Pendiente: enlazar a @{/reservas/add} cuando exista la reserva -->
-              <li><a href="#">Reservar Ahora</a></li>
-              <li><a href="#contacto">Política de Privacidad</a></li>
+          <div>
+            <h5
+              class="font-serif text-lg font-bold mb-4 text-[var(--azul-oscuro)]"
+            >
+              Enlaces Rápidos
+            </h5>
+            <!-- Elimine la clase 'list-unstyled' de Bootstrap y ahora se usa 'space-y-2' de Tailwind
+             para separar los elementos de la lista verticalmente de forma limpia. -->
+            <ul class="space-y-2 text-[var(--texto)] text-sm">
+              <li>
+                <a
+                  class="hover:text-[var(--azul)] transition inline-block py-1"
+                  th:href="@{/}"
+                  >Inicio</a
+                >
+              </li>
+              <li>
+                <a
+                  class="hover:text-[var(--azul)] transition inline-block py-1"
+                  th:href="@{/habitaciones}"
+                  >Habitaciones</a
+                >
+              </li>
+              <li>
+                <a
+                  class="hover:text-[var(--azul)] transition inline-block py-1"
+                  href="/#servicios"
+                  >Servicios</a
+                >
+              </li>
+              <li>
+                <a
+                  class="hover:text-[var(--azul)] transition inline-block py-1"
+                  href="#contacto"
+                  >Contacto</a
+                >
+              </li>
+              <li>
+                <a
+                  class="hover:text-[var(--azul)] transition inline-block py-1"
+                  href="#"
+                  >Reservar Ahora</a
+                >
+              </li>
+              <li>
+                <a
+                  class="hover:text-[var(--azul)] transition inline-block py-1"
+                  href="#contacto"
+                  >Política de Privacidad</a
+                >
+              </li>
             </ul>
           </div>
 
           <!-- Habitaciones -->
-          <div class="col-md-3">
-            <h5 class="mb-3">Habitaciones</h5>
-            <ul class="list-unstyled">
-              <li><a th:href="@{/habitaciones/1}">Normal</a></li>
-              <li><a th:href="@{/habitaciones/2}">Executive</a></li>
-              <li><a th:href="@{/habitaciones/3}">VIP</a></li>
-              <li><a th:href="@{/habitaciones/4}">Luxury</a></li>
-              <li><a th:href="@{/habitaciones}">Suites Especiales</a></li>
+          <div>
+            <h5
+              class="font-serif text-lg font-bold mb-4 text-[var(--azul-oscuro)]"
+            >
+              Habitaciones
+            </h5>
+            <ul class="space-y-2 text-[var(--texto)] text-sm">
+              <li>
+                <a
+                  class="hover:text-[var(--azul)] transition inline-block py-1"
+                  th:href="@{/habitaciones/1}"
+                  >Normal</a
+                >
+              </li>
+              <li>
+                <a
+                  class="hover:text-[var(--azul)] transition inline-block py-1"
+                  th:href="@{/habitaciones/2}"
+                  >Executive</a
+                >
+              </li>
+              <li>
+                <a
+                  class="hover:text-[var(--azul)] transition inline-block py-1"
+                  th:href="@{/habitaciones/3}"
+                  >VIP</a
+                >
+              </li>
+              <li>
+                <a
+                  class="hover:text-[var(--azul)] transition inline-block py-1"
+                  th:href="@{/habitaciones/4}"
+                  >Luxury</a
+                >
+              </li>
+              <li>
+                <a
+                  class="hover:text-[var(--azul)] transition inline-block py-1"
+                  th:href="@{/habitaciones}"
+                  >Suites Especiales</a
+                >
+              </li>
             </ul>
           </div>
 
           <!-- Contacto -->
-          <div class="col-md-3">
-            <h5 class="mb-3">Contáctanos</h5>
-            <p class="mb-2">
-              <i class="bi bi-geo-alt-fill text-dorado me-2"></i>
+          <div class="text-[var(--texto)] text-sm">
+            <h5
+              class="font-serif text-lg font-bold mb-4 text-[var(--azul-oscuro)]"
+            >
+              Contáctanos
+            </h5>
+            <p class="flex items-center gap-3 mb-3">
+              <i class="bi bi-geo-alt-fill text-[var(--dorado)] text-lg"></i>
               Av. El Malecón #12-34, Cartagena de Indias, Colombia
             </p>
-            <p class="mb-2">
-              <i class="bi bi-telephone-fill text-dorado me-2"></i>
+            <p class="flex items-center gap-3 mb-3">
+              <i class="bi bi-telephone-fill text-[var(--dorado)] text-lg"></i>
               +57 305 341 9585
             </p>
-            <p class="mb-2">
-              <i class="bi bi-envelope-fill text-dorado me-2"></i>
+            <p class="flex items-center gap-3 mb-3">
+              <i class="bi bi-envelope-fill text-[var(--dorado)] text-lg"></i>
               contacto@hmacondo.com
             </p>
-            <p class="mb-0">
-              <i class="bi bi-clock-fill text-dorado me-2"></i>
+            <p class="flex items-center gap-3">
+              <i class="bi bi-clock-fill text-[var(--dorado)] text-lg"></i>
               Recepción 24 horas
             </p>
           </div>
         </div>
 
-        <hr class="my-4" />
+        <hr class="my-8 border-gray-200" />
 
-        <div class="row align-items-center">
-          <div class="col-md-6">
-            <small
-              >&copy; 2026 Hotel Macondo. Todos los derechos reservados.</small
-            >
-          </div>
-          <div class="col-md-6 text-md-end">
-            <small class="frase-garcia">
-              "La vida no es la que uno vivió, sino la que uno recuerda" —
-              Gabriel García Márquez
-            </small>
+        <!-- Para alinear el copyright y la frase final toca usar'flex-col md:flex-row justify-between'
+          para que en dispositivos móviles queden apilados y en PC queden uno a cada lado -->
+        <div
+          class="flex flex-col md:flex-row justify-between items-center text-sm text-[var(--texto)] gap-4"
+        >
+          <div>&copy; 2026 Hotel Macondo. Todos los derechos reservados.</div>
+          <div class="font-serif italic text-[var(--azul)]">
+            "La vida no es la que uno vivió, sino la que uno recuerda" — Gabriel
+            García Márquez
           </div>
         </div>
       </div>
@@ -206,11 +329,7 @@
 
     <!-- ===== SCRIPTS ===== -->
     <th:block th:fragment="scripts">
-      <script
-        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq"
-        crossorigin="anonymous"
-      ></script>
+      <!-- Elimine el script 'bootstrap.bundle.min.js' -->
       <script th:src="@{/js/script.js}"></script>
     </th:block>
   </body>
