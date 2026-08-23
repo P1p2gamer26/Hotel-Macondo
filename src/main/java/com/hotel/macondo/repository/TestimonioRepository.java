@@ -13,6 +13,7 @@ public class TestimonioRepository {
 
     private Map<Integer, Testimonio> data = new LinkedHashMap<>();
 
+    /** Carga los testimonios de prueba publicados. */
     public TestimonioRepository() {
         data.put(1, new Testimonio(1,
                 "Hotel Macondo es un sueño hecho realidad. La combinación de lujo, naturaleza y la magia del Caribe colombiano me dejó sin palabras. Regresaré sin duda.",
@@ -25,6 +26,7 @@ public class TestimonioRepository {
                 "Sofía Benítez", "Madrid, España", 5, "/images/IconoP3.avif"));
     }
 
+    /** Retorna todos los testimonios publicados. */
     public Collection<Testimonio> findAll() {
         return data.values();
     }

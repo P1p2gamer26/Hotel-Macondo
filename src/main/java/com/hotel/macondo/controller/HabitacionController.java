@@ -9,45 +9,52 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.hotel.macondo.entities.Habitacion;
-import com.hotel.macondo.service.HotelService;
+import com.hotel.macondo.service.HabitacionService;
 
 @RequestMapping("/habitaciones")
 @Controller
 public class HabitacionController {
 
+    private final HabitacionService service;
+
+    /**
+     * Conecta el controlador con la interfaz de habitaciones.
+     */
     @Autowired
-    HotelService service;
+    public HabitacionController(HabitacionService service) {
+        this.service = service;
+    }
 
-    // http://localhost:8080/habitaciones
-    @GetMapping()
+    /**
+     * Muestra todas las habitaciones.
+     */
+    @GetMapping
     public String mostrarHabitaciones(Model model) {
-        model.addAttribute("habitaciones", service.buscarHabitaciones());
-
+        model.addAttribute("habitaciones", service.buscarTodas());
         return "habitaciones";
     }
 
-    // http://localhost:8080/habitaciones?personas=4
+    /**
+     * Filtra habitaciones por capacidad.
+     */
     @GetMapping(params = "personas")
     public String buscarPorPersonas(@RequestParam int personas, Model model) {
-        model.addAttribute("habitaciones", service.buscarHabitacionesPorPersonas(personas));
+        model.addAttribute("habitaciones", service.buscarPorPersonas(personas));
         model.addAttribute("personas", personas);
-
         return "habitaciones";
     }
 
-    // http://localhost:8080/habitaciones/1
+    /**
+     * Muestra el detalle de una habitacion o vuelve al listado si no existe.
+     */
     @GetMapping("/{id}")
     public String mostrarHabitacion(@PathVariable("id") Integer id, Model model) {
-        Habitacion habitacion = service.buscarHabitacionPorId(id);
-
-        // Si el id no existe volvemos al listado
+        Habitacion habitacion = service.buscarPorId(id);
         if (habitacion == null) {
             return "redirect:/habitaciones";
         }
 
         model.addAttribute("habitacion", habitacion);
-
         return "detalle_habitacion";
     }
-
 }
