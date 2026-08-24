@@ -46,27 +46,10 @@ public class OperadorController {
     // ===== CUENTA DE LA HABITACION =====
 
     /**
-     * Formulario para buscar la cuenta de una habitacion por su id.
-     */
-    @GetMapping("/cuenta")
-    public String buscarCuenta(Model model) {
-        model.addAttribute("seccionActiva", "cuenta");
-        return "operador/cuenta";
-    }
-
-    /**
-     * Redirecciona a la cuenta de la habitacion consultada.
-     */
-    @GetMapping("/cuenta/buscar")
-    public String buscarCuenta(@RequestParam int id) {
-        return "redirect:/operador/cuenta/" + id;
-    }
-
-    /**
      * Muestra el detalle de la cuenta de una habitacion.
      */
-    @GetMapping("/cuenta/{id}")
-    public String cuentaHabitacion(@PathVariable Integer id, Model model) {
+    @GetMapping("/cuenta")
+    public String cuentaHabitacion(Model model) {
         model.addAttribute("seccionActiva", "cuenta");
         return "operador/cuenta_habitacion";
     }
