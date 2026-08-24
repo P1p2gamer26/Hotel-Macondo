@@ -32,6 +32,11 @@ public class OperadorController {
         this.service = service;
     }
 
+    @GetMapping
+    public String inicio(Model model) {
+        return "operador/index";
+    }
+
     // ===== RESERVAS =====
 
     /**
@@ -70,7 +75,6 @@ public class OperadorController {
     /**
      * Retorna los operadores guardados temporalmente.
      */
-    @GetMapping
     @ResponseBody
     public Collection<Operador> listar() {
         return service.buscarTodos();
