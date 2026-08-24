@@ -7,15 +7,34 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.ui.Model;
 
 import com.hotel.macondo.entities.Operador;
 import com.hotel.macondo.service.OperadorService;
 
 @Controller
-@RequestMapping("/operadores")
+@RequestMapping("/operador")
 public class OperadorController {
 
     private final OperadorService service;
+
+    @GetMapping("/reservas")
+    public String reservas(Model model){
+        model.addAttribute("seccionActiva", "reservas");
+        return "reservas_operador";
+    }
+
+    @GetMapping("/cuenta")
+    public String cuentaHabitacion(Model model){
+        model.addAttribute("seccionActiva", "cuenta");
+        return "cuenta_habitacion";
+    }
+
+    @GetMapping("/checkout")
+    public String checkout(Model model){
+        model.addAttribute("seccionActiva", "checkout");
+        return "checkout_operador";
+    }
 
     /**
      * Conecta el controlador con la interfaz de operadores.

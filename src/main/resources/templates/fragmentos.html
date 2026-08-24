@@ -357,13 +357,16 @@
             Menú Principal
           </span>
 
-          <!-- Opción Activa (Reservas) -->
+          <!-- La opción activa se determina según la ruta actual. -->
           <a
-            th:href="@{operador/reservas}"
-            class="flex items-center gap-3 px-4 py-3 rounded-xl bg-[var(--crema-claro)] text-[var(--azul-oscuro)] font-bold border-l-4 border-[var(--dorado)] shadow-sm transition-all"
+            th:href="@{/operador/reservas}"
+            th:class="${seccionActiva == 'reservas'
+            ? 'flex items-center gap-3 px-4 py-3 rounded-xl bg-[var(--crema-claro)] text-[var(--azul-oscuro)] font-bold border-l-4 border-[var(--dorado)] shadow-sm transition-all' 
+            : 'flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 font-medium hover:bg-gray-50 transition-all'}"
           >
             <svg
-              class="w-5 h-5 stroke-[var(--azul-oscuro)]"
+              th:class="${seccionActiva == 'reservas'
+              ? 'w-5 h-5 stroke-[var(--azul-oscuro)]' : 'w-5 h-5 stroke-gray-500'}"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -380,11 +383,14 @@
 
           <!-- Cuenta Habitación -->
           <a
-            th:href="@{/operador/cuenta-habitacion}"
-            class="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 font-medium hover:bg-gray-50 transition-all"
+            th:href="@{/operador/cuenta}"
+            th:class="${seccionActiva == 'cuenta'
+            ? 'flex items-center gap-3 px-4 py-3 rounded-xl bg-[var(--crema-claro)] text-[var(--azul-oscuro)] font-bold border-l-4 border-[var(--dorado)] shadow-sm transition-all' 
+            : 'flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 font-medium hover:bg-gray-50 transition-all'}"
           >
             <svg
-              class="w-5 h-5 stroke-gray-500"
+              th:class="${seccionActiva == 'cuenta'
+              ? 'w-5 h-5 stroke-[var(--azul-oscuro)]' : 'w-5 h-5 stroke-gray-500'}"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -401,11 +407,14 @@
 
           <!-- Check-out -->
           <a
-            th:href="@{operador/check-out}"
-            class="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 font-medium hover:bg-gray-50 transition-all"
+            th:href="@{/operador/checkout}"
+            th:class="${seccionActiva == 'check-out'
+            ? 'flex items-center gap-3 px-4 py-3 rounded-xl bg-[var(--crema-claro)] text-[var(--azul-oscuro)] font-bold border-l-4 border-[var(--dorado)] shadow-sm transition-all' 
+            : 'flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 font-medium hover:bg-gray-50 transition-all'}"
           >
             <svg
-              class="w-5 h-5 stroke-gray-500"
+              th:class="${seccionActiva == 'check-out'
+              ? 'w-5 h-5 stroke-[var(--azul-oscuro)]' : 'w-5 h-5 stroke-gray-500'}"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
