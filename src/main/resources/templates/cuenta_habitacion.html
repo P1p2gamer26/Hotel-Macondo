@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+  <head
+    th:replace="~{fragmentos :: cabecera('Cuenta Habitación | Hotel Macondo')}"
+  ></head>
+  <body class="bg-gray-100 text-[var(--texto)] font-sans flex min-h-screen">
+    <!-- BARRA LATERAL (NAV OPERADOR) -->
+    <nav th:replace="~{fragmentos :: nav-operador}"></nav>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="flex-1 p-8 overflow-y-auto">
+      <!-- ENCABEZADO -->
+      <div class="flex items-center gap-4 mb-6 pb-4 border-b border-gray-200">
+        <div
+          class="w-14 h-14 bg-[var(--azul)] text-white rounded-full flex items-center justify-center font-serif font-bold text-2xl shadow-sm"
+        >
+          301
+        </div>
+        <div>
+          <h1 class="text-3xl font-serif font-bold text-[var(--azul-oscuro)]">
+            Habitación 301
+          </h1>
+          <p class="text-sm text-gray-500 font-medium">Cuenta de consumos</p>
+        </div>
+      </div>
+
+      <!-- GRID DE CONTENIDO -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- COLUMNA IZQUIERDA Y CENTRAL (2 Columnas en pantallas grandes) -->
+        <div class="lg:col-span-2 space-y-6">
+          <!-- TARJETA DETALLES DEL HUÉSPED -->
+          <div
+            class="bg-[#F6ECE0] border-l-4 border-[var(--azul)] rounded-xl p-6 shadow-sm grid grid-cols-2 gap-6"
+          >
+            <div>
+              <span
+                class="text-[0.68rem] font-bold text-gray-500 tracking-wider uppercase block mb-1"
+                >Huésped</span
+              >
+              <p class="font-bold text-[var(--azul-oscuro)] text-lg">
+                Valentina Ospina
+              </p>
+
+              <span
+                class="text-[0.68rem] font-bold text-gray-500 tracking-wider uppercase block mt-4 mb-1"
+                >Check-in</span
+              >
+              <p class="font-bold text-[var(--azul-oscuro)]">15 Sep 2025</p>
+            </div>
+            <div>
+              <span
+                class="text-[0.68rem] font-bold text-gray-500 tracking-wider uppercase block mb-1"
+                >Tipo</span
+              >
+              <p class="font-bold text-[var(--azul-oscuro)] text-lg">
+                VIP Suite
+              </p>
+
+              <span
+                class="text-[0.68rem] font-bold text-gray-500 tracking-wider uppercase block mt-4 mb-1"
+                >Check-out</span
+              >
+              <p class="font-bold text-[var(--azul-oscuro)]">19 Sep 2025</p>
+            </div>
+          </div>
+
+          <!-- TARJETA AGREGAR SERVICIO -->
+          <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+            <span
+              class="text-[0.72rem] font-bold text-[var(--azul)] tracking-wider uppercase block mb-4"
+              >Agregar Servicio</span
+            >
+
+            <form
+              action="#"
+              method="post"
+              class="flex flex-col sm:flex-row gap-4 items-end"
+            >
+              <div class="flex-1 w-full">
+                <label
+                  class="text-[0.68rem] font-bold text-gray-500 tracking-wider uppercase block mb-2"
+                  for="servicio"
+                  >Servicio</label
+                >
+                <select
+                  id="servicio"
+                  name="servicioId"
+                  class="w-full rounded-lg px-4 py-2.5 border border-gray-200 focus:outline-none focus:border-[var(--azul)] bg-gray-50 text-sm text-[var(--texto)]"
+                >
+                  <option value="">Seleccionar...</option>
+                  <option value="1">Spa & Bienestar - $120.000</option>
+                  <option value="2">Restaurante Gourmet - $85.000</option>
+                  <option value="3">Minibar - $45.000</option>
+                </select>
+              </div>
+
+              <div class="w-full sm:w-24">
+                <label
+                  class="text-[0.68rem] font-bold text-gray-500 tracking-wider uppercase block mb-2"
+                  for="cantidad"
+                  >Cant.</label
+                >
+                <input
+                  type="number"
+                  id="cantidad"
+                  name="cantidad"
+                  value="1"
+                  min="1"
+                  class="w-full rounded-lg px-3 py-2.5 border border-gray-200 text-center focus:outline-none focus:border-[var(--azul)] bg-gray-50 text-sm text-[var(--texto)]"
+                />
+              </div>
+
+              <button
+                type="submit"
+                class="w-full sm:w-auto px-6 py-2.5 bg-[#E2D8CD] hover:bg-[#D5C9BB] text-[var(--azul-oscuro)] font-bold text-sm rounded-lg transition-all"
+              >
+                Agregar
+              </button>
+            </form>
+          </div>
+
+          <!-- TABLA DE CONSUMOS -->
+          <div
+            class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden"
+          >
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse">
+                <thead>
+                  <tr
+                    class="bg-[var(--azul)] text-white text-[0.72rem] font-bold uppercase tracking-wider"
+                  >
+                    <th class="py-3.5 px-6">Servicio</th>
+                    <th class="py-3.5 px-4 text-left">Precio Unit.</th>
+                    <th class="py-3.5 px-4 text-center">Cantidad</th>
+                    <th class="py-3.5 px-4 text-left">Subtotal</th>
+                    <th class="py-3.5 px-6 text-center">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody
+                  class="divide-y divide-gray-100 text-sm font-medium text-[var(--texto)]"
+                >
+                  <tr class="hover:bg-gray-50/50 transition">
+                    <td class="py-4 px-6 font-bold text-[var(--azul-oscuro)]">
+                      Spa & Bienestar
+                    </td>
+                    <td class="py-4 px-4 text-gray-600">$120.000</td>
+                    <td class="py-4 px-4 text-center">1</td>
+                    <td class="py-4 px-4 font-bold text-[var(--azul)]">
+                      $120.000
+                    </td>
+                    <td class="py-4 px-6 text-center">
+                      <button
+                        class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg text-xs font-semibold transition"
+                      >
+                        <i class="bi bi-trash"></i> Eliminar
+                      </button>
+                    </td>
+                  </tr>
+
+                  <tr class="hover:bg-gray-50/50 transition">
+                    <td class="py-4 px-6 font-bold text-[var(--azul-oscuro)]">
+                      Restaurante Gourmet
+                    </td>
+                    <td class="py-4 px-4 text-gray-600">$85.000</td>
+                    <td class="py-4 px-4 text-center">2</td>
+                    <td class="py-4 px-4 font-bold text-[var(--azul)]">
+                      $170.000
+                    </td>
+                    <td class="py-4 px-6 text-center">
+                      <button
+                        class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg text-xs font-semibold transition"
+                      >
+                        <i class="bi bi-trash"></i> Eliminar
+                      </button>
+                    </td>
+                  </tr>
+
+                  <tr class="hover:bg-gray-50/50 transition">
+                    <td class="py-4 px-6 font-bold text-[var(--azul-oscuro)]">
+                      Minibar
+                    </td>
+                    <td class="py-4 px-4 text-gray-600">$45.000</td>
+                    <td class="py-4 px-4 text-center">3</td>
+                    <td class="py-4 px-4 font-bold text-[var(--azul)]">
+                      $135.000
+                    </td>
+                    <td class="py-4 px-6 text-center">
+                      <button
+                        class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg text-xs font-semibold transition"
+                      >
+                        <i class="bi bi-trash"></i> Eliminar
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- COLUMNA DERECHA (RESUMEN DE CUENTA) -->
+        <div class="lg:col-span-1">
+          <div
+            class="bg-white rounded-2xl p-6 shadow-md border border-gray-100 sticky top-8 flex flex-col justify-between h-auto"
+          >
+            <div>
+              <h2
+                class="font-serif text-2xl font-bold text-[var(--azul-oscuro)] mb-6"
+              >
+                Resumen de cuenta
+              </h2>
+
+              <!-- ITEMS CONSUMIDOS -->
+              <div class="space-y-3 pb-6 border-b border-gray-100 text-sm">
+                <div class="flex justify-between items-center text-gray-600">
+                  <span
+                    >Spa & Bienestar
+                    <small class="text-gray-400 font-normal">×1</small></span
+                  >
+                  <span class="font-bold text-[var(--azul-oscuro)]"
+                    >$120.000</span
+                  >
+                </div>
+                <div class="flex justify-between items-center text-gray-600">
+                  <span
+                    >Restaurante Gourmet
+                    <small class="text-gray-400 font-normal">×2</small></span
+                  >
+                  <span class="font-bold text-[var(--azul-oscuro)]"
+                    >$170.000</span
+                  >
+                </div>
+                <div class="flex justify-between items-center text-gray-600">
+                  <span
+                    >Minibar
+                    <small class="text-gray-400 font-normal">×3</small></span
+                  >
+                  <span class="font-bold text-[var(--azul-oscuro)]"
+                    >$135.000</span
+                  >
+                </div>
+              </div>
+
+              <!-- SUBTOTAL E IVA -->
+              <div class="py-4 border-b border-gray-100 space-y-2 text-sm">
+                <div class="flex justify-between items-center text-gray-500">
+                  <span>Subtotal</span>
+                  <span class="font-bold text-[var(--azul-oscuro)]"
+                    >$425.000</span
+                  >
+                </div>
+                <div class="flex justify-between items-center text-gray-500">
+                  <span>IVA (19%)</span>
+                  <span class="font-bold text-[var(--azul-oscuro)]"
+                    >$80.750</span
+                  >
+                </div>
+              </div>
+
+              <!-- TOTAL DESTACADO -->
+              <div
+                class="mt-6 mb-8 bg-[#EEF6F8] rounded-xl p-4 flex justify-between items-center"
+              >
+                <span class="text-[var(--azul)] font-bold text-sm">Total</span>
+                <span class="font-serif text-2xl font-bold text-[var(--azul)]"
+                  >$505.750</span
+                >
+              </div>
+            </div>
+
+            <!-- BOTÓN REGISTRAR PAGO -->
+            <button
+              type="button"
+              class="w-full bg-[var(--dorado)] hover:bg-[var(--dorado-oscuro)] text-[var(--azul-oscuro)] font-bold py-3 px-4 rounded-xl shadow-sm transition-all text-center"
+            >
+              Registrar pago
+            </button>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- SCRIPTS -->
+    <th:block th:replace="~{fragmentos :: scripts}"></th:block>
+  </body>
+</html>

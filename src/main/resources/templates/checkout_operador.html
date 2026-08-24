@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+  <head
+    th:replace="~{fragmentos :: cabecera('Check-out Habitación 301 | Hotel Macondo')}"
+  ></head>
+  <body class="bg-gray-100 text-[var(--texto)] font-sans flex min-h-screen">
+    <!-- BARRA LATERAL (NAV OPERADOR) -->
+    <nav th:replace="~{fragmentos :: nav-operador}"></nav>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="flex-1 p-8 overflow-y-auto">
+      <!-- ENCABEZADO -->
+      <div class="mb-8 pb-4 border-b border-gray-200">
+        <h1 class="text-3xl font-serif font-bold text-[var(--azul-oscuro)]">
+          Check-out — Habitación 301
+        </h1>
+        <p class="text-sm text-gray-500 font-medium mt-1">
+          Finalización de estadía — Portal operador
+        </p>
+      </div>
+
+      <div class="max-w-4xl space-y-8">
+        <!-- TARJETA: INFORMACIÓN DE LA ESTADÍA -->
+        <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+          <span
+            class="text-[0.72rem] font-bold text-[var(--azul)] tracking-wider uppercase block mb-6"
+          >
+            Información de la estadía
+          </span>
+
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-y-6 gap-x-4">
+            <div>
+              <span
+                class="text-[0.68rem] font-bold text-gray-400 tracking-wider uppercase block mb-1"
+                >Huésped</span
+              >
+              <p
+                class="font-bold text-[var(--azul-oscuro)] text-base"
+                th:text="${huesped != null ? huesped : 'Valentina Ospina'}"
+              >
+                Valentina Ospina
+              </p>
+            </div>
+
+            <div>
+              <span
+                class="text-[0.68rem] font-bold text-gray-400 tracking-wider uppercase block mb-1"
+                >Habitación</span
+              >
+              <p
+                class="font-bold text-[var(--azul-oscuro)] text-base"
+                th:text="${habitacion != null ? habitacion : '301 — VIP Suite'}"
+              >
+                301 — VIP Suite
+              </p>
+            </div>
+
+            <div>
+              <span
+                class="text-[0.68rem] font-bold text-gray-400 tracking-wider uppercase block mb-1"
+                >Fecha Entrada</span
+              >
+              <p
+                class="font-bold text-[var(--azul-oscuro)] text-base"
+                th:text="${fechaEntrada != null ? fechaEntrada : '15 Sep 2025'}"
+              >
+                15 Sep 2025
+              </p>
+            </div>
+
+            <div>
+              <span
+                class="text-[0.68rem] font-bold text-gray-400 tracking-wider uppercase block mb-1"
+                >Fecha Salida</span
+              >
+              <p
+                class="font-bold text-[var(--azul-oscuro)] text-base"
+                th:text="${fechaSalida != null ? fechaSalida : '19 Sep 2025'}"
+              >
+                19 Sep 2025
+              </p>
+            </div>
+
+            <div>
+              <span
+                class="text-[0.68rem] font-bold text-gray-400 tracking-wider uppercase block mb-1"
+                >Total Noches</span
+              >
+              <p
+                class="font-bold text-[var(--azul-oscuro)] text-base"
+                th:text="${noches != null ? noches : '4 noches'}"
+              >
+                4 noches
+              </p>
+            </div>
+
+            <div>
+              <span
+                class="text-[0.68rem] font-bold text-gray-400 tracking-wider uppercase block mb-1"
+                >Reserva</span
+              >
+              <p
+                class="font-bold text-[var(--azul-oscuro)] text-base"
+                th:text="${codigoReserva != null ? codigoReserva : 'MHC-20250915'}"
+              >
+                MHC-20250915
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- TARJETA: RESUMEN DE CONSUMOS -->
+        <div
+          class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden"
+        >
+          <div class="p-6 pb-4">
+            <span
+              class="text-[0.72rem] font-bold text-[var(--azul)] tracking-wider uppercase block"
+            >
+              Resumen de consumos
+            </span>
+          </div>
+
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr
+                class="bg-[var(--azul)] text-white text-[0.72rem] font-bold uppercase tracking-wider"
+              >
+                <th class="py-3.5 px-6">Concepto</th>
+                <th class="py-3.5 px-6 text-right">Valor</th>
+              </tr>
+            </thead>
+            <tbody
+              class="divide-y divide-gray-100 text-sm font-medium text-[var(--texto)]"
+            >
+              <tr class="hover:bg-gray-50/50 transition">
+                <td class="py-4 px-6 text-[var(--azul-oscuro)]">
+                  Restaurante Gourmet ×2
+                </td>
+                <td
+                  class="py-4 px-6 text-right font-bold text-[var(--azul-oscuro)]"
+                >
+                  $170.000
+                </td>
+              </tr>
+              <tr class="hover:bg-gray-50/50 transition">
+                <td class="py-4 px-6 text-[var(--azul-oscuro)]">Minibar ×3</td>
+                <td
+                  class="py-4 px-6 text-right font-bold text-[var(--azul-oscuro)]"
+                >
+                  $135.000
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- TOTAL FILA INFERIOR -->
+          <div
+            class="bg-[#EEF6F8] px-6 py-4 flex justify-between items-center border-t border-blue-50"
+          >
+            <span class="font-serif font-bold text-xl text-[var(--azul-oscuro)]"
+              >Total</span
+            >
+            <span class="font-serif text-2xl font-bold text-[var(--azul)]"
+              >$305.000</span
+            >
+          </div>
+        </div>
+
+        <!-- SECCIÓN: VERIFICACIÓN DE CHECK-OUT -->
+        <div class="space-y-4">
+          <span
+            class="text-[0.72rem] font-bold text-gray-500 tracking-wider uppercase block"
+          >
+            Verificación de check-out
+          </span>
+
+          <form action="#" method="post" class="space-y-4">
+            <!-- CHECK 1: CUENTA SALDADA -->
+            <label
+              class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex items-center justify-between cursor-pointer hover:border-gray-300 transition-all"
+            >
+              <div class="flex items-center gap-4">
+                <div
+                  class="w-12 h-12 rounded-xl bg-gray-100 text-gray-600 flex items-center justify-center text-xl"
+                >
+                  <i class="bi bi-check-circle"></i>
+                </div>
+                <div>
+                  <h4 class="font-bold text-[var(--azul-oscuro)] text-base">
+                    Cuenta saldada
+                  </h4>
+                  <p class="text-xs text-gray-400">Pendiente de verificación</p>
+                </div>
+              </div>
+              <input
+                type="checkbox"
+                name="cuentaSaldada"
+                class="w-5 h-5 accent-[var(--azul)] rounded cursor-pointer"
+              />
+            </label>
+
+            <!-- CHECK 2: LLAVES DEVUELTAS -->
+            <label
+              class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex items-center justify-between cursor-pointer hover:border-gray-300 transition-all"
+            >
+              <div class="flex items-center gap-4">
+                <div
+                  class="w-12 h-12 rounded-xl bg-gray-100 text-gray-600 flex items-center justify-center text-xl"
+                >
+                  <i class="bi bi-key"></i>
+                </div>
+                <div>
+                  <h4 class="font-bold text-[var(--azul-oscuro)] text-base">
+                    Llaves devueltas
+                  </h4>
+                  <p class="text-xs text-gray-400">Pendiente de verificación</p>
+                </div>
+              </div>
+              <input
+                type="checkbox"
+                name="llavesDevueltas"
+                class="w-5 h-5 accent-[var(--azul)] rounded cursor-pointer"
+              />
+            </label>
+
+            <!-- CHECK 3: HABITACIÓN INSPECCIONADA -->
+            <label
+              class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex items-center justify-between cursor-pointer hover:border-gray-300 transition-all"
+            >
+              <div class="flex items-center gap-4">
+                <div
+                  class="w-12 h-12 rounded-xl bg-gray-100 text-gray-600 flex items-center justify-center text-xl"
+                >
+                  <i class="bi bi-aspect-ratio"></i>
+                </div>
+                <div>
+                  <h4 class="font-bold text-[var(--azul-oscuro)] text-base">
+                    Habitación inspeccionada
+                  </h4>
+                  <p class="text-xs text-gray-400">Pendiente de verificación</p>
+                </div>
+              </div>
+              <input
+                type="checkbox"
+                name="habitacionInspeccionada"
+                class="w-5 h-5 accent-[var(--azul)] rounded cursor-pointer"
+              />
+            </label>
+
+            <!-- BOTÓN PRINCIPAL -->
+            <div class="pt-4">
+              <button
+                type="submit"
+                class="w-full bg-[#8BB8D0] hover:bg-[var(--azul)] text-white font-bold py-4 rounded-xl shadow-sm transition-all text-base text-center"
+              >
+                Realizar check-out
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </main>
+
+    <!-- SCRIPTS -->
+    <th:block th:replace="~{fragmentos :: scripts}"></th:block>
+  </body>
+</html>
