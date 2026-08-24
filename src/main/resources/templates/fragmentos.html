@@ -357,7 +357,9 @@
             Menú Principal
           </span>
 
-          <!-- La opción activa se determina según la ruta actual. -->
+          <!-- La opción activa se determina según la ruta actual.
+          Para identificar las pestañas se utiliza un operador ternario
+          el cual usa la variable seccionActiva que le da el controlador -->
           <a
             th:href="@{/operador/reservas}"
             th:class="${seccionActiva == 'reservas'
