@@ -43,11 +43,27 @@ public class AdminController {
     }
 
     /**
-     * /admin no tiene pantalla propia: entra directo a operadores.
+     * Tablero de entrada del panel: resume en cuantos elementos activos hay
+     * en cada seccion y ofrece el acceso a las tres pantallas de gestion.
      */
     @GetMapping
-    public String inicio() {
-        return "redirect:/admin/operadores";
+    public String inicio(Model model) {
+        model.addAttribute("totalOperadores", operadorService.buscarTodos().size());
+        model.addAttribute("operadoresActivos", operadorService.buscarTodos().stream()
+                .filter(operador -> Boolean.TRUE.equals(operador.getActivo()))
+                .count());
+
+        model.addAttribute("totalServicios", servicioService.buscarTodos().size());
+        model.addAttribute("serviciosActivos", servicioService.buscarTodos().stream()
+                .filter(Servicio::isActivo)
+                .count());
+
+        model.addAttribute("totalHabitaciones", habitacionService.buscarTodas().size());
+        model.addAttribute("habitacionesDisponibles", habitacionService.buscarTodas().stream()
+                .filter(habitacion -> "DISPONIBLE".equals(habitacion.getEstado()))
+                .count());
+
+        return "admin/index";
     }
 
     // ===== OPERADORES =====

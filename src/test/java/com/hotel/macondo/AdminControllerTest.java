@@ -41,10 +41,16 @@ class AdminControllerTest {
     HabitacionService habitacionService;
 
     @Test
-    void adminEntraDirectoAOperadores() throws Exception {
+    void adminMuestraElTableroConSusTotales() throws Exception {
         mockMvc.perform(get("/admin"))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/admin/operadores"));
+                .andExpect(status().isOk())
+                .andExpect(content().string(
+                        org.hamcrest.Matchers.containsString("Bienvenido al panel")))
+                // los totales del tablero salen de los datos en memoria
+                .andExpect(content().string(
+                        org.hamcrest.Matchers.containsString("Operadores,")))
+                .andExpect(content().string(
+                        org.hamcrest.Matchers.containsString("disponibles")));
     }
 
     @Test

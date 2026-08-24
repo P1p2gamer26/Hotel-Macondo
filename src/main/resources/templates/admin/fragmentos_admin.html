@@ -32,6 +32,12 @@
         <!-- th:classappend resalta el enlace de la seccion actual -->
         <a
           class="rounded-lg px-4 py-3 hover:bg-white/10 transition"
+          th:classappend="${activa == 'inicio'} ? 'bg-[var(--dorado)] text-[var(--azul-oscuro)] font-bold hover:bg-[var(--dorado)]'"
+          th:href="@{/admin}"
+          ><i class="bi bi-grid-1x2 mr-2"></i>Tablero</a
+        >
+        <a
+          class="rounded-lg px-4 py-3 hover:bg-white/10 transition"
           th:classappend="${activa == 'operadores'} ? 'bg-[var(--dorado)] text-[var(--azul-oscuro)] font-bold hover:bg-[var(--dorado)]'"
           th:href="@{/admin/operadores}"
           ><i class="bi bi-person-badge mr-2"></i>Operadores</a
