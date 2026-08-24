@@ -25,7 +25,7 @@
               <tr>
                 <th class="px-4 py-3">#</th>
                 <th class="px-4 py-3">Servicio</th>
-                <th class="px-4 py-3">Descripcion</th>
+                <th class="px-4 py-3">Categoria</th>
                 <th class="px-4 py-3">Precio (COP)</th>
                 <th class="px-4 py-3">Estado</th>
                 <th class="px-4 py-3 text-right">Acciones</th>
@@ -57,13 +57,14 @@
                 </td>
 
                 <td class="px-4 py-3">
-                  <textarea
-                    class="w-56 border border-gray-200 rounded-lg px-3 py-2 resize-none focus:outline-none focus:border-[var(--azul)]"
-                    name="descripcion"
-                    rows="2"
+                  <input
+                    class="w-40 border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:border-[var(--azul)]"
+                    type="text"
+                    name="categoria"
+                    th:value="${servicio.categoria}"
                     th:attr="form='servicio-' + ${servicio.id}"
-                    th:text="${servicio.descripcion}"
-                  ></textarea>
+                    required
+                  />
                 </td>
 
                 <td class="px-4 py-3">
