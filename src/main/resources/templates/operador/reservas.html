@@ -4,25 +4,25 @@
     th:replace="~{fragmentos :: cabecera('Reservas | Hotel Macondo')}"
   ></head>
 
-  <body class="bg-gray-100 text-[var(--texto)] font-sans flex min-h-screen">
+  <body class="bg-[var(--crema-claro)] text-[var(--texto)] font-sans flex flex-col md:flex-row min-h-screen">
     <nav th:replace="~{operador/fragmentos_operador :: menu}"></nav>
 
-    <main class="flex-1 p-8">
-      <h1 class="text-3xl font-serif font-bold text-[var(--azul-oscuro)] mb-2">
+    <main class="flex-1 p-6 md:p-10">
+      <h1 class="text-3xl md:text-4xl font-serif font-bold text-[var(--azul-oscuro)] mb-2">
         Reservas
       </h1>
 
-      <p class="text-gray-500 mb-8">
+      <p class="text-[var(--texto)] mb-8">
         Reservas registradas en el hotel y su estado actual.
       </p>
 
       <!-- Datos quemados igual que en las demas pantallas del operador:
            la fuente real se conecta cuando exista el servicio de reservas. -->
       <div
-        class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-x-auto"
+        class="bg-white rounded-2xl shadow-sm overflow-x-auto"
       >
         <table class="w-full text-left min-w-[720px]">
-          <thead class="bg-gray-50 text-gray-500 text-xs uppercase tracking-wider">
+          <thead class="bg-[var(--crema)] text-[var(--azul-oscuro)] text-sm uppercase tracking-wider">
             <tr>
               <th class="px-6 py-4">Codigo</th>
               <th class="px-6 py-4">Huesped</th>

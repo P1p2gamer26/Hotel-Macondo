@@ -119,16 +119,16 @@ public class AdminController {
     }
 
     /**
-     * Actualiza nombre, descripcion y precio de un servicio.
+     * Actualiza nombre, categoria y precio de un servicio.
      */
     @PostMapping("/servicios/{id}")
     public String editarServicio(@PathVariable Integer id,
             @RequestParam String nombre,
-            @RequestParam String descripcion,
+            @RequestParam String categoria,
             @RequestParam BigDecimal precio) {
         Servicio servicio = servicioService.buscarPorId(id);
         if (servicio != null) {
-            servicio.actualizarDatos(nombre, descripcion, precio);
+            servicio.actualizarDatos(nombre, categoria, precio);
         }
         return "redirect:/admin/servicios";
     }

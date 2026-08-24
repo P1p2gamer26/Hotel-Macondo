@@ -74,7 +74,7 @@ class MacondoApplicationTests {
     @Test
     void cuentaCalculaYLiquidaSuSaldo() {
         Servicio servicio = new Servicio(99, "Traslado", "Traslado local",
-                null, false, BigDecimal.valueOf(50000), true);
+                "Transporte", null, false, BigDecimal.valueOf(50000), true);
         Cuenta cuenta = new Cuenta(99, null);
 
         assertNotNull(cuenta.agregarItem(servicio, 2));

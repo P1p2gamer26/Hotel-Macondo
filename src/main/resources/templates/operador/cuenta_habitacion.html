@@ -3,12 +3,12 @@
   <head
     th:replace="~{fragmentos :: cabecera('Cuenta Habitación | Hotel Macondo')}"
   ></head>
-  <body class="bg-gray-100 text-[var(--texto)] font-sans flex min-h-screen">
+  <body class="bg-[var(--crema-claro)] text-[var(--texto)] font-sans flex flex-col md:flex-row min-h-screen">
     <!-- BARRA LATERAL (NAV OPERADOR) -->
     <nav th:replace="~{operador/fragmentos_operador :: menu}"></nav>
 
     <!-- CONTENIDO PRINCIPAL -->
-    <main class="flex-1 p-8 overflow-y-auto">
+    <main class="flex-1 p-6 md:p-10 overflow-y-auto">
       <!-- ENCABEZADO -->
       <div class="flex items-center gap-4 mb-6 pb-4 border-b border-gray-200">
         <div
@@ -17,7 +17,7 @@
           301
         </div>
         <div>
-          <h1 class="text-3xl font-serif font-bold text-[var(--azul-oscuro)]">
+          <h1 class="text-3xl md:text-4xl font-serif font-bold text-[var(--azul-oscuro)]">
             Habitación 301
           </h1>
           <p class="text-sm text-gray-500 font-medium">Cuenta de consumos</p>
@@ -30,7 +30,7 @@
         <div class="lg:col-span-2 space-y-6">
           <!-- TARJETA DETALLES DEL HUÉSPED -->
           <div
-            class="bg-[#F6ECE0] border-l-4 border-[var(--azul)] rounded-xl p-6 shadow-sm grid grid-cols-2 gap-6"
+            class="bg-[var(--crema)] border-l-4 border-[var(--azul)] rounded-xl p-6 shadow-sm grid grid-cols-2 gap-6"
           >
             <div>
               <span
@@ -65,7 +65,7 @@
           </div>
 
           <!-- TARJETA AGREGAR SERVICIO -->
-          <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+          <div class="bg-white rounded-2xl p-6 shadow-sm">
             <span
               class="text-[0.72rem] font-bold text-[var(--azul)] tracking-wider uppercase block mb-4"
               >Agregar Servicio</span
@@ -85,7 +85,7 @@
                 <select
                   id="servicio"
                   name="servicioId"
-                  class="w-full rounded-lg px-4 py-2.5 border border-gray-200 focus:outline-none focus:border-[var(--azul)] bg-gray-50 text-sm text-[var(--texto)]"
+                  class="w-full rounded-lg px-4 py-2.5 border border-gray-200 focus:outline-none focus:border-[var(--azul)] text-sm text-[var(--texto)]"
                 >
                   <option value="">Seleccionar...</option>
                   <option value="1">Spa & Bienestar - $120.000</option>
@@ -106,7 +106,7 @@
                   name="cantidad"
                   value="1"
                   min="1"
-                  class="w-full rounded-lg px-3 py-2.5 border border-gray-200 text-center focus:outline-none focus:border-[var(--azul)] bg-gray-50 text-sm text-[var(--texto)]"
+                  class="w-full rounded-lg px-3 py-2.5 border border-gray-200 text-center focus:outline-none focus:border-[var(--azul)] text-sm text-[var(--texto)]"
                 />
               </div>
 
@@ -121,13 +121,13 @@
 
           <!-- TABLA DE CONSUMOS -->
           <div
-            class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden"
+            class="bg-white rounded-2xl shadow-sm overflow-hidden"
           >
             <div class="overflow-x-auto">
               <table class="w-full text-left border-collapse">
                 <thead>
                   <tr
-                    class="bg-[var(--azul)] text-white text-[0.72rem] font-bold uppercase tracking-wider"
+                    class="bg-[var(--crema)] text-[var(--azul-oscuro)] text-sm font-bold uppercase tracking-wider"
                   >
                     <th class="py-3.5 px-6">Servicio</th>
                     <th class="py-3.5 px-4 text-left">Precio Unit.</th>
@@ -259,7 +259,7 @@
 
               <!-- TOTAL DESTACADO -->
               <div
-                class="mt-6 mb-8 bg-[#EEF6F8] rounded-xl p-4 flex justify-between items-center"
+                class="mt-6 mb-8 bg-[var(--crema-claro)] rounded-xl p-4 flex justify-between items-center"
               >
                 <span class="text-[var(--azul)] font-bold text-sm">Total</span>
                 <span class="font-serif text-2xl font-bold text-[var(--azul)]"
@@ -271,7 +271,7 @@
             <!-- BOTÓN REGISTRAR PAGO -->
             <button
               type="button"
-              class="w-full bg-[var(--dorado)] hover:bg-[var(--dorado-oscuro)] text-[var(--azul-oscuro)] font-bold py-3 px-4 rounded-xl shadow-sm transition-all text-center"
+              class="w-full bg-[var(--dorado)] hover:bg-[var(--dorado-oscuro)] text-[var(--azul-oscuro)] font-bold py-3 px-4 rounded-lg shadow-sm transition-all text-center"
             >
               Registrar pago
             </button>

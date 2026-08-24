@@ -12,6 +12,7 @@ public class Servicio {
     private Integer id;
     private String nombre;
     private String descripcion;
+    private String categoria;
     private String imagen;
     private boolean destacado;
     private BigDecimal precio;
@@ -20,19 +21,20 @@ public class Servicio {
     /**
      * Conserva el constructor usado por la pagina principal actual.
      */
-    public Servicio(Integer id, String nombre, String descripcion, String imagen,
-            boolean destacado) {
-        this(id, nombre, descripcion, imagen, destacado, BigDecimal.ZERO, true);
+    public Servicio(Integer id, String nombre, String descripcion, String categoria,
+            String imagen, boolean destacado) {
+        this(id, nombre, descripcion, categoria, imagen, destacado, BigDecimal.ZERO, true);
     }
 
     /**
      * Crea un servicio con sus datos comerciales completos.
      */
-    public Servicio(Integer id, String nombre, String descripcion, String imagen,
-            boolean destacado, BigDecimal precio, boolean activo) {
+    public Servicio(Integer id, String nombre, String descripcion, String categoria,
+            String imagen, boolean destacado, BigDecimal precio, boolean activo) {
         this.id = id;
         this.nombre = nombre;
         this.descripcion = descripcion;
+        this.categoria = categoria;
         this.imagen = imagen;
         this.destacado = destacado;
         this.precio = precio;
@@ -42,9 +44,9 @@ public class Servicio {
     /**
      * Actualiza la informacion editable del servicio.
      */
-    public void actualizarDatos(String nombre, String descripcion, BigDecimal precio) {
+    public void actualizarDatos(String nombre, String categoria, BigDecimal precio) {
         this.nombre = nombre;
-        this.descripcion = descripcion;
+        this.categoria = categoria;
         this.precio = precio;
     }
 

@@ -96,7 +96,7 @@ class AdminControllerTest {
     void editaServicioYAlternaSuEstado() throws Exception {
         mockMvc.perform(post("/admin/servicios/{id}", 1)
                 .param("nombre", "Spa renovado")
-                .param("descripcion", "Rituales caribenos")
+                .param("categoria", "Bienestar")
                 .param("precio", "250000"))
                 .andExpect(redirectedUrl("/admin/servicios"));
 
