@@ -5,7 +5,9 @@ import java.util.Collection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.ui.Model;
 
@@ -25,15 +27,34 @@ public class OperadorController {
     }
 
     @GetMapping("/cuenta")
-    public String cuentaHabitacion(Model model){
+    public String buscarCuenta(Model model) {
         model.addAttribute("seccionActiva", "cuenta");
+        return "buscar_cuenta";
+    }
+
+    @GetMapping("/cuenta/{id}")
+    public String cuentaHabitacion(
+            @PathVariable Integer id,
+            Model model) {
+
+        model.addAttribute("seccionActiva", "cuenta");
+
         return "cuenta_habitacion";
     }
+
 
     @GetMapping("/checkout")
     public String checkout(Model model){
         model.addAttribute("seccionActiva", "checkout");
         return "checkout_operador";
+    }
+
+    /*
+    * Redirecciona a la cuenta que se busca
+    */
+    @GetMapping("cuenta/buscar")
+    public String buscarCuenta(@RequestParam int id){
+        return "redirect:/operador/cuenta/" + id;
     }
 
     /**
