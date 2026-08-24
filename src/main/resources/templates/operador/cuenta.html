@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+  <head
+    th:replace="~{fragmentos :: cabecera('Buscar Cuenta | Hotel Macondo')}"
+  ></head>
+
+  <body class="bg-[var(--crema-claro)] text-[var(--texto)] font-sans flex flex-col md:flex-row min-h-screen">
+    <nav th:replace="~{operador/fragmentos_operador :: menu}"></nav>
+
+    <main class="flex-1 p-6 md:p-10">
+      <div class="max-w-xl mx-auto">
+        <h1
+          class="text-3xl md:text-4xl font-serif font-bold text-[var(--azul-oscuro)] mb-2"
+        >
+          Busqueda de habitacion
+        </h1>
+
+        <p class="text-[var(--texto)] mb-8">
+          Ingrese el ID de la habitación para consultar su cuenta.
+        </p>
+
+        <form
+          th:action="@{/operador/cuenta/buscar}"
+          method="get"
+          class="bg-white rounded-2xl p-6 shadow-sm"
+        >
+          <label for="id" class="text-sm font-bold text-gray-600 block mb-2">
+            ID de habitación
+          </label>
+
+          <div class="flex gap-3">
+            <input
+              type="number"
+              id="id"
+              name="id"
+              min="1"
+              required
+              placeholder="Ej. 301"
+              class="flex-1 rounded-lg px-4 py-3 border border-gray-200 focus:outline-none focus:border-[var(--azul)]"
+            />
+
+            <button
+              type="submit"
+              class="px-6 py-3 bg-[var(--dorado)] hover:bg-[var(--dorado-oscuro)] text-[var(--azul-oscuro)] font-bold rounded-lg transition-all"
+            >
+              Buscar
+            </button>
+          </div>
+        </form>
+      </div>
+    </main>
+
+    <th:block th:replace="~{fragmentos :: scripts}"></th:block>
+  </body>
+</html>

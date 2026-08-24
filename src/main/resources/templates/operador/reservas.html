@@ -3,21 +3,30 @@
   <head
     th:replace="~{fragmentos :: cabecera('Gestión de Reservas | Hotel Macondo')}"
   ></head>
-  <body class="bg-gray-100 text-[var(--texto)] font-sans flex min-h-screen">
+
+  <body
+    class="bg-[var(--crema-claro)] text-[var(--texto)] font-sans flex flex-col md:flex-row min-h-screen"
+  >
     <!-- BARRA LATERAL (NAV OPERADOR) -->
-    <nav th:replace="~{operador/fragmentos_operador}"></nav>
+    <nav th:replace="~{operador/fragmentos_operador :: menu}"></nav>
 
     <!-- CONTENIDO PRINCIPAL -->
-    <main class="flex-1 p-8 overflow-y-auto">
+    <main class="flex-1 p-6 md:p-10">
       <!-- ENCABEZADO -->
       <div class="mb-8 pb-4 border-b border-gray-200">
-        <h1 class="text-3xl font-serif font-bold text-[var(--azul-oscuro)]">
+        <h1
+          class="text-3xl md:text-4xl font-serif font-bold text-[var(--azul-oscuro)] mb-2"
+        >
           Reservas
         </h1>
         <p class="text-sm text-gray-500 font-medium mt-1">
           Portal operador — Hotel Macondo
         </p>
       </div>
+
+      <p class="text-[var(--texto)] mb-8">
+        Reservas registradas en el hotel y su estado actual.
+      </p>
 
       <!-- TARJETAS DE MÉTRICAS (METRICS DASHBOARD) -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -202,7 +211,7 @@
                 <td class="py-4 px-6 text-center">
                   <div class="flex justify-center items-center gap-2">
                     <a
-                      th:href="@{/operador/cuenta-habitacion}"
+                      th:href="@{/operador/cuenta/301}"
                       class="px-4 py-1.5 bg-[var(--azul)] text-white rounded-lg text-xs font-semibold hover:bg-[var(--azul-oscuro)] transition"
                       >Ver</a
                     >
