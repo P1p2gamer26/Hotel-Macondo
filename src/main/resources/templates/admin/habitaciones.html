@@ -39,7 +39,7 @@
                   <div class="flex items-center gap-3">
                     <img
                       class="w-14 h-14 rounded-lg object-cover bg-[var(--crema)]"
-                      th:src="@{'/images/' + ${habitacion.imagen}}"
+                      th:src="@{${habitacion.imagen}}"
                       th:alt="${habitacion.nombre}"
                     />
                     <div>

@@ -23,7 +23,7 @@
             <div class="flex items-start gap-4 p-6 pb-0">
               <img
                 class="w-20 h-20 rounded-xl object-cover bg-[var(--crema)]"
-                th:src="@{'/images/' + ${servicio.imagen}}"
+                th:src="@{${servicio.imagen}}"
                 th:alt="${servicio.nombre}"
               />
               <div class="flex-1">
