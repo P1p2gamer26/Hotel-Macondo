@@ -34,6 +34,7 @@ public class OperadorController {
 
     @GetMapping
     public String inicio(Model model) {
+        model.addAttribute("seccionActiva", "panel");
         return "operador/index";
     }
 
