@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+  <head
+    th:replace="~{fragmentos :: cabecera('Panel de administracion | Hotel Macondo')}"
+  ></head>
+
+  <body class="bg-[var(--crema-claro)] text-[var(--texto)] font-sans">
+    <div class="flex flex-col md:flex-row">
+      <aside th:replace="~{admin/fragmentos_admin :: menu('inicio')}"></aside>
+
+      <main class="flex-1 p-6 md:p-10">
+        <header
+          th:replace="~{admin/fragmentos_admin :: titulo('Panel de administracion', 'Resumen del hotel y acceso a las tres secciones de gestion.')}"
+        ></header>
+
+        <!-- Tarjetas de resumen: cada una lleva a su seccion, por eso el
+             bloque completo es un enlace y no solo el titulo. -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+          <a
+            class="bg-white rounded-2xl shadow-sm p-6 hover:shadow-md transition block"
+            th:href="@{/admin/operadores}"
+          >
+            <div class="flex items-center justify-between mb-4">
+              <span
+                class="text-[0.7rem] tracking-[3px] uppercase text-[var(--azul)] font-bold"
+                >Personal</span
+              >
+              <i class="bi bi-person-badge text-2xl text-[var(--dorado)]"></i>
+            </div>
+            <p
+              class="font-serif text-4xl font-bold text-[var(--azul-oscuro)]"
+              th:text="${totalOperadores}"
+            ></p>
+            <p class="mt-1">
+              Operadores,
+              <strong
+                class="text-[var(--azul-oscuro)]"
+                th:text="${operadoresActivos}"
+              ></strong>
+              activos
+            </p>
+          </a>
+
+          <a
+            class="bg-white rounded-2xl shadow-sm p-6 hover:shadow-md transition block"
+            th:href="@{/admin/servicios}"
+          >
+            <div class="flex items-center justify-between mb-4">
+              <span
+                class="text-[0.7rem] tracking-[3px] uppercase text-[var(--azul)] font-bold"
+                >Experiencias</span
+              >
+              <i class="bi bi-stars text-2xl text-[var(--dorado)]"></i>
+            </div>
+            <p
+              class="font-serif text-4xl font-bold text-[var(--azul-oscuro)]"
+              th:text="${totalServicios}"
+            ></p>
+            <p class="mt-1">
+              Servicios,
+              <strong
+                class="text-[var(--azul-oscuro)]"
+                th:text="${serviciosActivos}"
+              ></strong>
+              activos
+            </p>
+          </a>
+
+          <a
+            class="bg-white rounded-2xl shadow-sm p-6 hover:shadow-md transition block"
+            th:href="@{/admin/habitaciones}"
+          >
+            <div class="flex items-center justify-between mb-4">
+              <span
+                class="text-[0.7rem] tracking-[3px] uppercase text-[var(--azul)] font-bold"
+                >Hospedaje</span
+              >
+              <i class="bi bi-door-closed text-2xl text-[var(--dorado)]"></i>
+            </div>
+            <p
+              class="font-serif text-4xl font-bold text-[var(--azul-oscuro)]"
+              th:text="${totalHabitaciones}"
+            ></p>
+            <p class="mt-1">
+              Habitaciones,
+              <strong
+                class="text-[var(--azul-oscuro)]"
+                th:text="${habitacionesDisponibles}"
+              ></strong>
+              disponibles
+            </p>
+          </a>
+        </div>
+
+        <!-- Franja de bienvenida con el mismo degradado dorado del cierre
+             de la pagina publica, para que el panel se sienta del hotel. -->
+        <section
+          class="rounded-2xl bg-gradient-to-b from-[var(--crema-claro)] to-[var(--dorado)] p-10 text-center"
+        >
+          <img
+            class="w-16 h-auto mx-auto mb-4"
+            th:src="@{/images/logo.png}"
+            alt="Logo Hotel Macondo"
+          />
+          <h2
+            class="font-serif text-3xl font-bold text-[var(--azul-oscuro)] mb-2"
+          >
+            Bienvenido al panel
+          </h2>
+          <p class="max-w-xl mx-auto text-[var(--azul-oscuro)]">
+            Desde aqui se administra el personal, el catalogo de servicios y el
+            inventario de habitaciones del Hotel Macondo.
+          </p>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>
