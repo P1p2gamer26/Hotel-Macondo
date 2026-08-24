@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+  <body>
+    <header class="macondo-header" th:fragment="header">
+      <nav class="macondo-nav" aria-label="Navegación principal">
+        <a class="macondo-brand" th:href="@{/}" aria-label="Hotel Macondo, inicio">
+          <img th:src="@{/images/logo.png}" alt="" />
+          <span>Hotel Macondo</span>
+        </a>
+        <ul class="macondo-nav-links">
+          <li><a th:href="@{/}">Inicio</a></li>
+          <li><a th:href="@{/habitaciones}">Habitaciones</a></li>
+          <li><a class="is-active" th:href="@{/servicios}">Servicios</a></li>
+          <li><a href="/#contacto">Contacto</a></li>
+        </ul>
+        <div class="macondo-nav-actions">
+          <a class="button button-outline" th:href="@{/login}">Iniciar Sesión</a>
+          <a class="button button-neutral" href="#">Registrarse</a>
+          <a class="button button-gold" th:href="@{/habitaciones}">Reservar</a>
+        </div>
+        <button
+          class="macondo-menu-toggle"
+          type="button"
+          aria-label="Abrir menú"
+          aria-expanded="false"
+          aria-controls="macondo-mobile-menu"
+          data-menu-toggle
+        >
+          <i class="bi bi-list" aria-hidden="true"></i>
+        </button>
+      </nav>
+      <div class="macondo-mobile-menu" id="macondo-mobile-menu" data-mobile-menu hidden>
+        <a th:href="@{/}">Inicio</a>
+        <a th:href="@{/habitaciones}">Habitaciones</a>
+        <a th:href="@{/servicios}">Servicios</a>
+        <a href="/#contacto">Contacto</a>
+        <a th:href="@{/login}">Iniciar Sesión</a>
+        <a th:href="@{/habitaciones}">Reservar</a>
+      </div>
+    </header>
+  </body>
+</html>
