@@ -1,112 +1,357 @@
 <!doctype html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
   <head
-    th:replace="~{fragmentos :: cabecera('Reservas | Hotel Macondo')}"
+    th:replace="~{fragmentos :: cabecera('Gestión de Reservas | Hotel Macondo')}"
   ></head>
 
-  <body class="bg-[var(--crema-claro)] text-[var(--texto)] font-sans flex flex-col md:flex-row min-h-screen">
+  <body
+    class="bg-[var(--crema-claro)] text-[var(--texto)] font-sans flex flex-col md:flex-row min-h-screen"
+  >
+    <!-- BARRA LATERAL (NAV OPERADOR) -->
     <nav th:replace="~{operador/fragmentos_operador :: menu}"></nav>
 
+    <!-- CONTENIDO PRINCIPAL -->
     <main class="flex-1 p-6 md:p-10">
-      <h1 class="text-3xl md:text-4xl font-serif font-bold text-[var(--azul-oscuro)] mb-2">
-        Reservas
-      </h1>
+      <!-- ENCABEZADO -->
+      <div class="mb-8 pb-4 border-b border-gray-200">
+        <h1
+          class="text-3xl md:text-4xl font-serif font-bold text-[var(--azul-oscuro)] mb-2"
+        >
+          Reservas
+        </h1>
+        <p class="text-sm text-gray-500 font-medium mt-1">
+          Portal operador — Hotel Macondo
+        </p>
+      </div>
 
       <p class="text-[var(--texto)] mb-8">
         Reservas registradas en el hotel y su estado actual.
       </p>
 
-      <!-- Datos quemados igual que en las demas pantallas del operador:
-           la fuente real se conecta cuando exista el servicio de reservas. -->
+      <!-- TARJETAS DE MÉTRICAS (METRICS DASHBOARD) -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <!-- Tarjeta 1: Reservas Hoy -->
+        <div
+          class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex justify-between items-start"
+        >
+          <div>
+            <span
+              class="text-[0.68rem] font-bold text-gray-400 tracking-wider uppercase block mb-3"
+              >Reservas hoy</span
+            >
+            <span class="text-3xl font-bold text-[var(--azul-oscuro)] block"
+              >7</span
+            >
+            <span class="text-xs text-gray-400 mt-1 block">Total del día</span>
+          </div>
+          <div
+            class="w-10 h-10 rounded-xl bg-blue-50 text-[var(--azul)] flex items-center justify-center text-lg"
+          >
+            <i class="bi bi-clipboard-check"></i>
+          </div>
+        </div>
+
+        <!-- Tarjeta 2: Check-ins Hoy -->
+        <div
+          class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex justify-between items-start"
+        >
+          <div>
+            <span
+              class="text-[0.68rem] font-bold text-gray-400 tracking-wider uppercase block mb-3"
+              >Check-ins hoy</span
+            >
+            <span class="text-3xl font-bold text-[var(--azul-oscuro)] block"
+              >3</span
+            >
+            <span class="text-xs text-gray-400 mt-1 block"
+              >Llegadas esperadas</span
+            >
+          </div>
+          <div
+            class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-lg"
+          >
+            <i class="bi bi-person-check"></i>
+          </div>
+        </div>
+
+        <!-- Tarjeta 3: Check-outs Hoy -->
+        <div
+          class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex justify-between items-start"
+        >
+          <div>
+            <span
+              class="text-[0.68rem] font-bold text-gray-400 tracking-wider uppercase block mb-3"
+              >Check-outs hoy</span
+            >
+            <span class="text-3xl font-bold text-[var(--azul-oscuro)] block"
+              >2</span
+            >
+            <span class="text-xs text-gray-400 mt-1 block"
+              >Salidas programadas</span
+            >
+          </div>
+          <div
+            class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-lg"
+          >
+            <i class="bi bi-calendar-event"></i>
+          </div>
+        </div>
+
+        <!-- Tarjeta 4: Ocupación -->
+        <div
+          class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex justify-between items-start"
+        >
+          <div>
+            <span
+              class="text-[0.68rem] font-bold text-gray-400 tracking-wider uppercase block mb-3"
+              >Ocupación</span
+            >
+            <span class="text-3xl font-bold text-[var(--azul-oscuro)] block"
+              >78%</span
+            >
+            <span class="text-xs text-gray-400 mt-1 block"
+              >Habitaciones ocupadas</span
+            >
+          </div>
+          <div
+            class="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center text-lg"
+          >
+            <i class="bi bi-door-closed"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- BARRA DE BÚSQUEDA Y FILTROS -->
       <div
-        class="bg-white rounded-2xl shadow-sm overflow-x-auto"
+        class="flex flex-col lg:flex-row gap-4 justify-between items-center mb-6"
       >
-        <table class="w-full text-left min-w-[720px]">
-          <thead class="bg-[var(--crema)] text-[var(--azul-oscuro)] text-sm uppercase tracking-wider">
-            <tr>
-              <th class="px-6 py-4">Codigo</th>
-              <th class="px-6 py-4">Huesped</th>
-              <th class="px-6 py-4">Habitacion</th>
-              <th class="px-6 py-4">Entrada</th>
-              <th class="px-6 py-4">Salida</th>
-              <th class="px-6 py-4">Estado</th>
-              <th class="px-6 py-4 text-right">Cuenta</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr class="border-t border-gray-100">
-              <td class="px-6 py-4 font-mono text-sm">MCD-1041</td>
-              <td class="px-6 py-4 font-medium text-[var(--azul-oscuro)]">
-                Remedios Moscote
-              </td>
-              <td class="px-6 py-4">301 &middot; VIP</td>
-              <td class="px-6 py-4">2026-08-24</td>
-              <td class="px-6 py-4">2026-08-27</td>
-              <td class="px-6 py-4">
-                <span
-                  class="rounded-full px-3 py-1 text-xs font-bold bg-green-100 text-green-700"
-                  >En estancia</span
-                >
-              </td>
-              <td class="px-6 py-4 text-right">
-                <a
-                  class="text-[var(--azul)] hover:underline font-medium"
-                  th:href="@{/operador/cuenta/301}"
-                  >Ver cuenta</a
-                >
-              </td>
-            </tr>
+        <!-- Input de Búsqueda -->
+        <div class="relative w-full lg:w-1/2">
+          <i
+            class="bi bi-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+          ></i>
+          <input
+            type="text"
+            placeholder="Buscar código, cliente o habitación..."
+            class="w-full bg-white rounded-xl pl-11 pr-4 py-2.5 border border-gray-200 text-sm focus:outline-none focus:border-[var(--azul)] text-[var(--texto)] shadow-sm"
+          />
+        </div>
 
-            <tr class="border-t border-gray-100">
-              <td class="px-6 py-4 font-mono text-sm">MCD-1042</td>
-              <td class="px-6 py-4 font-medium text-[var(--azul-oscuro)]">
-                Aureliano Buendia
-              </td>
-              <td class="px-6 py-4">204 &middot; Executive</td>
-              <td class="px-6 py-4">2026-08-25</td>
-              <td class="px-6 py-4">2026-08-28</td>
-              <td class="px-6 py-4">
-                <span
-                  class="rounded-full px-3 py-1 text-xs font-bold bg-[var(--crema)] text-[var(--azul-oscuro)]"
-                  >Por llegar</span
-                >
-              </td>
-              <td class="px-6 py-4 text-right">
-                <a
-                  class="text-[var(--azul)] hover:underline font-medium"
-                  th:href="@{/operador/cuenta/204}"
-                  >Ver cuenta</a
-                >
-              </td>
-            </tr>
+        <!-- Filtros (Pills) -->
+        <div
+          class="flex flex-wrap gap-2 w-full lg:w-auto justify-start lg:justify-end text-xs font-semibold"
+        >
+          <button
+            class="px-5 py-2 rounded-full bg-[var(--azul)] text-white shadow-sm transition"
+          >
+            Todas
+          </button>
+          <button
+            class="px-5 py-2 rounded-full bg-white text-[var(--azul)] border border-[var(--azul)] hover:bg-blue-50 transition"
+          >
+            Activa
+          </button>
+          <button
+            class="px-5 py-2 rounded-full bg-white text-[var(--azul)] border border-[var(--azul)] hover:bg-blue-50 transition"
+          >
+            Futura
+          </button>
+          <button
+            class="px-5 py-2 rounded-full bg-white text-[var(--azul)] border border-[var(--azul)] hover:bg-blue-50 transition"
+          >
+            Cancelada
+          </button>
+          <button
+            class="px-5 py-2 rounded-full bg-white text-[var(--azul)] border border-[var(--azul)] hover:bg-blue-50 transition"
+          >
+            Finalizada
+          </button>
+        </div>
+      </div>
 
-            <tr class="border-t border-gray-100">
-              <td class="px-6 py-4 font-mono text-sm">MCD-1039</td>
-              <td class="px-6 py-4 font-medium text-[var(--azul-oscuro)]">
-                Fernanda del Carpio
-              </td>
-              <td class="px-6 py-4">102 &middot; Normal</td>
-              <td class="px-6 py-4">2026-08-20</td>
-              <td class="px-6 py-4">2026-08-23</td>
-              <td class="px-6 py-4">
-                <span
-                  class="rounded-full px-3 py-1 text-xs font-bold bg-gray-200 text-gray-600"
-                  >Finalizada</span
-                >
-              </td>
-              <td class="px-6 py-4 text-right">
-                <a
-                  class="text-[var(--azul)] hover:underline font-medium"
-                  th:href="@{/operador/cuenta/102}"
-                  >Ver cuenta</a
-                >
-              </td>
-            </tr>
-          </tbody>
-        </table>
+      <!-- TABLA DE RESERVAS -->
+      <div
+        class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden"
+      >
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr
+                class="bg-[var(--azul)] text-white text-[0.72rem] font-bold uppercase tracking-wider"
+              >
+                <th class="py-4 px-6">Código</th>
+                <th class="py-4 px-6">Cliente</th>
+                <th class="py-4 px-6">Habitación</th>
+                <th class="py-4 px-6">Entrada</th>
+                <th class="py-4 px-6">Salida</th>
+                <th class="py-4 px-6 text-center">Estado</th>
+                <th class="py-4 px-6 text-center">Acciones</th>
+              </tr>
+            </thead>
+            <tbody
+              class="divide-y divide-gray-100 text-sm font-medium text-[var(--texto)]"
+            >
+              <!-- Fila 1 -->
+              <tr class="hover:bg-gray-50/50 transition">
+                <td class="py-4 px-6 font-bold text-[var(--azul)]">
+                  MHC-20250915
+                </td>
+                <td class="py-4 px-6 font-bold text-[var(--azul-oscuro)]">
+                  Valentina Ospina
+                </td>
+                <td class="py-4 px-6 text-gray-600">301 — VIP</td>
+                <td class="py-4 px-6 text-gray-600">15 Sep 2025</td>
+                <td class="py-4 px-6 text-gray-600">19 Sep 2025</td>
+                <td class="py-4 px-6 text-center">
+                  <span
+                    class="inline-block px-4 py-1 rounded-full text-xs font-semibold bg-sky-50 text-sky-600 border border-sky-200"
+                    >Activa</span
+                  >
+                </td>
+                <td class="py-4 px-6 text-center">
+                  <div class="flex justify-center items-center gap-2">
+                    <a
+                      th:href="@{/operador/cuenta/301}"
+                      class="px-4 py-1.5 bg-[var(--azul)] text-white rounded-lg text-xs font-semibold hover:bg-[var(--azul-oscuro)] transition"
+                      >Ver</a
+                    >
+                    <button
+                      class="px-3 py-1.5 bg-white border border-red-300 text-red-500 rounded-lg text-xs font-semibold hover:bg-red-50 transition"
+                    >
+                      Cancelar
+                    </button>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Fila 2 -->
+              <tr class="hover:bg-gray-50/50 transition">
+                <td class="py-4 px-6 font-bold text-[var(--azul)]">
+                  MHC-20250918
+                </td>
+                <td class="py-4 px-6 font-bold text-[var(--azul-oscuro)]">
+                  Juan Restrepo
+                </td>
+                <td class="py-4 px-6 text-gray-600">105 — Normal</td>
+                <td class="py-4 px-6 text-gray-600">18 Sep 2025</td>
+                <td class="py-4 px-6 text-gray-600">20 Sep 2025</td>
+                <td class="py-4 px-6 text-center">
+                  <span
+                    class="inline-block px-4 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200"
+                    >Futura</span
+                  >
+                </td>
+                <td class="py-4 px-6 text-center">
+                  <div class="flex justify-center items-center gap-2">
+                    <button
+                      class="px-4 py-1.5 bg-[var(--azul)] text-white rounded-lg text-xs font-semibold hover:bg-[var(--azul-oscuro)] transition"
+                    >
+                      Ver
+                    </button>
+                    <button
+                      class="px-3 py-1.5 bg-white border border-red-300 text-red-500 rounded-lg text-xs font-semibold hover:bg-red-50 transition"
+                    >
+                      Cancelar
+                    </button>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Fila 3 -->
+              <tr class="hover:bg-gray-50/50 transition">
+                <td class="py-4 px-6 font-bold text-[var(--azul)]">
+                  MHC-20250920
+                </td>
+                <td class="py-4 px-6 font-bold text-[var(--azul-oscuro)]">
+                  Sofía Benítez
+                </td>
+                <td class="py-4 px-6 text-gray-600">202 — Executive</td>
+                <td class="py-4 px-6 text-gray-600">20 Sep 2025</td>
+                <td class="py-4 px-6 text-gray-600">25 Sep 2025</td>
+                <td class="py-4 px-6 text-center">
+                  <span
+                    class="inline-block px-4 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200"
+                    >Futura</span
+                  >
+                </td>
+                <td class="py-4 px-6 text-center">
+                  <div class="flex justify-center items-center gap-2">
+                    <button
+                      class="px-4 py-1.5 bg-[var(--azul)] text-white rounded-lg text-xs font-semibold hover:bg-[var(--azul-oscuro)] transition"
+                    >
+                      Ver
+                    </button>
+                    <button
+                      class="px-3 py-1.5 bg-white border border-red-300 text-red-500 rounded-lg text-xs font-semibold hover:bg-red-50 transition"
+                    >
+                      Cancelar
+                    </button>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Fila 4 -->
+              <tr class="hover:bg-gray-50/50 transition">
+                <td class="py-4 px-6 font-bold text-[var(--azul)]">
+                  MHC-20250814
+                </td>
+                <td class="py-4 px-6 font-bold text-[var(--azul-oscuro)]">
+                  Martín Delgado
+                </td>
+                <td class="py-4 px-6 text-gray-600">401 — Luxury</td>
+                <td class="py-4 px-6 text-gray-600">14 Ago 2025</td>
+                <td class="py-4 px-6 text-gray-600">18 Ago 2025</td>
+                <td class="py-4 px-6 text-center">
+                  <span
+                    class="inline-block px-4 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200"
+                    >Finalizada</span
+                  >
+                </td>
+                <td class="py-4 px-6 text-center">
+                  <div class="flex justify-center items-center gap-2">
+                    <button
+                      class="px-4 py-1.5 bg-[var(--azul)] text-white rounded-lg text-xs font-semibold hover:bg-[var(--azul-oscuro)] transition"
+                    >
+                      Ver
+                    </button>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Fila 5 -->
+              <tr class="hover:bg-gray-50/50 transition">
+                <td class="py-4 px-6 font-bold text-[var(--azul)]">
+                  MHC-20250901
+                </td>
+                <td class="py-4 px-6 font-bold text-[var(--azul-oscuro)]">
+                  Laura Mendoza
+                </td>
+                <td class="py-4 px-6 text-gray-600">107 — Normal</td>
+                <td class="py-4 px-6 text-gray-600">1 Sep 2025</td>
+                <td class="py-4 px-6 text-gray-600">3 Sep 2025</td>
+                <td class="py-4 px-6 text-center">
+                  <span
+                    class="inline-block px-4 py-1 rounded-full text-xs font-semibold bg-red-50 text-red-600 border border-red-200"
+                    >Cancelada</span
+                  >
+                </td>
+                <td class="py-4 px-6 text-center">
+                  <div class="flex justify-center items-center gap-2">
+                    <button
+                      class="px-4 py-1.5 bg-[var(--azul)] text-white rounded-lg text-xs font-semibold hover:bg-[var(--azul-oscuro)] transition"
+                    >
+                      Ver
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </main>
 
+    <!-- SCRIPTS -->
     <th:block th:replace="~{fragmentos :: scripts}"></th:block>
   </body>
 </html>

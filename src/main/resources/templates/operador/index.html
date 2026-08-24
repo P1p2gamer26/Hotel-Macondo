@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+  <head
+    th:replace="~{fragmentos :: cabecera('Portal Operador | Hotel Macondo')}"
+  ></head>
+  <body class="bg-gray-100 text-[var(--texto)] font-sans flex min-h-screen">
+    <!-- BARRA LATERAL (NAV OPERADOR) -->
+    <nav th:replace="~{operador/fragmentos_operador}"></nav>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="flex-1 p-8 overflow-y-auto">
+      <!-- ENCABEZADO -->
+      <div class="mb-8 pb-4 border-b border-gray-200">
+        <h1 class="text-3xl font-serif font-bold text-[var(--azul-oscuro)]">
+          Panel Principal
+        </h1>
+        <p class="text-sm text-gray-500 font-medium mt-1">
+          Vista general del operador — Hotel Macondo
+        </p>
+      </div>
+
+      <!-- SECCIONES / SERVICIOS PRINCIPALES DEL OPERADOR -->
+      <h2 class="text-xl font-serif font-bold text-[var(--azul-oscuro)] mb-6">
+        Módulos de Gestión
+      </h2>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <!-- TARJETA 1: RESERVAS -->
+        <div
+          class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col justify-between hover:shadow-md transition"
+        >
+          <div>
+            <div
+              class="w-12 h-12 rounded-xl bg-blue-50 text-[var(--azul)] flex items-center justify-center text-xl mb-4"
+            >
+              <i class="bi bi-calendar-check"></i>
+            </div>
+            <h3
+              class="font-serif text-xl font-bold text-[var(--azul-oscuro)] mb-2"
+            >
+              Reservas
+            </h3>
+            <p class="text-sm text-gray-500 mb-6">
+              Gestiona el listado general de reservas, realiza búsquedas por
+              cliente, consulta check-ins y check-outs del día.
+            </p>
+          </div>
+          <a
+            th:href="@{/operador/reservas}"
+            class="w-full bg-[var(--azul)] hover:bg-[var(--azul-oscuro)] text-white font-bold py-3 px-4 rounded-xl text-center text-sm transition-all flex items-center justify-center gap-2"
+          >
+            <span>Ir a Reservas</span>
+            <i class="bi bi-arrow-right"></i>
+          </a>
+        </div>
+
+        <!-- TARJETA 2: CUENTA HABITACIÓN (Buscador por ID/Número) -->
+        <div
+          class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col justify-between hover:shadow-md transition"
+        >
+          <div>
+            <div
+              class="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-xl mb-4"
+            >
+              <i class="bi bi-receipt"></i>
+            </div>
+            <h3
+              class="font-serif text-xl font-bold text-[var(--azul-oscuro)] mb-2"
+            >
+              Cuenta Habitación
+            </h3>
+            <p class="text-sm text-gray-500 mb-6">
+              Ingresa el número de habitación para cargar o consultar consumos
+              adicionales de los huéspedes.
+            </p>
+          </div>
+
+          <!-- Formulario con ID de Habitación y Botón de Búsqueda -->
+          <form
+            th:action="@{/operador/cuenta-habitacion}"
+            method="get"
+            class="space-y-3"
+          >
+            <div>
+              <label
+                for="habitacionId"
+                class="text-[0.68rem] font-bold text-gray-400 tracking-wider uppercase block mb-1"
+                >Número de Habitación / ID</label
+              >
+              <input
+                type="text"
+                id="habitacionId"
+                name="id"
+                placeholder="Ej: 301"
+                required
+                class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-[var(--texto)] focus:outline-none focus:border-[var(--azul)]"
+              />
+            </div>
+            <button
+              type="submit"
+              class="w-full bg-[var(--dorado)] hover:bg-[var(--dorado-oscuro)] text-[var(--azul-oscuro)] font-bold py-2.5 px-4 rounded-xl text-center text-sm transition-all flex items-center justify-center gap-2"
+            >
+              <i class="bi bi-search"></i>
+              <span>Buscar Cuenta</span>
+            </button>
+          </form>
+        </div>
+
+        <!-- TARJETA 3: CHECK-OUT (Buscador por ID/Número) -->
+        <div
+          class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col justify-between hover:shadow-md transition"
+        >
+          <div>
+            <div
+              class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl mb-4"
+            >
+              <i class="bi bi-box-arrow-right"></i>
+            </div>
+            <h3
+              class="font-serif text-xl font-bold text-[var(--azul-oscuro)] mb-2"
+            >
+              Check-out
+            </h3>
+            <p class="text-sm text-gray-500 mb-6">
+              Ingresa el número de habitación para verificar el estado de cuenta
+              y finalizar la estadía.
+            </p>
+          </div>
+
+          <!-- Formulario con ID de Habitación y Botón de Búsqueda -->
+          <form
+            th:action="@{/operador/check-out}"
+            method="get"
+            class="space-y-3"
+          >
+            <div>
+              <label
+                for="habitacionCheckOutId"
+                class="text-[0.68rem] font-bold text-gray-400 tracking-wider uppercase block mb-1"
+              >
+                Número de Habitación / ID
+              </label>
+              <input
+                type="text"
+                id="habitacionCheckOutId"
+                name="id"
+                placeholder="Ej: 301"
+                required
+                class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-[var(--texto)] focus:outline-none focus:border-[var(--azul)]"
+              />
+            </div>
+            <button
+              type="submit"
+              class="w-full bg-[var(--azul)] hover:bg-[var(--azul-oscuro)] text-white font-bold py-3 px-4 rounded-xl text-center text-sm transition-all flex items-center justify-center gap-2"
+            >
+              <i class="bi bi-search"></i>
+              <span>Iniciar Check-out</span>
+            </button>
+          </form>
+        </div>
+      </div>
+    </main>
+
+    <!-- SCRIPTS -->
+    <th:block th:replace="~{fragmentos :: scripts}"></th:block>
+  </body>
+</html>
