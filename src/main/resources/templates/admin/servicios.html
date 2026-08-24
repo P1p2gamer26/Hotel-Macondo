@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+  <head
+    th:replace="~{fragmentos :: cabecera('Servicios | Panel Macondo')}"
+  ></head>
+
+  <body class="bg-[var(--crema-claro)] text-[var(--texto)] font-sans">
+    <div class="flex flex-col md:flex-row">
+      <aside th:replace="~{admin/fragmentos_admin :: menu('servicios')}"></aside>
+
+      <main class="flex-1 p-6 md:p-10">
+        <header
+          th:replace="~{admin/fragmentos_admin :: titulo('Servicios', 'Catalogo de experiencias que se pueden cargar a la cuenta del huesped.')}"
+        ></header>
+
+        <!-- Cada tarjeta es un formulario propio: se edita en el mismo listado
+             para no necesitar una pantalla de detalle aparte. -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <article
+            class="bg-white rounded-2xl shadow-sm overflow-hidden flex flex-col"
+            th:each="servicio : ${servicios}"
+          >
+            <div class="flex items-start gap-4 p-6 pb-0">
+              <img
+                class="w-20 h-20 rounded-xl object-cover bg-[var(--crema)]"
+                th:src="@{${servicio.imagen}}"
+                th:alt="${servicio.nombre}"
+              />
+              <div class="flex-1">
+                <h2
+                  class="font-serif text-xl font-bold text-[var(--azul-oscuro)]"
+                  th:text="${servicio.nombre}"
+                ></h2>
+                <div class="flex gap-2 mt-2">
+                  <span
+                    class="rounded-full px-3 py-1 text-xs font-bold"
+                    th:classappend="${servicio.activo} ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-gray-600'"
+                    th:text="${servicio.activo} ? 'Activo' : 'Inactivo'"
+                  ></span>
+                  <span
+                    class="rounded-full px-3 py-1 text-xs font-bold bg-[var(--dorado)] text-[var(--azul-oscuro)]"
+                    th:if="${servicio.destacado}"
+                    >Destacado</span
+                  >
+                </div>
+              </div>
+            </div>
+
+            <form
+              class="p-6 flex flex-col gap-3 flex-1"
+              method="post"
+              th:action="@{/admin/servicios/{id}(id=${servicio.id})}"
+            >
+              <input
+                class="border border-gray-200 rounded-lg px-4 py-2 focus:outline-none focus:border-[var(--azul)]"
+                type="text"
+                name="nombre"
+                th:value="${servicio.nombre}"
+                required
+              />
+              <textarea
+                class="border border-gray-200 rounded-lg px-4 py-2 focus:outline-none focus:border-[var(--azul)] resize-none"
+                name="descripcion"
+                rows="2"
+                th:text="${servicio.descripcion}"
+              ></textarea>
+              <label class="text-sm">
+                Precio (COP)
+                <input
+                  class="w-full mt-1 border border-gray-200 rounded-lg px-4 py-2 focus:outline-none focus:border-[var(--azul)]"
+                  type="number"
+                  name="precio"
+                  min="0"
+                  step="1000"
+                  th:value="${servicio.precio}"
+                  required
+                />
+              </label>
+              <div class="flex gap-3 mt-auto pt-2">
+                <button
+                  class="bg-[var(--azul)] hover:bg-[var(--azul-oscuro)] text-white font-bold rounded-lg px-6 py-2 transition"
+                  type="submit"
+                >
+                  Guardar
+                </button>
+              </div>
+            </form>
+
+            <!-- Formulario separado porque cambia el estado sin tocar los datos -->
+            <form
+              class="px-6 pb-6"
+              method="post"
+              th:action="@{/admin/servicios/{id}/estado(id=${servicio.id})}"
+            >
+              <button
+                class="text-[var(--azul)] hover:underline font-medium"
+                type="submit"
+                th:text="${servicio.activo} ? 'Desactivar servicio' : 'Activar servicio'"
+              ></button>
+            </form>
+          </article>
+        </div>
+      </main>
+    </div>
+  </body>
+</html>

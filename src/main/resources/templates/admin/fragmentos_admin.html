@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Fragmentos del panel</title>
+  </head>
+  <body>
+    <!-- ===== BARRA LATERAL DEL PANEL =====
+         Se repite en las tres pantallas de /admin, por eso vive aqui.
+         Recibe 'activa' (operadores | servicios | habitaciones) para marcar
+         en que seccion esta parado el administrador. -->
+    <aside
+      th:fragment="menu(activa)"
+      class="w-full md:w-64 shrink-0 bg-[var(--azul-oscuro)] text-white md:min-h-screen p-6"
+    >
+      <a class="flex items-center gap-3 mb-10" th:href="@{/}">
+        <img
+          class="w-10 h-auto"
+          th:src="@{/images/logo.png}"
+          alt="Logo Hotel Macondo"
+        />
+        <span class="font-serif text-xl font-bold text-[var(--dorado)]"
+          >Macondo</span
+        >
+      </a>
+
+      <p class="text-[0.7rem] tracking-[3px] uppercase text-white/50 mb-4">
+        Administracion
+      </p>
+
+      <nav class="flex flex-col gap-1">
+        <!-- th:classappend resalta el enlace de la seccion actual -->
+        <a
+          class="rounded-lg px-4 py-3 hover:bg-white/10 transition"
+          th:classappend="${activa == 'inicio'} ? 'bg-[var(--dorado)] text-[var(--azul-oscuro)] font-bold hover:bg-[var(--dorado)]'"
+          th:href="@{/admin}"
+          ><i class="bi bi-grid-1x2 mr-2"></i>Tablero</a
+        >
+        <a
+          class="rounded-lg px-4 py-3 hover:bg-white/10 transition"
+          th:classappend="${activa == 'operadores'} ? 'bg-[var(--dorado)] text-[var(--azul-oscuro)] font-bold hover:bg-[var(--dorado)]'"
+          th:href="@{/admin/operadores}"
+          ><i class="bi bi-person-badge mr-2"></i>Operadores</a
+        >
+        <a
+          class="rounded-lg px-4 py-3 hover:bg-white/10 transition"
+          th:classappend="${activa == 'servicios'} ? 'bg-[var(--dorado)] text-[var(--azul-oscuro)] font-bold hover:bg-[var(--dorado)]'"
+          th:href="@{/admin/servicios}"
+          ><i class="bi bi-stars mr-2"></i>Servicios</a
+        >
+        <a
+          class="rounded-lg px-4 py-3 hover:bg-white/10 transition"
+          th:classappend="${activa == 'habitaciones'} ? 'bg-[var(--dorado)] text-[var(--azul-oscuro)] font-bold hover:bg-[var(--dorado)]'"
+          th:href="@{/admin/habitaciones}"
+          ><i class="bi bi-door-closed mr-2"></i>Habitaciones</a
+        >
+      </nav>
+
+      <a
+        class="block mt-10 text-sm text-white/60 hover:text-[var(--dorado)]"
+        th:href="@{/}"
+        ><i class="bi bi-arrow-left mr-1"></i>Volver al sitio</a
+      >
+    </aside>
+
+    <!-- ===== ENCABEZADO DE SECCION =====
+         Titulo + bajada, identico en las tres pantallas. -->
+    <header th:fragment="titulo(texto, bajada)" class="mb-8">
+      <h1
+        class="text-3xl md:text-4xl font-serif font-bold text-[var(--azul-oscuro)]"
+        th:text="${texto}"
+      ></h1>
+      <p class="text-[var(--texto)] mt-1" th:text="${bajada}"></p>
+    </header>
+  </body>
+</html>
