@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+  <head
+    th:replace="~{fragmentos :: cabecera('Operadores | Panel Macondo')}"
+  ></head>
+
+  <body class="bg-[var(--crema-claro)] text-[var(--texto)] font-sans">
+    <div class="flex flex-col md:flex-row">
+      <aside th:replace="~{admin/fragmentos_admin :: menu('operadores')}"></aside>
+
+      <main class="flex-1 p-6 md:p-10">
+        <header
+          th:replace="~{admin/fragmentos_admin :: titulo('Operadores', 'Personal habilitado para gestionar reservas, cuentas y checkout.')}"
+        ></header>
+
+        <!-- Alta de operador: un solo campo, el estado arranca en activo -->
+        <form
+          class="bg-white rounded-2xl shadow-sm p-6 mb-8 flex flex-col sm:flex-row gap-4"
+          method="post"
+          th:action="@{/admin/operadores}"
+        >
+          <input
+            class="flex-1 border border-gray-200 rounded-lg px-4 py-3 focus:outline-none focus:border-[var(--azul)]"
+            type="text"
+            name="nombre"
+            placeholder="Nombre del operador"
+            required
+          />
+          <button
+            class="bg-[var(--dorado)] hover:bg-[var(--dorado-oscuro)] text-[var(--azul-oscuro)] font-bold rounded-lg px-8 py-3 transition"
+            type="submit"
+          >
+            Agregar
+          </button>
+        </form>
+
+        <div class="bg-white rounded-2xl shadow-sm overflow-x-auto">
+          <table class="w-full text-left min-w-[520px]">
+            <thead
+              class="bg-[var(--crema)] text-[var(--azul-oscuro)] text-sm uppercase tracking-wider"
+            >
+              <tr>
+                <th class="px-6 py-4">#</th>
+                <th class="px-6 py-4">Nombre</th>
+                <th class="px-6 py-4">Estado</th>
+                <th class="px-6 py-4 text-right">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                class="border-t border-gray-100"
+                th:each="operador : ${operadores}"
+              >
+                <td class="px-6 py-4" th:text="${operador.id}"></td>
+                <td
+                  class="px-6 py-4 font-medium text-[var(--azul-oscuro)]"
+                  th:text="${operador.nombre}"
+                ></td>
+                <td class="px-6 py-4">
+                  <!-- La pastilla cambia de color segun el operador este activo -->
+                  <span
+                    class="rounded-full px-3 py-1 text-xs font-bold"
+                    th:classappend="${operador.activo} ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-gray-600'"
+                    th:text="${operador.activo} ? 'Activo' : 'Inactivo'"
+                  ></span>
+                </td>
+                <td class="px-6 py-4 text-right whitespace-nowrap">
+                  <form
+                    class="inline"
+                    method="post"
+                    th:action="@{/admin/operadores/{id}/estado(id=${operador.id})}"
+                  >
+                    <button
+                      class="text-[var(--azul)] hover:underline font-medium"
+                      type="submit"
+                      th:text="${operador.activo} ? 'Desactivar' : 'Activar'"
+                    ></button>
+                  </form>
+                  <form
+                    class="inline ml-4"
+                    method="post"
+                    th:action="@{/admin/operadores/{id}/eliminar(id=${operador.id})}"
+                  >
+                    <button
+                      class="text-red-600 hover:underline font-medium"
+                      type="submit"
+                    >
+                      Eliminar
+                    </button>
+                  </form>
+                </td>
+              </tr>
+              <tr th:if="${operadores.isEmpty()}">
+                <td class="px-6 py-10 text-center" colspan="4">
+                  Aun no hay operadores registrados.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </main>
+    </div>
+  </body>
+</html>

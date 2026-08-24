@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+  <head
+    th:replace="~{fragmentos :: cabecera('Habitaciones | Panel Macondo')}"
+  ></head>
+
+  <body class="bg-[var(--crema-claro)] text-[var(--texto)] font-sans">
+    <div class="flex flex-col md:flex-row">
+      <aside
+        th:replace="~{admin/fragmentos_admin :: menu('habitaciones')}"
+      ></aside>
+
+      <main class="flex-1 p-6 md:p-10">
+        <header
+          th:replace="~{admin/fragmentos_admin :: titulo('Habitaciones', 'Inventario del hotel y disponibilidad para nuevas reservas.')}"
+        ></header>
+
+        <div class="bg-white rounded-2xl shadow-sm overflow-x-auto">
+          <table class="w-full text-left min-w-[760px]">
+            <thead
+              class="bg-[var(--crema)] text-[var(--azul-oscuro)] text-sm uppercase tracking-wider"
+            >
+              <tr>
+                <th class="px-6 py-4">Habitacion</th>
+                <th class="px-6 py-4">Numero</th>
+                <th class="px-6 py-4">Piso</th>
+                <th class="px-6 py-4">Capacidad</th>
+                <th class="px-6 py-4">Precio / noche</th>
+                <th class="px-6 py-4">Estado</th>
+                <th class="px-6 py-4 text-right">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                class="border-t border-gray-100"
+                th:each="habitacion : ${habitaciones}"
+              >
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-3">
+                    <img
+                      class="w-14 h-14 rounded-lg object-cover bg-[var(--crema)]"
+                      th:src="@{'/images/' + ${habitacion.imagen}}"
+                      th:alt="${habitacion.nombre}"
+                    />
+                    <div>
+                      <p
+                        class="font-medium text-[var(--azul-oscuro)]"
+                        th:text="${habitacion.nombre}"
+                      ></p>
+                      <p
+                        class="text-sm text-[var(--texto)]"
+                        th:text="${habitacion.etiqueta}"
+                      ></p>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-6 py-4" th:text="${habitacion.numero}"></td>
+                <td class="px-6 py-4" th:text="${habitacion.piso}"></td>
+                <td
+                  class="px-6 py-4"
+                  th:text="${habitacion.capacidad} + ' pers.'"
+                ></td>
+                <!-- formatInteger con POINT separa los miles al estilo colombiano -->
+                <td
+                  class="px-6 py-4 font-medium"
+                  th:text="'$ ' + ${#numbers.formatInteger(habitacion.precio, 1, 'POINT')}"
+                ></td>
+                <td class="px-6 py-4">
+                  <span
+                    class="rounded-full px-3 py-1 text-xs font-bold"
+                    th:classappend="${habitacion.estado == 'DISPONIBLE'} ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-gray-600'"
+                    th:text="${habitacion.estado == 'DISPONIBLE'} ? 'Disponible' : 'No disponible'"
+                  ></span>
+                </td>
+                <td class="px-6 py-4 text-right whitespace-nowrap">
+                  <form
+                    class="inline"
+                    method="post"
+                    th:action="@{/admin/habitaciones/{id}/estado(id=${habitacion.id})}"
+                  >
+                    <button
+                      class="text-[var(--azul)] hover:underline font-medium"
+                      type="submit"
+                      th:text="${habitacion.estado == 'DISPONIBLE'} ? 'Deshabilitar' : 'Habilitar'"
+                    ></button>
+                  </form>
+                  <a
+                    class="ml-4 text-[var(--texto)] hover:underline font-medium"
+                    th:href="@{/habitaciones/{id}(id=${habitacion.id})}"
+                    >Ver ficha</a
+                  >
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </main>
+    </div>
+  </body>
+</html>
