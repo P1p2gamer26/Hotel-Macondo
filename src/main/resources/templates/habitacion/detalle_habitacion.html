@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+  <head th:replace="~{fragmentos :: cabecera('Habitación | Hotel Macondo')}"></head>
+<!-- La vista reutiliza la cabecera comun y no carga recursos propios. -->
+
+  <body class="bg-[var(--crema-claro)] text-[var(--texto)] font-sans">
+    <!-- Navegacion publica compartida. -->
+<nav th:replace="~{fragmentos :: navbar}"></nav>
+
+    <main>
+      <!-- Hero dinamico con la imagen, etiqueta, capacidad y precio de la habitacion seleccionada. -->
+<header class="relative flex min-h-[390px] items-center justify-center overflow-hidden px-5 py-16 md:min-h-[440px]" th:attr="aria-label=${habitacion.nombre}">
+        <img class="absolute inset-0 h-full w-full object-cover" th:src="@{${habitacion.imagen}}" th:alt="${habitacion.nombre}" />
+        <div class="absolute inset-0 bg-[rgba(14,42,63,0.60)]" aria-hidden="true"></div>
+        <div class="relative z-10 mx-auto max-w-4xl text-center text-white">
+          <span class="inline-flex rounded-full bg-[var(--dorado)] px-5 py-2 text-xs font-bold uppercase tracking-[1px] text-[var(--azul-oscuro)]" th:text="${habitacion.etiqueta}"></span>
+          <h1 class="mt-6 font-serif text-5xl font-bold !text-white md:text-6xl" th:text="${habitacion.nombre}"></h1>
+          <div class="mt-6 flex flex-col items-center justify-center gap-3 text-sm md:flex-row">
+            <span class="flex items-center gap-2 rounded-full border border-white/40 bg-black/20 px-5 py-2.5"><i class="bi bi-people" aria-hidden="true"></i><span th:text="${'Hasta ' + habitacion.capacidad + ' huéspedes'}"></span></span>
+            <strong class="rounded-full border border-[var(--dorado)] bg-[rgba(245,205,99,0.18)] px-5 py-2.5 text-[#ffe18b]" th:text="${'Desde $' + #numbers.formatInteger(habitacion.precio, 1, 'POINT') + ' COP / noche'}"></strong>
+          </div>
+        </div>
+      </header>
+
+      <!-- Migas de pan para regresar al catalogo de hospedaje. -->
+<nav class="border-b border-gray-200 bg-white" aria-label="Migas de pan">
+        <div class="mx-auto flex max-w-[1180px] items-center gap-2 px-5 py-4 text-sm">
+          <a class="text-[var(--azul)] hover:underline" th:href="@{/}">Inicio</a>
+          <i class="bi bi-chevron-right text-[10px] text-gray-400" aria-hidden="true"></i>
+          <a class="text-[var(--azul)] hover:underline" th:href="@{/habitaciones}">Habitaciones</a>
+          <i class="bi bi-chevron-right text-[10px] text-gray-400" aria-hidden="true"></i>
+          <span class="text-[var(--texto)]" th:text="${habitacion.nombre}"></span>
+        </div>
+      </nav>
+
+      <!-- Dos columnas: informacion completa y resumen de reserva fijo en escritorio. -->
+<section class="mx-auto grid max-w-[1180px] grid-cols-1 gap-10 px-5 py-12 lg:grid-cols-[minmax(0,1fr)_360px] lg:items-start lg:py-16">
+        <div>
+          <!-- La descripcion existente funciona como introduccion de la ficha. -->
+<blockquote class="border-l-4 border-[var(--dorado)] pl-5 font-serif text-2xl italic leading-9 text-[#7a3f2f]" th:text="${habitacion.descripcion}"></blockquote>
+
+          <!-- Datos operativos reales de Habitacion: numero, piso, capacidad y estado. -->
+<section class="mt-12" aria-labelledby="detalle-habitacion">
+            <h2 class="font-serif text-3xl font-bold text-[var(--azul-oscuro)]" id="detalle-habitacion">Detalles de la habitación</h2>
+            <div class="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <article class="flex min-h-14 items-center gap-4 rounded-lg bg-white px-5 py-4 shadow-sm"><i class="bi bi-door-open text-2xl text-[var(--azul)]" aria-hidden="true"></i><div><p class="text-xs font-bold uppercase tracking-[1px] text-gray-500">Número</p><p class="mt-1 font-semibold" th:text="${habitacion.numero}"></p></div></article>
+              <article class="flex min-h-14 items-center gap-4 rounded-lg bg-white px-5 py-4 shadow-sm"><i class="bi bi-building text-2xl text-[var(--azul)]" aria-hidden="true"></i><div><p class="text-xs font-bold uppercase tracking-[1px] text-gray-500">Piso</p><p class="mt-1 font-semibold" th:text="${habitacion.piso}"></p></div></article>
+              <article class="flex min-h-14 items-center gap-4 rounded-lg bg-white px-5 py-4 shadow-sm"><i class="bi bi-people text-2xl text-[var(--azul)]" aria-hidden="true"></i><div><p class="text-xs font-bold uppercase tracking-[1px] text-gray-500">Capacidad</p><p class="mt-1 font-semibold" th:text="${habitacion.capacidad + ' huéspedes'}"></p></div></article>
+              <article class="flex min-h-14 items-center gap-4 rounded-lg bg-white px-5 py-4 shadow-sm"><i class="bi bi-check-circle text-2xl text-[#218b83]" aria-hidden="true"></i><div><p class="text-xs font-bold uppercase tracking-[1px] text-gray-500">Estado</p><p class="mt-1 font-semibold" th:text="${habitacion.estado == 'DISPONIBLE' ? 'Disponible' : 'No disponible'}"></p></div></article>
+            </div>
+          </section>
+
+          <!-- Imagen ampliada y descripcion para inspeccionar visualmente la habitacion. -->
+<section class="mt-16 overflow-hidden rounded-lg bg-white shadow-[0_10px_25px_rgba(30,58,70,0.10)]" aria-labelledby="imagen-habitacion">
+            <img class="h-[300px] w-full object-cover md:h-[390px]" th:src="@{${habitacion.imagen}}" th:alt="${habitacion.nombre}" />
+            <div class="p-6"><h2 class="font-serif text-2xl font-bold text-[var(--azul-oscuro)]" id="imagen-habitacion" th:text="${habitacion.nombre}"></h2><p class="mt-2 leading-7" th:text="${habitacion.descripcion}"></p></div>
+          </section>
+        </div>
+
+        <!-- Resumen de reserva con tarifa nocturna y datos esenciales de la habitacion. -->
+<aside class="rounded-lg bg-white p-6 shadow-[0_18px_45px_rgba(30,58,70,0.12)] lg:sticky lg:top-24" aria-labelledby="informacion-reserva">
+          <h2 class="font-serif text-2xl font-bold text-[var(--azul-oscuro)]" id="informacion-reserva">Información de reserva</h2>
+          <div class="mt-5 rounded-lg border border-[#c9e0e9] bg-[#eef6f9] p-5">
+            <span class="text-[11px] font-bold uppercase tracking-[1px] text-[var(--azul)]">Precio por noche</span>
+            <strong class="mt-2 block font-serif text-2xl leading-8 text-[var(--azul)]" th:text="${'Desde $' + #numbers.formatInteger(habitacion.precio, 1, 'POINT') + ' COP'}"></strong>
+          </div>
+          <dl class="mt-6 divide-y divide-gray-200 text-sm">
+            <div class="flex items-center justify-between py-4"><dt class="text-gray-500">Habitación</dt><dd class="font-semibold" th:text="${habitacion.nombre}"></dd></div>
+            <div class="flex items-center justify-between py-4"><dt class="text-gray-500">Capacidad</dt><dd class="font-semibold" th:text="${habitacion.capacidad + ' personas'}"></dd></div>
+            <div class="flex items-center justify-between py-4"><dt class="text-gray-500">Estado</dt><dd class="font-semibold text-[#218b83]" th:text="${habitacion.estado == 'DISPONIBLE' ? 'Disponible' : 'No disponible'}"></dd></div>
+          </dl>
+          <a class="mt-6 block rounded-md bg-[var(--dorado)] px-5 py-3.5 text-center font-bold text-[var(--azul-oscuro)] shadow-[0_8px_20px_rgba(245,205,99,0.30)] transition hover:bg-[var(--dorado-oscuro)]" href="#">Reservar ahora</a>
+          <a class="mt-5 block text-center font-semibold text-[var(--azul)] hover:underline" th:href="@{/habitaciones}">Ver todas las habitaciones</a>
+        </aside>
+      </section>
+    </main>
+
+    <!-- Footer comun de landing, servicios y habitaciones. -->
+<footer th:replace="~{fragmentos :: footer}"></footer>
+    <th:block th:replace="~{fragmentos :: scripts}"></th:block>
+  </body>
+</html>

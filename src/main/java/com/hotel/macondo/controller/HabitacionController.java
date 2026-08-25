@@ -30,8 +30,9 @@ public class HabitacionController {
      */
     @GetMapping
     public String mostrarHabitaciones(Model model) {
+        // Se entrega el catalogo completo a la vista publica de habitaciones.
         model.addAttribute("habitaciones", service.buscarTodas());
-        return "habitaciones";
+        return "habitacion/habitaciones";
     }
 
     /**
@@ -39,9 +40,10 @@ public class HabitacionController {
      */
     @GetMapping(params = "personas")
     public String buscarPorPersonas(@RequestParam int personas, Model model) {
+        // El servicio aplica la capacidad minima solicitada antes de renderizar la vista.
         model.addAttribute("habitaciones", service.buscarPorPersonas(personas));
         model.addAttribute("personas", personas);
-        return "habitaciones";
+        return "habitacion/habitaciones";
     }
 
     /**
@@ -54,7 +56,8 @@ public class HabitacionController {
             return "redirect:/habitaciones";
         }
 
+        // La ficha recibe una unica habitacion validada por identificador.
         model.addAttribute("habitacion", habitacion);
-        return "detalle_habitacion";
+        return "habitacion/detalle_habitacion";
     }
 }

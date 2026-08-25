@@ -1,4 +1,4 @@
-﻿<!-- Todo este archivo son fragmentos reutilizables: se centralizan aqui
+<!-- Todo este archivo son fragmentos reutilizables: se centralizan aqui
     para no repetir el navbar, el footer ni los enlaces de Bootstrap en
     cada vista. Se llaman con th:replace="~{fragmentos :: nombre}". -->
 
@@ -88,14 +88,14 @@
           <li>
             <a
               class="font-medium hover:text-[var(--azul)] transition"
-              href="/#habitaciones"
+              th:href="@{/habitaciones}"
               >Habitaciones</a
             >
           </li>
           <li>
             <a
               class="font-medium hover:text-[var(--azul)] transition"
-              href="/#servicios"
+              th:href="@{/servicios}"
               >Servicios</a
             >
           </li>
@@ -211,7 +211,7 @@
               <li>
                 <a
                   class="hover:text-[var(--azul)] transition inline-block py-1"
-                  href="/#servicios"
+                  th:href="@{/servicios}"
                   >Servicios</a
                 >
               </li>
