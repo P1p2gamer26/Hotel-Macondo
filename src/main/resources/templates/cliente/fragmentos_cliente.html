@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Fragmentos Cliente</title>
+  </head>
+  <body>
+    <!-- NAVBAR CLIENTE LOGUEADO -->
+    <nav
+      th:fragment="navbar-cliente"
+      class="bg-white shadow-md sticky top-0 z-50 py-4"
+    >
+      <div
+        class="container mx-auto px-4 flex flex-wrap justify-between items-center"
+      >
+        <!-- Logo -->
+        <a
+          class="flex items-center gap-3 font-serif text-xl font-bold text-[#1a759f]"
+          th:href="@{/cliente}"
+        >
+          <th:block th:replace="~{fragmentos :: logo}"></th:block>
+          Hotel Macondo
+        </a>
+
+        <!-- Enlaces -->
+        <ul class="hidden md:flex gap-6 font-sans text-gray-600 font-medium">
+          <li>
+            <a class="hover:text-[#1a759f] transition" th:href="@{/cliente}"
+              >Inicio</a
+            >
+          </li>
+          <li>
+            <a
+              class="hover:text-[#1a759f] transition"
+              th:href="@{/reservas/activas}"
+              >Mis Reservas</a
+            >
+          </li>
+          <li>
+            <a
+              class="hover:text-[#1a759f] transition"
+              th:href="@{/reservas/historial}"
+              >Historial</a
+            >
+          </li>
+          <li>
+            <a class="hover:text-[#1a759f] transition" th:href="@{/servicios}"
+              >Servicios</a
+            >
+          </li>
+        </ul>
+
+        <!-- Botones -->
+        <div class="hidden md:flex items-center gap-3 font-sans text-sm">
+          <a
+            class="border-2 border-[#1a759f] text-[#1a759f] font-semibold px-4 py-2 rounded-lg hover:bg-[#1a759f] hover:text-white transition"
+            th:href="@{/cliente/perfil}"
+            >Mi Perfil</a
+          >
+          <form th:action="@{/logout}" method="post" class="m-0">
+            <button
+              type="submit"
+              class="bg-[#f9c74f] text-[#0e2a3f] font-bold px-5 py-2 rounded-lg hover:bg-[#e6b43a] transition cursor-pointer"
+            >
+              Cerrar sesión
+            </button>
+          </form>
+        </div>
+
+        <!-- Menú móvil -->
+        <button class="md:hidden text-2xl text-[#1a759f] focus:outline-none">
+          <i class="bi bi-list"></i>
+        </button>
+      </div>
+    </nav>
+  </body>
+</html>

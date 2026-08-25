@@ -1,5 +1,6 @@
 /* ===== Hotel Macondo - estilos base ===== */
 
+
 /* Tailwind las absorbe dinamicamente usando la sintaxis [var(--color)] en el HTML. */
 :root {
   --azul: #1a6d92;
@@ -37,16 +38,23 @@ body {
   background-color: #ffffff;
 }
 
-h1,
-h2,
-h3,
-h4,
-h5,
-.titulo {
-  font-family: "Playfair Display", serif;
+
+h1, h2, h3, h4, h5, .titulo {
+  font-family: "Playfair Display", serif !important;
   font-weight: 700;
-  color: var(--azul-oscuro);
 }
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes scaleIn {
+  from { transform: scale(1.06); }
+  to { transform: scale(1); }
+}
+
+.animar-imagen { animation: scaleIn 0.9s cubic-bezier(0.25,0.46,0.45,0.94) forwards; }
+.animar-texto { animation: fadeInUp 0.6s 0.1s cubic-bezier(0.25,0.46,0.45,0.94) both; }
 
 /* ==========================================================================
    Todas las clases de componentes personalizados que estaban aqui 

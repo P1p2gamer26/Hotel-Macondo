@@ -1,14 +1,14 @@
 package com.hotel.macondo.service;
 
-/*
- * ============================================================
- * AQUI VA TODO LO DE RESERVAR (servicio)
- * ============================================================
- *
- * Aqui va la interfaz del servicio de reservas: buscarTodas, buscarPorId,
- * guardar y eliminar. La interfaz existe para que el controlador dependa de
- * ella y no de la implementacion.
- */
+import java.util.List;
+
+import com.hotel.macondo.entities.Reserva;
+
 public interface ReservaService {
 
+    List<Reserva> obtenerReservasActivas();
+
+    List<Reserva> obtenerHistorial();
+
+    Reserva buscarPorId(String id);
 }
