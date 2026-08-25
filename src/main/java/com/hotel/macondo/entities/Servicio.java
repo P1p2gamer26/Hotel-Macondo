@@ -1,6 +1,8 @@
 package com.hotel.macondo.entities;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,6 +19,12 @@ public class Servicio {
     private boolean destacado;
     private BigDecimal precio;
     private boolean activo;
+    private String categoria;
+    private String duracion;
+    private String descripcionDetalle;
+    private String horario;
+    private List<String> incluidos = new ArrayList<>();
+    private List<String> etiquetas = new ArrayList<>();
 
     /**
      * Conserva el constructor usado por la pagina principal actual.

@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+  <head th:replace="~{fragmentos :: cabecera('Detalle de servicio | Hotel Macondo')}"></head>
+<!-- La cabecera comun evita duplicar dependencias de Tailwind y recursos de la landing. -->
+
+  <body class="bg-[#faf4ec] font-['Questrial'] text-[#343434]">
+    <!-- Navegacion publica compartida. -->
+<nav th:replace="~{fragmentos :: navbar}"></nav>
+
+    <main>
+      <!-- Hero dinamico: la imagen, categoria, nombre y precio proceden de servicio. -->
+<header class="relative flex min-h-[390px] items-center justify-center overflow-hidden px-5 py-16 md:min-h-[440px]" th:attr="aria-label=${servicio.nombre}">
+        <img class="absolute inset-0 h-full w-full object-cover" th:src="@{${servicio.imagen}}" th:alt="${servicio.nombre}" />
+        <div class="absolute inset-0 bg-black/50" aria-hidden="true"></div>
+
+        <div class="relative z-10 mx-auto max-w-4xl text-center text-white">
+          <span class="inline-flex rounded-full bg-[#ffc94d] px-5 py-2 text-xs font-bold uppercase text-[#624800]" th:text="${servicio.categoria}"></span>
+          <h1 class="mt-6 font-['Playfair_Display'] text-5xl font-bold !text-white md:text-6xl" th:text="${servicio.nombre}"></h1>
+          <div class="mt-6 flex flex-col items-center justify-center gap-3 text-sm md:flex-row">
+            <span class="flex items-center gap-2 rounded-full border border-white/40 bg-black/20 px-5 py-2.5">
+              <i class="bi bi-clock" aria-hidden="true"></i>
+              <span th:text="${servicio.horario}"></span>
+            </span>
+            <strong
+              class="rounded-full border border-[#ffc94d] bg-[#ffc94d]/20 px-5 py-2.5 text-[#ffd76f]"
+              th:text="${'Desde $' + #numbers.formatInteger(servicio.precio, 1, 'POINT') + ' COP'}"
+            ></strong>
+          </div>
+        </div>
+      </header>
+
+      <!-- Migas de pan para volver al inicio o al catalogo sin perder contexto. -->
+<nav class="border-b border-gray-200 bg-white" aria-label="Migas de pan">
+        <div class="mx-auto flex max-w-[1180px] items-center gap-2 px-5 py-4 text-sm">
+          <a class="text-[#147ba5] hover:underline" th:href="@{/}">Inicio</a>
+          <i class="bi bi-chevron-right text-[10px] text-gray-400" aria-hidden="true"></i>
+          <a class="text-[#147ba5] hover:underline" th:href="@{/servicios}">Servicios</a>
+          <i class="bi bi-chevron-right text-[10px] text-gray-400" aria-hidden="true"></i>
+          <span class="text-[#343434]" th:text="${servicio.nombre}"></span>
+        </div>
+      </nav>
+
+      <!-- Layout de detalle: contenido principal y tarjeta de reserva lateral en escritorio. -->
+<section class="mx-auto grid max-w-[1180px] grid-cols-1 gap-10 px-5 py-12 lg:grid-cols-[minmax(0,1fr)_360px] lg:items-start lg:py-16">
+        <div>
+          <!-- Resumen comercial que reutiliza la descripcion registrada del servicio. -->
+<blockquote class="border-l-4 border-[#ffc94d] pl-5 font-['Playfair_Display'] text-2xl italic leading-9 text-[#7a3f2f]" th:text="${servicio.descripcion}"></blockquote>
+          <p class="mt-7 text-[17px] leading-8 text-[#3f3f3f]" th:text="${servicio.descripcionDetalle}"></p>
+
+          <!-- Lista completa de inclusiones recibida desde servicio.incluidos. -->
+<section class="mt-12" aria-labelledby="incluye-servicio">
+            <h2 class="font-['Playfair_Display'] text-3xl font-bold text-[#162f3b]" id="incluye-servicio">¿Qué incluye?</h2>
+            <ul class="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2" data-included-grid>
+              <li class="flex min-h-12 items-center gap-3 rounded-lg bg-white px-5 py-3 shadow-sm" th:each="incluido : ${servicio.incluidos}">
+                <i class="bi bi-check-circle text-[#1683b0]" aria-hidden="true"></i>
+                <span th:text="${incluido}"></span>
+              </li>
+            </ul>
+          </section>
+
+          <!-- Etiquetas dinamicas que ayudan a clasificar la experiencia. -->
+<div class="mt-10 flex flex-wrap gap-2" aria-label="Etiquetas del servicio">
+            <span
+              class="rounded-full border border-[#b8d6e2] bg-[#edf6f9] px-4 py-2 text-sm font-semibold text-[#147ba5]"
+              th:each="etiqueta : ${servicio.etiquetas}"
+              th:text="${etiqueta}"
+            ></span>
+          </div>
+
+          <!-- Servicios relacionados entregados por el controlador para continuar la exploracion. -->
+<section class="mt-16" aria-labelledby="otros-servicios">
+            <h2 class="font-['Playfair_Display'] text-3xl font-bold text-[#162f3b]" id="otros-servicios">Otros servicios</h2>
+            <div class="mt-7 grid grid-cols-1 gap-6 md:grid-cols-2">
+              <article class="overflow-hidden rounded-lg bg-white shadow-[0_10px_25px_rgba(30,58,70,0.10)]" th:each="relacionado : ${relacionados}">
+                <div class="relative h-44 overflow-hidden">
+                  <img class="h-full w-full object-cover transition duration-500 hover:scale-105" th:src="@{${relacionado.imagen}}" th:alt="${relacionado.nombre}" />
+                  <span class="absolute left-3 top-3 rounded-full bg-white px-3 py-1 text-[10px] font-bold uppercase text-[#147ba5]" th:text="${relacionado.categoria}"></span>
+                </div>
+                <div class="p-5">
+                  <h3 class="font-['Playfair_Display'] text-xl font-bold text-[#162f3b]" th:text="${relacionado.nombre}"></h3>
+                  <p class="mt-2 text-sm leading-6 text-gray-600" th:text="${relacionado.descripcion}"></p>
+                  <a class="mt-3 inline-flex items-center gap-2 font-bold text-[#147ba5] hover:underline" th:href="@{/servicios/{id}(id=${relacionado.id})}">
+                    Ver más <i class="bi bi-arrow-right" aria-hidden="true"></i>
+                  </a>
+                </div>
+              </article>
+            </div>
+          </section>
+        </div>
+
+        <!-- Tarjeta sticky: concentra precio, horario, inclusiones y accion de agregar. -->
+<aside class="rounded-lg bg-white p-6 shadow-[0_18px_45px_rgba(30,58,70,0.12)] lg:sticky lg:top-24" aria-labelledby="informacion-servicio">
+          <h2 class="font-['Playfair_Display'] text-2xl font-bold text-[#162f3b]" id="informacion-servicio">Información del servicio</h2>
+
+          <div class="mt-5 rounded-lg border border-[#c9e0e9] bg-[#eef6f9] p-5">
+            <span class="text-[11px] font-bold uppercase text-[#147ba5]">Precio</span>
+            <strong
+              class="mt-2 block font-['Playfair_Display'] text-2xl leading-8 text-[#147ba5]"
+              th:text="${'Desde $' + #numbers.formatInteger(servicio.precio, 1, 'POINT') + ' COP'}"
+            ></strong>
+          </div>
+
+          <section class="border-b border-gray-200 py-6">
+            <h3 class="text-[11px] font-bold uppercase text-gray-500">Horario</h3>
+            <p class="mt-3 leading-6" th:text="${servicio.horario}"></p>
+          </section>
+
+          <section class="py-6">
+            <h3 class="text-[11px] font-bold uppercase text-gray-500">Incluye</h3>
+            <ul class="mt-4 space-y-3 text-sm">
+              <li class="flex items-center gap-2" th:each="incluido, estado : ${servicio.incluidos}" th:if="${estado.index < 4}">
+                <i class="bi bi-check-circle text-[#218b83]" aria-hidden="true"></i>
+                <span th:text="${incluido}"></span>
+              </li>
+            </ul>
+            <button
+              class="mt-4 text-sm font-semibold text-[#147ba5] hover:underline"
+              type="button"
+              data-included-more
+              th:if="${servicio.incluidos.size() > 4}"
+              th:text="${'+' + (servicio.incluidos.size() - 4) + ' más incluidos'}"
+            ></button>
+          </section>
+
+          <button
+            class="w-full rounded-md border border-[#ffc94d] bg-[#ffc94d] px-5 py-3.5 font-bold text-[#624800] shadow-[0_8px_20px_rgba(255,201,77,0.30)] transition hover:bg-[#efb630] aria-pressed:border-emerald-600 aria-pressed:bg-emerald-600 aria-pressed:text-white"
+            type="button"
+            th:attr="data-add-service=${servicio.nombre}"
+            data-default-label="Agregar a mi estadía"
+            data-added-label="Añadido a mi estadía"
+            aria-pressed="false"
+          >Agregar a mi estadía</button>
+          <a class="mt-5 block text-center font-semibold text-[#147ba5] hover:underline" href="#">Ver mis reservas activas</a>
+        </aside>
+      </section>
+    </main>
+
+    <!-- Footer reutilizado desde la landing. -->
+<footer th:replace="~{fragmentos :: footer}"></footer>
+    <!-- Se cargan scripts comunes y la interaccion propia de servicios. -->
+<th:block th:replace="~{fragmentos :: scripts}"></th:block>
+    <script th:src="@{/js/servicios.js}"></script>
+  </body>
+</html>

@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+  <head th:replace="~{fragmentos :: cabecera('Servicios | Hotel Macondo')}"></head>
+<!-- La cabecera comun carga Tailwind, tipografias, iconos y metadatos de la landing. -->
+
+  <body class="bg-[#f8efe3] font-['Questrial'] text-[#343434]">
+    <!-- Navegacion compartida por landing, servicios y habitaciones. -->
+<nav th:replace="~{fragmentos :: navbar}"></nav>
+
+    <main>
+      <!-- Hero del catalogo: imagen absoluta, capa oscura y texto centrado con utilidades Tailwind. -->
+<header class="relative flex min-h-[360px] items-center justify-center overflow-hidden px-5 py-20 md:min-h-[420px]">
+        <img
+          class="absolute inset-0 h-full w-full object-cover"
+          th:src="@{/images/PlayaPriv.avif}"
+          alt="Playa del Hotel Macondo"
+        />
+        <div class="absolute inset-0 bg-black/45" aria-hidden="true"></div>
+        <div class="relative z-10 mx-auto max-w-3xl text-center text-white">
+          <p class="mb-5 text-xs font-bold uppercase text-[#ffc94d]">Hotel Macondo</p>
+          <h1 class="font-['Playfair_Display'] text-5xl font-bold !text-white md:text-6xl">Nuestros Servicios</h1>
+          <p class="mx-auto mt-5 max-w-2xl text-lg leading-8 text-white/95">
+            Cada experiencia diseñada para que tu estadía en el Caribe colombiano sea verdaderamente inolvidable.
+          </p>
+        </div>
+      </header>
+
+      <!-- Area principal: conserva un ancho de lectura y separacion uniforme con el resto del sitio. -->
+<section class="mx-auto max-w-[1180px] px-5 py-12 md:py-16" aria-labelledby="catalogo-servicios">
+        <h2 class="sr-only" id="catalogo-servicios">Catálogo de servicios</h2>
+
+        <!-- Filtros por categoria: el atributo data-service-filter es consumido por servicios.js. -->
+<div class="mb-12 flex flex-wrap justify-center gap-3" role="group" aria-label="Filtrar servicios por categoría">
+          <button
+            class="rounded-full border-2 border-[#147ba5] bg-white px-7 py-2.5 font-bold text-[#147ba5] transition hover:bg-[#e8f4f8] aria-pressed:border-[#147ba5] aria-pressed:bg-[#147ba5] aria-pressed:text-white"
+            type="button"
+            data-service-filter="Todos"
+            aria-pressed="true"
+          >Todos</button>
+          <button
+            class="rounded-full border-2 border-[#147ba5] bg-white px-7 py-2.5 font-bold text-[#147ba5] transition hover:bg-[#e8f4f8] aria-pressed:border-[#147ba5] aria-pressed:bg-[#147ba5] aria-pressed:text-white"
+            type="button"
+            th:each="categoria : ${categorias}"
+            th:text="${categoria}"
+            th:attr="data-service-filter=${categoria}"
+            aria-pressed="false"
+          ></button>
+        </div>
+
+        <!-- Rejilla responsive: una columna en movil y dos columnas desde pantallas grandes. -->
+<div class="grid grid-cols-1 gap-8 lg:grid-cols-2" data-services-grid>
+          <!-- Cada articulo representa un Servicio activo enviado por ServicioController en el modelo. -->
+<article
+            class="flex h-full flex-col overflow-hidden rounded-lg bg-white shadow-[0_12px_30px_rgba(30,58,70,0.10)]"
+            th:each="servicio : ${servicios}"
+            data-service-card="true"
+            th:attr="data-category=${servicio.categoria}"
+          >
+            <!-- Media de la tarjeta: etiqueta, estado destacado y precio se superponen sobre la imagen. -->
+<div class="relative h-[240px] overflow-hidden md:h-[270px]">
+              <img
+                class="h-full w-full object-cover transition duration-500 hover:scale-105"
+                th:src="@{${servicio.imagen}}"
+                th:alt="${servicio.nombre}"
+              />
+              <span
+                class="absolute left-4 top-4 rounded-full bg-white px-3 py-1 text-[11px] font-bold uppercase text-[#147ba5] shadow-sm"
+                th:text="${servicio.categoria}"
+              ></span>
+              <span
+                class="absolute right-4 top-4 rounded-full bg-[#ffc94d] px-3 py-1 text-xs font-bold text-[#624800]"
+                th:if="${servicio.destacado}"
+              >Más popular</span>
+              <span
+                class="absolute bottom-3 right-0 rounded-l-md bg-[#ffc94d] px-5 py-2 text-sm font-bold text-[#5a4200]"
+                th:text="${(servicio.categoria == 'Gastronomía' ? 'Menú desde $' : 'Desde $') + #numbers.formatInteger(servicio.precio, 1, 'POINT')}"
+              ></span>
+            </div>
+
+            <!-- Contenido comercial del servicio: nombre, duracion, descripcion e inclusiones. -->
+<div class="flex flex-1 flex-col p-6 md:p-7">
+              <div class="flex items-start justify-between gap-5">
+                <h2
+                  class="font-['Playfair_Display'] text-2xl font-bold text-[#172f3b]"
+                  th:text="${servicio.nombre}"
+                ></h2>
+                <span class="shrink-0 pt-1 text-xs text-gray-500" th:text="${servicio.duracion}"></span>
+              </div>
+
+              <p class="mt-3 min-h-[72px] text-[15px] leading-6 text-[#5d5d5d]" th:text="${servicio.descripcion}"></p>
+
+              <!-- Incluidos dinamicos: se recorren desde servicio.incluidos sin valores quemados en la vista. -->
+<section class="mt-5 rounded-lg border border-[#efd28d] bg-[#fff5d8] p-4" aria-label="Incluye">
+                <h3 class="mb-3 text-[11px] font-bold uppercase text-[#147ba5]">Incluye</h3>
+                <ul class="grid grid-cols-1 gap-x-5 gap-y-2 text-sm sm:grid-cols-2">
+                  <li class="flex items-center gap-2" th:each="incluido : ${servicio.incluidos}">
+                    <i class="bi bi-check-circle text-[#218b83]" aria-hidden="true"></i>
+                    <span th:text="${incluido}"></span>
+                  </li>
+                </ul>
+              </section>
+
+              <!-- Acciones: detalle navega a la ruta del servicio y agregar cambia estado visual mediante JavaScript. -->
+<div class="mt-5 grid grid-cols-[minmax(0,1fr)_auto] gap-3">
+                <a
+                  class="flex min-h-11 items-center justify-center gap-2 rounded-md bg-[#1d82a8] px-5 py-3 font-bold text-white transition hover:bg-[#156b8d]"
+                  th:href="@{/servicios/{id}(id=${servicio.id})}"
+                >
+                  Ver detalle <i class="bi bi-arrow-right" aria-hidden="true"></i>
+                </a>
+                <button
+                  class="min-h-11 rounded-md border border-[#ffc94d] bg-[#ffc94d] px-5 py-3 font-bold text-[#624800] transition hover:bg-[#efb630] aria-pressed:border-emerald-600 aria-pressed:bg-emerald-600 aria-pressed:text-white"
+                  type="button"
+                  th:attr="data-add-service=${servicio.nombre}"
+                  data-default-label="Agregar"
+                  data-added-label="Añadido"
+                  aria-pressed="false"
+                >Agregar</button>
+              </div>
+            </div>
+          </article>
+        </div>
+
+        <section class="mt-16 rounded-lg bg-[#176f91] px-6 py-14 text-center text-white shadow-[0_20px_40px_rgba(23,111,145,0.20)] md:px-12 md:py-16" aria-labelledby="llamado-reserva">
+          <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-full border border-[#ffc94d]/60 bg-white/10 text-2xl text-[#ffc94d]">
+            <i class="bi bi-star" aria-hidden="true"></i>
+          </div>
+          <h2 class="mt-6 font-['Playfair_Display'] text-3xl font-bold !text-white md:text-4xl" id="llamado-reserva">
+            ¿Listo para vivir la experiencia Macondo?
+          </h2>
+          <p class="mx-auto mt-4 max-w-2xl text-lg leading-7 text-white/90">
+            Reserva tu estadía ahora y agrega cualquiera de nuestros servicios para una experiencia completa.
+          </p>
+          <a class="mt-8 inline-flex rounded-md bg-[#ffc94d] px-10 py-3.5 font-bold text-[#624800] transition hover:bg-[#efb630]" th:href="@{/habitaciones}">Reservar ahora</a>
+        </section>
+      </section>
+    </main>
+
+    <!-- Footer comun: es exactamente el mismo fragmento usado por la landing y habitaciones. -->
+<footer th:replace="~{fragmentos :: footer}"></footer>
+    <!-- Scripts compartidos mas la interaccion especifica del catalogo. -->
+<th:block th:replace="~{fragmentos :: scripts}"></th:block>
+    <script th:src="@{/js/servicios.js}"></script>
+  </body>
+</html>
