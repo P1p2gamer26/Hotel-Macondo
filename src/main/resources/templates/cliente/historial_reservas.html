@@ -3,107 +3,166 @@
   <head
     th:replace="~{fragmentos :: cabecera('Historial de Reservas | Hotel Macondo')}"
   ></head>
-  <body
-    style="
-      min-height: 100vh;
-      background: #f8f6f3;
-      display: flex;
-      flex-direction: column;
-    "
-  >
-    <!-- NAVBAR DE CLIENTE -->
+  <body class="min-h-screen bg-[#f8f6f3] flex flex-col font-sans">
     <nav th:replace="~{cliente/fragmentos_cliente :: navbar-cliente}"></nav>
 
-    <main
-      style="
-        flex: 1;
-        max-width: 1100px;
-        margin: 0 auto;
-        width: 100%;
-        padding: 3rem 1.5rem;
-      "
-    >
-      <h1
-        style="
-          font-family: &quot;Playfair Display&quot;, serif;
-          font-size: 2rem;
-          font-weight: 700;
-          color: #0e2a3f;
-        "
-      >
-        Historial de Reservas
-      </h1>
-      <p
-        style="
-          font-family: &quot;Poppins&quot;, sans-serif;
-          font-size: 0.875rem;
-          color: #888;
-        "
-      >
-        Todas tus estadías anteriores
-      </p>
+    <main class="flex-1 max-w-[1100px] mx-auto w-full px-6 py-12">
+      <!-- HEADER -->
+      <div class="mb-8">
+        <h1
+          class="font-serif text-3xl md:text-4xl font-bold text-[#0e2a3f] mb-2"
+        >
+          Historial de Experiencias
+        </h1>
+        <p class="font-sans text-sm text-gray-500">
+          Un recuento de todas tus estadías en Hotel Macondo
+        </p>
+      </div>
 
-      <div style="margin-top: 2rem">
-        <!-- Estado vacío -->
-        <div th:if="${historial == null or historial.isEmpty()}">
-          <div
-            style="
-              text-align: center;
-              padding: 4rem 2rem;
-              background: linear-gradient(135deg, #1a759f, #87ceeb);
-              border-radius: 20px;
-              color: white;
-            "
+      <!-- BARRA DE FILTROS-->
+      <div class="flex gap-2.5 flex-wrap mb-8">
+        <!-- Botón Todos activo por defecto visualmente -->
+        <a
+          href="#"
+          class="font-sans text-xs font-semibold px-5 py-2 rounded-full border-2 border-[var(--azul)] bg-[var(--azul)] text-white transition-all"
+        >
+          Todos
+        </a>
+        <!-- Botones inactivos visualmente -->
+        <a
+          href="#"
+          class="font-sans text-xs font-semibold px-5 py-2 rounded-full border-2 border-[rgba(26,117,159,0.2)] text-gray-600 hover:border-[var(--azul)] bg-transparent transition-all"
+        >
+          Finalizada
+        </a>
+        <a
+          href="#"
+          class="font-sans text-xs font-semibold px-5 py-2 rounded-full border-2 border-[rgba(26,117,159,0.2)] text-gray-600 hover:border-[var(--azul)] bg-transparent transition-all"
+        >
+          Cancelada
+        </a>
+      </div>
+
+      <!-- TARJETAS DE HISTORIAL-->
+      <div class="flex flex-col gap-4">
+        <!-- Estado vacio -->
+        <div
+          th:if="${historial == null or historial.isEmpty()}"
+          class="bg-gradient-to-br from-[var(--azul)] to-[#87ceeb] rounded-2xl overflow-hidden p-16 md:p-20 text-center shadow-[0_10px_40px_rgba(26,117,159,0.2)]"
+        >
+          <div class="text-6xl mb-6 leading-none">🌊</div>
+          <h2 class="font-serif text-2xl md:text-3xl font-bold text-white mb-3">
+            Aún no tienes experiencias registradas
+          </h2>
+          <p
+            class="font-sans text-sm text-white/80 mb-8 leading-relaxed max-w-md mx-auto"
           >
-            <div style="font-size: 4rem">🌊</div>
-            <h2
-              style="
-                font-family: &quot;Playfair Display&quot;, serif;
-                font-size: 1.6rem;
-              "
-            >
-              Aún no tienes experiencias registradas
-            </h2>
-            <a
-              th:href="@{/cliente}"
-              style="
-                display: inline-block;
-                background: #f9c74f;
-                color: #333;
-                padding: 0.85rem 2rem;
-                border-radius: 10px;
-                text-decoration: none;
-                margin-top: 1rem;
-              "
-              >Hacer mi primera reserva</a
-            >
-          </div>
+            Cada estadía en Hotel Macondo es una historia que merece ser
+            vivida.<br />
+            Comienza tu primera aventura caribeña hoy.
+          </p>
+          <a
+            th:href="@{/cliente}"
+            class="font-sans text-sm font-bold bg-[var(--dorado)] text-[#333] rounded-xl px-8 py-3.5 inline-flex items-center gap-2 transition-transform hover:scale-105"
+          >
+            Hacer mi primera reserva <i class="bi bi-arrow-right"></i>
+          </a>
         </div>
 
-        <!-- Lista de historial -->
+        <!-- Bucle iterando la lista de tu base de datos -->
         <div
           th:each="h : ${historial}"
-          style="
-            background: white;
-            border-radius: 16px;
-            padding: 1.5rem;
-            margin-bottom: 1rem;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-            border-left: 6px solid #27ae60;
-          "
+          class="bg-white rounded-[16px] shadow-[0_4px_20px_rgba(0,0,0,0.08)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.13)] flex overflow-hidden transition-shadow duration-300"
         >
-          <p>
-            <strong>Código:</strong> <span th:text="${h.numeroReserva}"></span>
+          <!-- Línea de color (Verde para Finalizada, Rojo para Cancelada) -->
+          <div
+            class="w-2 flex-shrink-0"
+            th:classappend="${h.estado == 'Finalizada' or h.estado == 'FINALIZADA'} ? 'bg-[#27ae60]' : 'bg-[#e74c3c]'"
+          ></div>
+
+          <div
+            class="flex-1 p-5 md:p-6 flex items-center flex-wrap gap-4 md:gap-6"
+          >
+            <!-- IZQUIERDA: Detalles de la habitación -->
+            <div class="flex-[1_1_200px]">
+              <div class="flex items-center gap-2 mb-1">
+                <i class="bi bi-door-closed text-gray-400 text-xs"></i>
+                <span
+                  class="font-sans text-[0.68rem] text-gray-400 tracking-wider"
+                  th:text="${h.numeroReserva}"
+                ></span>
+              </div>
+              <h3 class="font-serif text-xl font-bold text-[#0e2a3f] mb-1">
+                Habitación Macondo
+              </h3>
+              <p
+                class="font-sans text-[0.78rem] text-gray-500 mb-0"
+                th:text="${h.cantidadPersonas} + ' personas'"
+              ></p>
+
+              <div class="flex items-center gap-1.5 mt-2">
+                <i class="bi bi-calendar3 text-gray-400 text-[0.7rem]"></i>
+                <span
+                  class="font-sans text-[0.75rem] text-gray-500"
+                  th:text="${h.fechaInicio} + ' &rarr; ' + ${h.fechaFin}"
+                ></span>
+              </div>
+            </div>
+
+            <!-- CENTRO: Precio -->
+            <div class="flex-none">
+              <span
+                class="font-serif text-lg md:text-xl font-bold text-[var(--azul)]"
+                th:text="'$' + ${h.total}"
+              ></span>
+            </div>
+
+            <!-- DERECHA -->
+            <div class="flex-none text-right ml-auto md:ml-0">
+              <span
+                class="font-sans text-[0.72rem] font-bold rounded-lg px-3 py-1.5 tracking-wider border-[1.5px]"
+                th:text="${h.estado}"
+                th:classappend="${h.estado == 'Finalizada' or h.estado == 'FINALIZADA'} ? 'text-[#27ae60] bg-[#27ae60]/10 border-[#27ae60]/30' : 'text-[#e74c3c] bg-[#e74c3c]/10 border-[#e74c3c]/30'"
+              >
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div
+        th:if="${historial != null and !historial.isEmpty()}"
+        class="mt-10 grid grid-cols-1 sm:grid-cols-3 gap-4"
+      >
+        <div class="bg-white rounded-xl border border-[#e8e0d8] p-5 md:p-6">
+          <p class="font-sans text-[0.7rem] text-gray-500 mb-1 tracking-wider">
+            Estadías totales
           </p>
-          <p><strong>Estado:</strong> <span th:text="${h.estado}"></span></p>
-          <p><strong>Total:</strong> $<span th:text="${h.total}"></span></p>
-          <p>
-            <strong>Personas:</strong>
-            <span th:text="${h.cantidadPersonas}"></span>
+          <p
+            class="font-serif text-2xl md:text-3xl font-bold text-[#27ae60] m-0"
+            th:text="${historial.size()}"
+          ></p>
+        </div>
+
+        <div class="bg-white rounded-xl border border-[#e8e0d8] p-5 md:p-6">
+          <p class="font-sans text-[0.7rem] text-gray-500 mb-1 tracking-wider">
+            Noches acumuladas
           </p>
-          <p>
-            <strong>Fechas:</strong> <span th:text="${h.fechaInicio}"></span> →
-            <span th:text="${h.fechaFin}"></span>
+          <p
+            class="font-serif text-2xl md:text-3xl font-bold text-[var(--azul)] m-0"
+          >
+            12
+          </p>
+        </div>
+
+        <div class="bg-white rounded-xl border border-[#e8e0d8] p-5 md:p-6">
+          <p class="font-sans text-[0.7rem] text-gray-500 mb-1 tracking-wider">
+            Cancelaciones
+          </p>
+          <p
+            class="font-serif text-2xl md:text-3xl font-bold text-[#e74c3c] m-0"
+          >
+            0
           </p>
         </div>
       </div>

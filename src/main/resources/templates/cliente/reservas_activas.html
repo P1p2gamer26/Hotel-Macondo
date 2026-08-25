@@ -3,86 +3,180 @@
   <head
     th:replace="~{fragmentos :: cabecera('Reservas Activas | Hotel Macondo')}"
   ></head>
-  <body
-    style="
-      min-height: 100vh;
-      background: #faf8f5;
-      display: flex;
-      flex-direction: column;
-    "
-  >
-    <!-- NAVBAR DE CLIENTE -->
+  <body class="min-h-screen bg-[#faf8f5] flex flex-col font-sans">
     <nav th:replace="~{cliente/fragmentos_cliente :: navbar-cliente}"></nav>
 
-    <main
-      style="
-        flex: 1;
-        max-width: 1100px;
-        margin: 0 auto;
-        width: 100%;
-        padding: 3rem 1.5rem;
-      "
-    >
-      <h1
-        style="
-          font-family: &quot;Playfair Display&quot;, serif;
-          font-size: 2rem;
-          font-weight: 700;
-          color: #0e2a3f;
-        "
-      >
-        Reservas Activas
-      </h1>
-      <p
-        style="
-          font-family: &quot;Poppins&quot;, sans-serif;
-          font-size: 0.875rem;
-          color: #888;
-        "
-      >
-        Gestiona tus reservas actuales y próximas estadías
-      </p>
+    <main class="flex-1 max-w-[1100px] mx-auto w-full px-6 py-12">
+      <!-- HEADER -->
+      <div class="mb-8">
+        <h1
+          class="font-serif text-3xl md:text-4xl font-bold text-[#0e2a3f] mb-2"
+        >
+          Reservas Activas
+        </h1>
+        <p class="font-sans text-sm text-gray-500">
+          Gestiona tus reservas actuales y próximas estadías
+        </p>
+      </div>
 
-      <div style="margin-top: 2rem">
-        <!-- Estado vacío -->
-        <div th:if="${reservas == null or reservas.isEmpty()}">
-          <p
-            style="
-              text-align: center;
-              padding: 3rem;
-              background: white;
-              border-radius: 16px;
-            "
+      <!-- BARRA DE FILTRO DUMMY -->
+      <div
+        class="bg-white rounded-xl p-4 md:px-6 md:py-4 shadow-[0_4px_20px_rgba(0,0,0,0.07)] flex items-center gap-6 flex-wrap mb-7"
+      >
+        <div class="flex items-center gap-2">
+          <i class="bi bi-search text-gray-400"></i>
+          <span class="font-sans text-sm font-semibold text-gray-600"
+            >Estado:</span
           >
+        </div>
+
+        <div class="flex gap-2 flex-wrap">
+          <a
+            href="#"
+            class="font-sans text-xs font-semibold px-4 py-1.5 rounded-full border-2 border-[var(--azul)] bg-[var(--azul)] text-white transition-all"
+          >
+            Todos
+          </a>
+          <!-- Botones inactivos visualmente -->
+          <a
+            href="#"
+            class="font-sans text-xs font-semibold px-4 py-1.5 rounded-full border-2 border-gray-100 text-gray-500 hover:border-[var(--azul)] bg-transparent transition-all"
+          >
+            Activa
+          </a>
+          <a
+            href="#"
+            class="font-sans text-xs font-semibold px-4 py-1.5 rounded-full border-2 border-gray-100 text-gray-500 hover:border-[var(--azul)] bg-transparent transition-all"
+          >
+            Confirmada
+          </a>
+          <a
+            href="#"
+            class="font-sans text-xs font-semibold px-4 py-1.5 rounded-full border-2 border-gray-100 text-gray-500 hover:border-[var(--azul)] bg-transparent transition-all"
+          >
+            Pendiente
+          </a>
+        </div>
+
+        <div class="flex items-center gap-2 ml-auto">
+          <i class="bi bi-calendar3 text-gray-400"></i>
+          <input
+            type="date"
+            class="font-sans text-sm text-gray-600 border-[1.5px] border-gray-200 rounded-lg px-3 py-1.5 outline-none focus:border-[var(--azul)] transition-colors"
+          />
+        </div>
+      </div>
+
+      <!-- TARJETAS DE RESERVA REALES -->
+      <div class="flex flex-col gap-4">
+        <div
+          th:if="${reservas == null or reservas.isEmpty()}"
+          class="bg-white rounded-[16px] p-12 text-center shadow-[0_4px_20px_rgba(0,0,0,0.07)]"
+        >
+          <i class="bi bi-check-circle text-5xl text-gray-300"></i>
+          <p class="font-serif text-xl text-gray-500 mt-4">
             No tienes reservas activas
           </p>
         </div>
 
-        <!-- Lista de reservas -->
+        <!-- Bucle iterando la lista de tu base de datos -->
         <div
           th:each="r : ${reservas}"
-          style="
-            background: white;
-            border-radius: 16px;
-            padding: 1.5rem;
-            margin-bottom: 1rem;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-            border-left: 6px solid #1a759f;
-          "
+          class="bg-white rounded-[16px] shadow-[0_4px_20px_rgba(0,0,0,0.08)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.13)] flex overflow-hidden transition-shadow duration-300"
         >
-          <p>
-            <strong>Código:</strong> <span th:text="${r.numeroReserva}"></span>
+          <!-- Línea de color -->
+          <div class="w-2 flex-shrink-0 bg-[var(--azul)]"></div>
+
+          <div class="flex-1 p-6 flex items-center flex-wrap gap-6">
+            <!-- IZQUIERDA -->
+            <div class="flex-[1_1_200px]">
+              <div class="flex items-center gap-2 mb-1">
+                <i class="bi bi-door-closed text-gray-400 text-sm"></i>
+                <span
+                  class="font-sans text-[0.72rem] text-gray-400 tracking-wider"
+                  th:text="${r.numeroReserva}"
+                ></span>
+              </div>
+              <h3 class="font-serif text-2xl font-bold text-[var(--azul)] mb-1">
+                Habitación Estándar
+              </h3>
+              <p
+                class="font-sans text-sm text-gray-500 mb-2"
+                th:text="${r.cantidadPersonas} + ' personas'"
+              ></p>
+              <div class="flex items-center gap-1.5">
+                <i class="bi bi-calendar3 text-gray-400 text-xs"></i>
+                <span
+                  class="font-sans text-[0.78rem] text-gray-600"
+                  th:text="${r.fechaInicio} + ' &rarr; ' + ${r.fechaFin}"
+                ></span>
+              </div>
+            </div>
+
+            <!-- CENTRO -->
+            <div class="flex flex-col items-center gap-2.5 flex-none">
+              <span
+                class="font-sans text-[0.72rem] font-bold rounded-lg px-3 py-1 tracking-wider border-[1.5px] text-[var(--azul)] bg-[var(--azul)]/10 border-[var(--azul)]"
+                th:text="${r.estado}"
+              >
+              </span>
+
+              <!-- Mostrar el precio real -->
+              <span
+                class="font-serif text-lg font-bold text-[#0e2a3f]"
+                th:text="'$' + ${r.total}"
+              ></span>
+            </div>
+
+            <!-- DERECHA -->
+            <div class="flex flex-col gap-2.5 flex-none items-stretch">
+              <a
+                href="#"
+                class="font-sans text-sm font-semibold text-center text-white bg-[var(--azul)] hover:bg-[#0e2a3f] rounded-lg px-5 py-2 transition-colors"
+              >
+                Modificar
+              </a>
+              <button
+                class="font-sans text-sm font-semibold text-[#e74c3c] bg-transparent border-[1.5px] border-[#e74c3c] hover:text-[#c0392b] hover:border-[#c0392b] rounded-lg px-5 py-2 transition-colors cursor-pointer"
+              >
+                Cancelar
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CINTA DE RESUMEN DUMMY -->
+      <div
+        th:if="${reservas != null and !reservas.isEmpty()}"
+        class="mt-8 bg-gradient-to-br from-[var(--azul)]/5 to-[#87ceeb]/10 border border-[var(--azul)]/10 rounded-xl p-4 md:px-6 md:py-4 flex gap-8 flex-wrap"
+      >
+        <div>
+          <p class="font-sans text-[0.7rem] text-gray-500 mb-1 tracking-wider">
+            Total reservas
           </p>
-          <p><strong>Estado:</strong> <span th:text="${r.estado}"></span></p>
-          <p><strong>Total:</strong> $<span th:text="${r.total}"></span></p>
-          <p>
-            <strong>Personas:</strong>
-            <span th:text="${r.cantidadPersonas}"></span>
+          <p
+            class="font-serif text-2xl font-bold text-[var(--azul)] m-0"
+            th:text="${reservas.size()}"
+          ></p>
+        </div>
+        <div>
+          <p class="font-sans text-[0.7rem] text-gray-500 mb-1 tracking-wider">
+            Activas
           </p>
-          <p>
-            <strong>Fechas:</strong> <span th:text="${r.fechaInicio}"></span> →
-            <span th:text="${r.fechaFin}"></span>
+          <p class="font-serif text-2xl font-bold text-[var(--azul)] m-0">1</p>
+        </div>
+        <div>
+          <p class="font-sans text-[0.7rem] text-gray-500 mb-1 tracking-wider">
+            Confirmadas
           </p>
+          <p class="font-serif text-2xl font-bold text-[var(--azul)] m-0">1</p>
+        </div>
+        <div>
+          <p class="font-sans text-[0.7rem] text-gray-500 mb-1 tracking-wider">
+            Pendientes
+          </p>
+          <p class="font-serif text-2xl font-bold text-[var(--azul)] m-0">0</p>
         </div>
       </div>
     </main>
