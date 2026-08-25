@@ -19,7 +19,6 @@ public class Servicio {
     private boolean destacado;
     private BigDecimal precio;
     private boolean activo;
-    private String categoria;
     private String duracion;
     private String descripcionDetalle;
     private String horario;
