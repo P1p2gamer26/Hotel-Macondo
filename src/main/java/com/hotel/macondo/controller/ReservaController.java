@@ -1,27 +1,34 @@
 package com.hotel.macondo.controller;
 
-/*
- * ============================================================
- * AQUI VA TODO LO DE RESERVAR
- * ============================================================
- *
- * Controlador del CRUD de reservas. Vacio por ahora.
- *
- * Cuando se implemente, aqui van:
- *
- *   GET  /reservas             -> listar todas las reservas
- *   GET  /reservas/add         -> formulario de reserva (recibiendo por
- *                                 parametros la fecha y el tipo de habitacion
- *                                 que el usuario eligio en la landing)
- *   POST /reservas/add         -> validar y guardar la reserva
- *   GET  /reservas/{id}        -> detalle / confirmacion de la reserva
- *   GET  /reservas/update/{id} -> editar una reserva existente
- *   GET  /reservas/delete/{id} -> eliminar una reserva
- *
- * Debe usar ReservaService y HabitacionService (para la lista de habitaciones del
- * combo) y devolver las vistas reservar.html, reservas.html y
- * detalle_reserva.html.
- */
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import com.hotel.macondo.entities.Reserva;
+import com.hotel.macondo.service.ReservaService;
+
+@Controller
+@RequestMapping("/cliente/reservas")
 public class ReservaController {
 
+    private final ReservaService reservaService;
+
+    @Autowired
+    public ReservaController(ReservaService reservaService) {
+        this.reservaService = reservaService;
+    }
+
+    @GetMapping("/activas")
+    public String reservasActivas(Model model) {
+        model.addAttribute("reservas", reservaService.obtenerReservasActivas());
+        return "reservas-activas";
+    }
+
+    @GetMapping("/historial")
+    public String historialReservas(Model model) {
+        model.addAttribute("historial", reservaService.obtenerHistorial());
+        return "historial-reservas";
+    }
 }
