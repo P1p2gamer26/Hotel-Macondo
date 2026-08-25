@@ -32,6 +32,12 @@ public class OperadorController {
         this.service = service;
     }
 
+    @GetMapping
+    public String inicio(Model model) {
+        model.addAttribute("seccionActiva", "panel");
+        return "operador/index";
+    }
+
     // ===== RESERVAS =====
 
     /**
@@ -45,7 +51,7 @@ public class OperadorController {
 
     // ===== CUENTA DE LA HABITACION =====
 
-    /**
+       /**
      * Formulario para buscar la cuenta de una habitacion por su id.
      */
     @GetMapping("/cuenta")
@@ -65,6 +71,7 @@ public class OperadorController {
     /**
      * Muestra el detalle de la cuenta de una habitacion.
      */
+
     @GetMapping("/cuenta/{id}")
     public String cuentaHabitacion(@PathVariable Integer id, Model model) {
         model.addAttribute("seccionActiva", "cuenta");
@@ -87,7 +94,6 @@ public class OperadorController {
     /**
      * Retorna los operadores guardados temporalmente.
      */
-    @GetMapping
     @ResponseBody
     public Collection<Operador> listar() {
         return service.buscarTodos();
