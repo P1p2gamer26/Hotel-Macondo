@@ -33,4 +33,5 @@ public class ServicioController {
     public Collection<Servicio> listar() {
         return service.buscarTodos();
     }
+
 }

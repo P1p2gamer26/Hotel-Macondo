@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+  <head
+    th:replace="~{fragmentos :: cabecera('Mi Perfil | Hotel Macondo')}"
+  ></head>
+  <body
+    style="
+      min-height: 100vh;
+      background: linear-gradient(180deg, #e3ecef 0%, #f5e6d3 100%);
+      display: flex;
+      flex-direction: column;
+    "
+  >
+    <nav th:replace="~{cliente/fragmentos_cliente :: navbar-cliente}"></nav>
+
+    <main
+      style="
+        flex: 1;
+        max-width: 900px;
+        margin: 0 auto;
+        width: 100%;
+        padding: 3rem 1.5rem;
+      "
+    >
+      <!-- HEADER -->
+      <div style="margin-bottom: 2rem">
+        <h1
+          style="
+            font-family: &quot;Playfair Display&quot;, serif;
+            font-size: 2rem;
+            font-weight: 700;
+            color: #0e2a3f;
+            margin: 0 0 0.4rem;
+          "
+        >
+          Mi Perfil
+        </h1>
+        <p
+          style="
+            font-family: &quot;Poppins&quot;, sans-serif;
+            font-size: 0.875rem;
+            color: #666;
+            margin: 0;
+          "
+        >
+          Gestiona tu información personal y preferencias
+        </p>
+      </div>
+
+      <!-- FORMULARIO DE DATOS -->
+      <div
+        style="
+          background: #fff;
+          border-radius: 20px;
+          padding: 2rem;
+          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.09);
+          margin-bottom: 1.5rem;
+        "
+      >
+        <div
+          style="
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.75rem;
+          "
+        >
+          <div>
+            <h3
+              style="
+                font-family: &quot;Playfair Display&quot;, serif;
+                font-size: 1.2rem;
+                font-weight: 700;
+                color: #0e2a3f;
+                margin: 0 0 0.2rem;
+              "
+            >
+              Datos personales
+            </h3>
+            <p
+              style="
+                font-family: &quot;Poppins&quot;, sans-serif;
+                font-size: 0.78rem;
+                color: #999;
+                margin: 0;
+              "
+            >
+              Información de tu cuenta y preferencias de contacto
+            </p>
+          </div>
+        </div>
+
+        <!-- Formulamos usando los datos que vienen de model.addAttribute("cliente", cliente) -->
+        <form
+          action="#"
+          th:action="@{/cliente/perfil/actualizar}"
+          th:object="${cliente}"
+          method="post"
+        >
+          <input type="hidden" th:field="*{id}" />
+          <input type="hidden" th:field="*{cedula}" />
+
+          <div
+            style="
+              display: grid;
+              grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+              gap: 1.25rem;
+              margin-bottom: 1.5rem;
+            "
+          >
+            <div>
+              <label
+                style="
+                  display: block;
+                  font-family: &quot;Poppins&quot;, sans-serif;
+                  font-size: 0.7rem;
+                  font-weight: 600;
+                  color: #1a759f;
+                  margin-bottom: 0.4rem;
+                  text-transform: uppercase;
+                  letter-spacing: 0.08em;
+                "
+              >
+                <i class="bi bi-person"></i> Nombre
+              </label>
+              <input
+                type="text"
+                th:field="*{nombre}"
+                style="
+                  width: 100%;
+                  padding: 0.85rem 1rem;
+                  border-radius: 12px;
+                  border: 1.5px solid rgba(26, 117, 159, 0.2);
+                  font-family: &quot;Poppins&quot;, sans-serif;
+                  font-size: 0.875rem;
+                  color: #333;
+                  outline: none;
+                  transition: border-color 0.2s;
+                "
+              />
+            </div>
+
+            <div>
+              <label
+                style="
+                  display: block;
+                  font-family: &quot;Poppins&quot;, sans-serif;
+                  font-size: 0.7rem;
+                  font-weight: 600;
+                  color: #1a759f;
+                  margin-bottom: 0.4rem;
+                  text-transform: uppercase;
+                  letter-spacing: 0.08em;
+                "
+              >
+                <i class="bi bi-person"></i> Apellido
+              </label>
+              <input
+                type="text"
+                th:field="*{apellido}"
+                style="
+                  width: 100%;
+                  padding: 0.85rem 1rem;
+                  border-radius: 12px;
+                  border: 1.5px solid rgba(26, 117, 159, 0.2);
+                  font-family: &quot;Poppins&quot;, sans-serif;
+                  font-size: 0.875rem;
+                  color: #333;
+                  outline: none;
+                "
+              />
+            </div>
+
+            <div>
+              <label
+                style="
+                  display: block;
+                  font-family: &quot;Poppins&quot;, sans-serif;
+                  font-size: 0.7rem;
+                  font-weight: 600;
+                  color: #1a759f;
+                  margin-bottom: 0.4rem;
+                  text-transform: uppercase;
+                  letter-spacing: 0.08em;
+                "
+              >
+                <i class="bi bi-envelope"></i> Correo electrónico
+              </label>
+              <input
+                type="email"
+                th:field="*{correo}"
+                style="
+                  width: 100%;
+                  padding: 0.85rem 1rem;
+                  border-radius: 12px;
+                  border: 1.5px solid rgba(26, 117, 159, 0.2);
+                  font-family: &quot;Poppins&quot;, sans-serif;
+                  font-size: 0.875rem;
+                  color: #333;
+                  outline: none;
+                "
+              />
+            </div>
+
+            <div>
+              <label
+                style="
+                  display: block;
+                  font-family: &quot;Poppins&quot;, sans-serif;
+                  font-size: 0.7rem;
+                  font-weight: 600;
+                  color: #1a759f;
+                  margin-bottom: 0.4rem;
+                  text-transform: uppercase;
+                  letter-spacing: 0.08em;
+                "
+              >
+                <i class="bi bi-telephone"></i> Teléfono
+              </label>
+              <input
+                type="tel"
+                th:field="*{telefono}"
+                style="
+                  width: 100%;
+                  padding: 0.85rem 1rem;
+                  border-radius: 12px;
+                  border: 1.5px solid rgba(26, 117, 159, 0.2);
+                  font-family: &quot;Poppins&quot;, sans-serif;
+                  font-size: 0.875rem;
+                  color: #333;
+                  outline: none;
+                "
+              />
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 0.75rem; justify-content: flex-end">
+            <button
+              type="submit"
+              style="
+                font-family: &quot;Poppins&quot;, sans-serif;
+                font-size: 0.85rem;
+                font-weight: 700;
+                background: #f9c74f;
+                color: #333;
+                border: none;
+                border-radius: 8px;
+                padding: 0.65rem 1.75rem;
+                cursor: pointer;
+                transition: all 0.2s;
+              "
+            >
+              Guardar cambios
+            </button>
+          </div>
+        </form>
+      </div>
+    </main>
+
+    <footer th:replace="~{fragmentos :: footer}"></footer>
+  </body>
+</html>

@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+  <head
+    th:replace="~{fragmentos :: cabecera('Historial de Reservas | Hotel Macondo')}"
+  ></head>
+  <body
+    style="
+      min-height: 100vh;
+      background: #f8f6f3;
+      display: flex;
+      flex-direction: column;
+    "
+  >
+    <!-- NAVBAR DE CLIENTE -->
+    <nav th:replace="~{cliente/fragmentos_cliente :: navbar-cliente}"></nav>
+
+    <main
+      style="
+        flex: 1;
+        max-width: 1100px;
+        margin: 0 auto;
+        width: 100%;
+        padding: 3rem 1.5rem;
+      "
+    >
+      <h1
+        style="
+          font-family: &quot;Playfair Display&quot;, serif;
+          font-size: 2rem;
+          font-weight: 700;
+          color: #0e2a3f;
+        "
+      >
+        Historial de Reservas
+      </h1>
+      <p
+        style="
+          font-family: &quot;Poppins&quot;, sans-serif;
+          font-size: 0.875rem;
+          color: #888;
+        "
+      >
+        Todas tus estadías anteriores
+      </p>
+
+      <div style="margin-top: 2rem">
+        <!-- Estado vacío -->
+        <div th:if="${historial == null or historial.isEmpty()}">
+          <div
+            style="
+              text-align: center;
+              padding: 4rem 2rem;
+              background: linear-gradient(135deg, #1a759f, #87ceeb);
+              border-radius: 20px;
+              color: white;
+            "
+          >
+            <div style="font-size: 4rem">🌊</div>
+            <h2
+              style="
+                font-family: &quot;Playfair Display&quot;, serif;
+                font-size: 1.6rem;
+              "
+            >
+              Aún no tienes experiencias registradas
+            </h2>
+            <a
+              th:href="@{/cliente}"
+              style="
+                display: inline-block;
+                background: #f9c74f;
+                color: #333;
+                padding: 0.85rem 2rem;
+                border-radius: 10px;
+                text-decoration: none;
+                margin-top: 1rem;
+              "
+              >Hacer mi primera reserva</a
+            >
+          </div>
+        </div>
+
+        <!-- Lista de historial -->
+        <div
+          th:each="h : ${historial}"
+          style="
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border-left: 6px solid #27ae60;
+          "
+        >
+          <p>
+            <strong>Código:</strong> <span th:text="${h.numeroReserva}"></span>
+          </p>
+          <p><strong>Estado:</strong> <span th:text="${h.estado}"></span></p>
+          <p><strong>Total:</strong> $<span th:text="${h.total}"></span></p>
+          <p>
+            <strong>Personas:</strong>
+            <span th:text="${h.cantidadPersonas}"></span>
+          </p>
+          <p>
+            <strong>Fechas:</strong> <span th:text="${h.fechaInicio}"></span> →
+            <span th:text="${h.fechaFin}"></span>
+          </p>
+        </div>
+      </div>
+    </main>
+
+    <footer th:replace="~{fragmentos :: footer}"></footer>
+  </body>
+</html>

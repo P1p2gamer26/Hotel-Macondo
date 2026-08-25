@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+  <head
+    th:replace="~{fragmentos :: cabecera('Reservas Activas | Hotel Macondo')}"
+  ></head>
+  <body
+    style="
+      min-height: 100vh;
+      background: #faf8f5;
+      display: flex;
+      flex-direction: column;
+    "
+  >
+    <!-- NAVBAR DE CLIENTE -->
+    <nav th:replace="~{cliente/fragmentos_cliente :: navbar-cliente}"></nav>
+
+    <main
+      style="
+        flex: 1;
+        max-width: 1100px;
+        margin: 0 auto;
+        width: 100%;
+        padding: 3rem 1.5rem;
+      "
+    >
+      <h1
+        style="
+          font-family: &quot;Playfair Display&quot;, serif;
+          font-size: 2rem;
+          font-weight: 700;
+          color: #0e2a3f;
+        "
+      >
+        Reservas Activas
+      </h1>
+      <p
+        style="
+          font-family: &quot;Poppins&quot;, sans-serif;
+          font-size: 0.875rem;
+          color: #888;
+        "
+      >
+        Gestiona tus reservas actuales y próximas estadías
+      </p>
+
+      <div style="margin-top: 2rem">
+        <!-- Estado vacío -->
+        <div th:if="${reservas == null or reservas.isEmpty()}">
+          <p
+            style="
+              text-align: center;
+              padding: 3rem;
+              background: white;
+              border-radius: 16px;
+            "
+          >
+            No tienes reservas activas
+          </p>
+        </div>
+
+        <!-- Lista de reservas -->
+        <div
+          th:each="r : ${reservas}"
+          style="
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border-left: 6px solid #1a759f;
+          "
+        >
+          <p>
+            <strong>Código:</strong> <span th:text="${r.numeroReserva}"></span>
+          </p>
+          <p><strong>Estado:</strong> <span th:text="${r.estado}"></span></p>
+          <p><strong>Total:</strong> $<span th:text="${r.total}"></span></p>
+          <p>
+            <strong>Personas:</strong>
+            <span th:text="${r.cantidadPersonas}"></span>
+          </p>
+          <p>
+            <strong>Fechas:</strong> <span th:text="${r.fechaInicio}"></span> →
+            <span th:text="${r.fechaFin}"></span>
+          </p>
+        </div>
+      </div>
+    </main>
+
+    <footer th:replace="~{fragmentos :: footer}"></footer>
+  </body>
+</html>
