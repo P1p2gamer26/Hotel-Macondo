@@ -218,65 +218,102 @@
       </div>
     </section>
 
-    <!--SERVICIOS-->
-    <section class="py-20" id="servicios">
-      <div class="container mx-auto px-4">
-        <div class="text-center mb-16">
-          <p
-            class="text-[var(--azul)] text-[0.8rem] font-bold tracking-[3px] uppercase block mb-2"
-          >
-            Experiencias
-          </p>
-          <h2
-            class="text-4xl md:text-5xl font-serif font-bold text-[var(--azul-oscuro)] mb-4"
-          >
-            Nuestros Servicios
-          </h2>
-          <p class="max-w-2xl mx-auto text-[var(--texto)]">
-            En Macondo, cada detalle ha sido pensado para que tu estancia supere
-            cualquier sueño.
-          </p>
-        </div>
-
-        <!--CARRUSEL-->
-        <!-- Ya no dependemos de Bootstrap JS. Usamos flex con overflow-x-auto y snap-x para un carrusel 100% nativo y fluido -->
+    <!-- SERVICIOS CARRUSEL-->
+    <section
+      id="servicios"
+      class="relative w-full h-[90vh] overflow-hidden bg-[#050e18]"
+    >
+      <!-- Contenedor de las diapositivas -->
+      <div id="carrusel-servicios" class="relative w-full h-full">
+        <!-- Iteracion de cada servicio -->
+        <!-- Por defecto todos tienen opacity-0 y z-0, excepto el primero que se marca visible en Thymeleaf -->
         <div
-          class="flex overflow-x-auto snap-x snap-mandatory gap-6 pb-8"
-          style="scrollbar-width: none"
+          class="slide-servicio absolute inset-0 transition-opacity duration-1000 ease-in-out"
+          th:each="servicio, iterStat : ${servicios}"
+          th:classappend="${iterStat.first} ? 'opacity-100 z-10' : 'opacity-0 z-0'"
         >
-          <!-- Items del Carrusel -->
+          <!-- Imagen de fondo -->
+          <img
+            th:src="@{${servicio.imagen}}"
+            th:alt="${servicio.nombre}"
+            class="w-full h-full object-cover"
+          />
+
           <div
-            class="min-w-[90%] md:min-w-[60%] lg:min-w-[45%] snap-center relative rounded-[16px] overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.15)] flex-shrink-0"
-            th:each="servicio : ${servicios}"
+            class="absolute inset-0 bg-gradient-to-r from-[#050e18]/95 via-[#050e18]/60 to-transparent"
+          ></div>
+          <div
+            class="absolute inset-0 bg-gradient-to-t from-[#050e18]/80 via-transparent to-transparent"
+          ></div>
+
+          <!-- Contenido de texto -->
+          <div
+            class="absolute inset-0 flex flex-col justify-center px-8 md:px-16 lg:px-24"
           >
-            <img
-              class="w-full h-[380px] object-cover"
-              th:src="@{${servicio.imagen}}"
-              th:alt="${servicio.nombre}"
-            />
+            <h2
+              class="text-4xl md:text-5xl lg:text-7xl font-serif font-bold text-white mb-6 tracking-wide"
+            >
+              Nuestros Servicios
+            </h2>
 
             <span
-              class="absolute top-[14px] right-[14px] bg-[var(--dorado)] text-[var(--azul-oscuro)] text-[0.7rem] font-bold tracking-[1px] px-[0.8rem] py-[0.3rem] rounded-[20px]"
-              th:if="${servicio.destacado}"
-              >DESTACADO</span
+              class="inline-block bg-[var(--dorado)]/20 text-[var(--dorado)] border border-[var(--dorado)]/40 text-[0.7rem] font-bold tracking-widest uppercase px-4 py-1 rounded-full mb-4 w-max"
             >
+              Destacado
+            </span>
 
-            <!-- Degradado sobre la imagen para que el texto sea legible -->
-            <div
-              class="absolute inset-x-0 bottom-0 p-6 bg-gradient-to-t from-black/90 via-black/50 to-transparent text-white"
-            >
-              <h3
-                class="font-serif text-2xl font-bold mb-2 text-white"
-                th:text="${servicio.nombre}"
-              ></h3>
-              <p
-                class="text-[0.95rem] text-gray-200"
-                th:text="${servicio.descripcion}"
-              ></p>
+            <h3
+              class="font-serif text-2xl md:text-3xl font-bold mb-4 text-[var(--dorado)] uppercase tracking-widest"
+              th:text="${servicio.nombre}"
+            ></h3>
+            <p
+              class="text-gray-300 mb-8 text-lg md:text-xl max-w-xl leading-relaxed"
+              th:text="${servicio.descripcion}"
+            ></p>
+
+            <div class="flex flex-wrap gap-4">
+              <!-- Boton explorar servicio -->
+              <a
+                th:href="@{/servicios}"
+                class="bg-[var(--dorado)] text-[var(--azul-oscuro)] font-bold px-8 py-3 rounded-lg hover:bg-white transition shadow-[0_4px_20px_rgba(249,199,79,0.3)]"
+              >
+                Explorar servicio
+              </a>
+
+              <!-- Boton ver todos -->
+              <a
+                th:href="@{/servicios}"
+                class="bg-transparent text-white font-bold px-8 py-3 rounded-lg border-2 border-white hover:bg-white hover:text-[var(--azul-oscuro)] transition"
+              >
+                Ver todos
+              </a>
             </div>
           </div>
         </div>
-        <!--FIN CAROUSEL-->
+      </div>
+
+      <!-- Barra inferior de miniaturas -->
+      <div
+        class="absolute bottom-0 w-full bg-[#050e18]/80 backdrop-blur-md border-t border-white/10 px-4 md:px-16 py-4 flex gap-4 overflow-x-auto z-20 flex justify-center"
+        style="scrollbar-width: none"
+      >
+        <button
+          class="thumb-btn relative flex-shrink-0 w-28 h-16 md:w-36 md:h-20 rounded-lg overflow-hidden border-2 transition-all cursor-pointer"
+          th:each="servicio, iterStat : ${servicios}"
+          th:classappend="${iterStat.first} ? 'border-[var(--dorado)] opacity-100 scale-105' : 'border-transparent opacity-50 hover:opacity-80'"
+          th:data-slide="${iterStat.index}"
+        >
+          <img
+            th:src="@{${servicio.imagen}}"
+            th:alt="${servicio.nombre}"
+            class="w-full h-full object-cover"
+          />
+          <div class="absolute inset-0 bg-black/40"></div>
+          <span
+            class="absolute bottom-1 left-2 text-white text-[0.65rem] md:text-xs font-bold truncate w-[90%] text-left"
+            th:text="${servicio.nombre}"
+          ></span>
+        </button>
       </div>
     </section>
 

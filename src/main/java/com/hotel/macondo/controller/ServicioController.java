@@ -67,4 +67,5 @@ public class ServicioController {
         model.addAttribute("relacionados", relacionados);
         return "servicio/detalle_servicio";
     }
+
 }
