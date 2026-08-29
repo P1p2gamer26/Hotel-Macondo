@@ -1,0 +1,212 @@
+/* 
+   Estilos de Login y Registro con Bootstrap 5
+
+/* Variables globales con la paleta oficial del Hotel Macondo */
+:root {
+  --azul: #1a6d92;
+  --azul-oscuro: #0e2a3f;
+  --dorado: #f5cd63;
+  --dorado-oscuro: #e0b03f;
+  --crema: #f7e7d3;
+  --crema-claro: #faf8f5;
+  --texto: #4a4a4a;
+}
+
+nav a,
+footer a {
+  text-decoration: none !important;
+  color: inherit;
+}
+
+nav ul li a {
+  color: var(--texto) !important;
+  text-decoration: none !important;
+}
+
+nav ul li a:hover {
+  color: var(--azul) !important;
+}
+
+/* ==========================================================================
+   CONFIGURACION BASE
+   ========================================================================== */
+body {
+  font-family: "Questrial", sans-serif;
+  color: var(--texto);
+  background-color: var(--crema-claro);
+  margin: 0;
+  padding: 0;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+.font-serif {
+  font-family: "Playfair Display", serif;
+}
+
+/* Panel visual izquierdo con imagen de fondo y gradiente oscuro */
+.panel-visual {
+  background-image: linear-gradient(rgba(8, 26, 42, 0.65), rgba(8, 26, 42, 0.88)),
+                    url("/images/Playa.avif");
+  background-size: cover;
+  background-position: center;
+  min-height: calc(100vh - 76px);
+}
+
+/* Enlace de retroceso con efecto hover */
+.btn-volver {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #ffffff;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.btn-volver:hover {
+  color: var(--dorado);
+}
+
+.btn-volver-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(6px);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Tarjeta contenedora del formulario de registro */
+.card-registro {
+  background-color: #ffffff;
+  border-radius: 20px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+  padding: 2.5rem;
+  width: 100%;
+  max-width: 480px;
+}
+
+/* Emblema circular con gradiente de marca */
+.logo-circulo {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--azul-oscuro) 0%, var(--azul) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 0.75rem auto;
+}
+
+/* Etiquetas personalizadas de formulario */
+.form-label-custom {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--azul);
+  margin-bottom: 0.35rem;
+  display: block;
+}
+
+/* Grupos de entrada estilizados */
+.input-group-custom {
+  background-color: #f7f7f7;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 10px;
+  transition: border-color 0.2s ease;
+}
+
+.input-group-custom:focus-within {
+  border-color: var(--azul);
+}
+
+.input-group-custom .input-group-text {
+  background: transparent;
+  border: none;
+  color: #9ca3af;
+  padding-left: 0.85rem;
+  padding-right: 0.35rem;
+}
+
+.input-group-custom .form-control {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  font-size: 0.9rem;
+  color: var(--texto);
+  padding: 0.7rem 0.6rem;
+}
+
+.input-group-custom .btn-toggle-pass {
+  background: transparent;
+  border: none;
+  color: #9ca3af;
+  padding-right: 0.85rem;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.input-group-custom .btn-toggle-pass:hover {
+  color: var(--azul);
+}
+
+/* Boton principal de envio */
+.btn-crear-cuenta {
+  background-color: var(--dorado);
+  color: var(--azul-oscuro);
+  font-weight: 700;
+  font-size: 0.95rem;
+  border: 2px solid var(--dorado);
+  border-radius: 10px;
+  padding: 0.75rem;
+  transition: all 0.2s ease;
+}
+
+.btn-crear-cuenta:hover {
+  background-color: var(--dorado-oscuro);
+  border-color: var(--dorado-oscuro);
+  color: var(--azul-oscuro);
+}
+
+/* Separador visual intermedio */
+.separador-o {
+  position: relative;
+  text-align: center;
+  margin: 1.5rem 0;
+}
+
+.separador-o hr {
+  border: none;
+  border-top: 1px solid #e5e7eb;
+  margin: 0;
+}
+
+.separador-o span {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #ffffff;
+  padding: 0 0.75rem;
+  color: #9ca3af;
+  font-size: 0.85rem;
+}
+
+/* Enlace a pantalla de login */
+.link-login {
+  color: var(--azul) !important;
+  font-weight: 700;
+  text-decoration: none !important;
+}
+
+.link-login:hover {
+  text-decoration: underline !important;
+}
