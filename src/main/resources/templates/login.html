@@ -6,16 +6,13 @@
     ></th:block>
   </head>
 
-  <!-- Se aplica color de fondo y texto base inyectando paleta oficial -->
   <body class="bg-[var(--crema)] text-[var(--texto)] font-sans">
     <!-- NAVBAR -->
     <nav th:replace="~{fragmentos :: navbar}"></nav>
 
     <!-- CONTENIDO PRINCIPAL LOGIN -->
-    <!-- Se implementa CSS Grid de 1 columna en movil y 2 en PC, ocupando el alto restante de la pantalla -->
     <main class="grid grid-cols-1 lg:grid-cols-2 min-h-[calc(100vh-76px)]">
       <!-- SECCION IZQUIERDA (VISUAL Y TEXTOS) -->
-      <!-- Fondo con gradiente y centrado mediante flexbox -->
       <section
         class="flex flex-col justify-between p-8 md:p-12 bg-cover bg-center text-white"
         style="
@@ -29,7 +26,6 @@
             th:href="@{/}"
             class="inline-flex items-center gap-2 mb-10 text-white hover:text-[var(--dorado)] transition font-medium text-sm"
           >
-            <!-- Icono de volver estilizado con fondo translucido -->
             <span
               class="w-8 h-8 rounded-full bg-white/15 backdrop-blur-sm flex items-center justify-center"
               >←</span
@@ -66,15 +62,13 @@
       </section>
 
       <!-- SECCION DERECHA (FORMULARIO) -->
-      <!-- Contenedor alineado al centro -->
       <section
         class="bg-[var(--crema-claro)] flex items-center justify-center p-6 md:p-12"
       >
-        <!-- Tarjeta principal del login con sombras y bordes redondeados -->
         <div
           class="w-full max-w-[440px] bg-white rounded-[20px] shadow-[0_10px_30px_rgba(0,0,0,0.05)] p-8 md:p-10"
         >
-          <div class="text-center mb-8 flex flex-col items-center">
+          <div class="text-center mb-6 flex flex-col items-center">
             <th:block th:replace="~{fragmentos :: logo}"></th:block>
             <h2
               class="text-2xl font-serif font-bold text-[var(--azul-oscuro)] mt-4 mb-1"
@@ -88,6 +82,17 @@
             </p>
           </div>
 
+          <!-- Alerta condicional de credenciales incorrectas -->
+          <div
+            th:if="${error != null}"
+            class="mb-5 p-3.5 bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl flex items-center gap-2.5"
+          >
+            <i
+              class="bi bi-exclamation-triangle-fill text-red-500 text-sm flex-shrink-0"
+            ></i>
+            <span th:text="${error}"></span>
+          </div>
+
           <form th:action="@{/login}" method="post">
             <div class="mb-5">
               <label
@@ -95,7 +100,6 @@
                 class="text-[var(--azul)] text-[0.72rem] font-bold tracking-[1.2px] uppercase mb-2 block"
                 >Correo electrónico</label
               >
-              <!-- Agrupacion de icono e input mediante flexbox -->
               <div
                 class="flex items-center bg-gray-50 border border-gray-200 rounded-lg focus-within:border-[var(--azul)] transition px-3"
               >
@@ -119,7 +123,6 @@
                 class="text-[var(--azul)] text-[0.72rem] font-bold tracking-[1.2px] uppercase mb-2 block"
                 >Contraseña</label
               >
-              <!-- Agrupacion de icono e input interactivo mediante flexbox -->
               <div
                 class="flex items-center bg-gray-50 border border-gray-200 rounded-lg focus-within:border-[var(--azul)] transition px-3"
               >
@@ -136,8 +139,10 @@
                 />
                 <span
                   class="text-gray-400 pr-2 cursor-pointer hover:text-[var(--azul)] transition"
+                  id="btnTogglePass"
+                  onclick="togglePass()"
                 >
-                  <i class="bi bi-eye"></i>
+                  <i class="bi bi-eye" id="iconoEye"></i>
                 </span>
               </div>
             </div>
@@ -150,7 +155,6 @@
               >
             </div>
 
-            <!-- Boton de accion principal inyectando variables de color dorado -->
             <button
               type="submit"
               class="w-full bg-[var(--dorado)] text-[var(--azul-oscuro)] font-bold rounded-lg py-3 border-2 border-[var(--dorado)] hover:bg-[var(--dorado-oscuro)] hover:border-[var(--dorado-oscuro)] transition"
@@ -159,7 +163,6 @@
             </button>
           </form>
 
-          <!-- Separador visual horizontal implementado con bordes relativos -->
           <div class="relative my-8 text-center">
             <hr class="border-gray-200" />
             <span
@@ -184,5 +187,20 @@
     <footer th:replace="~{fragmentos :: footer}"></footer>
 
     <th:block th:replace="~{fragmentos :: scripts}"></th:block>
+
+    <!-- Script para alternar visibilidad de contrasena -->
+    <script>
+      function togglePass() {
+        const pass = document.getElementById("password");
+        const eye = document.getElementById("iconoEye");
+        if (pass.type === "password") {
+          pass.type = "text";
+          eye.classList.replace("bi-eye", "bi-eye-slash");
+        } else {
+          pass.type = "password";
+          eye.classList.replace("bi-eye-slash", "bi-eye");
+        }
+      }
+    </script>
   </body>
 </html>

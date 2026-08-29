@@ -16,33 +16,32 @@ public class UsuarioRepository {
     private final Map<String, Usuario> data = new LinkedHashMap<>();
 
     /**
-     * Carga credenciales temporales para cada rol del sistema.
+     * Carga credenciales vinculadas directamente con los IDs de Cliente y Operador
      */
     public UsuarioRepository() {
-        save(new Usuario(1, "cliente@macondo.com", "cliente123", Rol.CLIENTE));
-        save(new Usuario(2, "operador@macondo.com", "operador123", Rol.OPERADOR));
-        save(new Usuario(3, "admin@macondo.com", "admin123", Rol.ADMINISTRADOR));
+        // --- ADMINISTRADORES (No tienen entidad propia, se manejan como Usuario) ---
+        save(new Usuario(99, "admin@macondo.com", "admin123", Rol.ADMINISTRADOR));
+
+        // --- OPERADORES (Vinculado con Operador id: 1) ---
+        save(new Usuario(1, "operador@macondo.com", "operador123", Rol.OPERADOR));
+
+        // --- CLIENTES (Vinculados con los IDs reales de ClienteRepository) ---
+        save(new Usuario(1, "ana@macondo.com", "ana123", Rol.CLIENTE));
+        save(new Usuario(2, "luis@macondo.com", "luis123", Rol.CLIENTE));
     }
 
-    /**
-     * Retorna una copia de todos los usuarios.
-     */
     public Collection<Usuario> findAll() {
         return List.copyOf(data.values());
     }
 
-    /**
-     * Busca un usuario por correo sin distinguir mayusculas.
-     */
     public Usuario findByCorreo(String correo) {
         return correo == null ? null : data.get(correo.toLowerCase());
     }
 
-    /**
-     * Guarda un usuario indexado por su correo.
-     */
     public Usuario save(Usuario usuario) {
-        data.put(usuario.getCorreo().toLowerCase(), usuario);
+        if (usuario != null && usuario.getCorreo() != null) {
+            data.put(usuario.getCorreo().toLowerCase(), usuario);
+        }
         return usuario;
     }
 }
