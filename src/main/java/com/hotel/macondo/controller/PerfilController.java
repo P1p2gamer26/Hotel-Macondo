@@ -1,48 +1,56 @@
 package com.hotel.macondo.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.hotel.macondo.entities.Cliente;
 import com.hotel.macondo.service.ClienteService;
 
+/**
+ * Gestiona el perfil del cliente indicado en la ruta privada.
+ */
 @Controller
-@RequestMapping("/cliente")
+@RequestMapping("/cliente/{id}")
 public class PerfilController {
 
     private final ClienteService clienteService;
 
-    @Autowired
     public PerfilController(ClienteService clienteService) {
         this.clienteService = clienteService;
     }
 
-    // http://localhost:8080/cliente/perfil
+    /** Renderiza el perfil del cliente solicitado. */
     @GetMapping("/perfil")
-    public String mostrarPerfil(Model model) {
-        Cliente cliente = clienteService.buscarPorId(1);
-        model.addAttribute("cliente", cliente);
+    public String mostrarPerfil(@PathVariable Integer id, Model model) {
+        model.addAttribute("cliente", obtenerCliente(id));
         return "cliente/perfil_cliente";
     }
 
-    // http://localhost:8080/cliente/perfil/actualizar
-    @PostMapping("/perfil/actualizar")
-    public String actualizarPerfil(Cliente cliente) {
-        // Buscar el cliente existente para mantener su ID y reservas
-        Cliente existente = clienteService.buscarPorId(cliente.getId());
-        if (existente != null) {
-            existente.actualizarInformacion(
-                    cliente.getNombre(),
-                    cliente.getApellido(),
-                    cliente.getTelefono(),
-                    cliente.getCorreo());
-            clienteService.guardar(existente);
+    /** Actualiza solamente los datos personales editables del cliente. */
+    @PostMapping("/perfil")
+    public String actualizarPerfil(@PathVariable Integer id, Cliente cliente) {
+        Cliente existente = obtenerCliente(id);
+        existente.actualizarInformacion(
+                cliente.getNombre(),
+                cliente.getApellido(),
+                cliente.getTelefono(),
+                cliente.getCorreo());
+        clienteService.guardar(existente);
+        return "redirect:/cliente/" + id + "/perfil?exito=true";
+    }
+
+    /** Centraliza la validacion del identificador usado por ambas operaciones. */
+    private Cliente obtenerCliente(Integer id) {
+        Cliente cliente = clienteService.buscarPorId(id);
+        if (cliente == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Cliente no encontrado");
         }
-        return "redirect:/cliente/perfil?exito=true";
+        return cliente;
     }
 }

@@ -16,7 +16,7 @@
         <!-- Logo -->
         <a
           class="flex items-center gap-3 font-serif text-xl font-bold text-[#1a759f]"
-          th:href="@{/cliente}"
+          th:href="@{/cliente/{id}(id=${cliente.id})}"
         >
           <th:block th:replace="~{fragmentos :: logo}"></th:block>
           Hotel Macondo
@@ -25,21 +25,21 @@
         <!-- Enlaces -->
         <ul class="hidden md:flex gap-6 font-sans text-gray-600 font-medium">
           <li>
-            <a class="hover:text-[#1a759f] transition" th:href="@{/cliente}"
+            <a class="hover:text-[#1a759f] transition" th:href="@{/cliente/{id}(id=${cliente.id})}"
               >Inicio</a
             >
           </li>
           <li>
             <a
               class="hover:text-[#1a759f] transition"
-              th:href="@{/reservas/activas}"
+              th:href="@{/cliente/{id}/reservas(id=${cliente.id})}"
               >Mis Reservas</a
             >
           </li>
           <li>
             <a
               class="hover:text-[#1a759f] transition"
-              th:href="@{/reservas/historial}"
+              th:href="@{/cliente/{id}/historial(id=${cliente.id})}"
               >Historial</a
             >
           </li>
@@ -54,7 +54,7 @@
         <div class="hidden md:flex items-center gap-3 font-sans text-sm">
           <a
             class="border-2 border-[#1a759f] text-[#1a759f] font-semibold px-4 py-2 rounded-lg hover:bg-[#1a759f] hover:text-white transition"
-            th:href="@{/cliente/perfil}"
+            th:href="@{/cliente/{id}/perfil(id=${cliente.id})}"
             >Mi Perfil</a
           >
           <form th:action="@{/logout}" method="post" class="m-0">

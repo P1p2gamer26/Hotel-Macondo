@@ -62,7 +62,7 @@
             Comienza tu primera aventura caribeña hoy.
           </p>
           <a
-            th:href="@{/cliente}"
+            th:href="@{/cliente/{id}(id=${cliente.id})}"
             class="font-sans text-sm font-bold bg-[var(--dorado)] text-[#333] rounded-xl px-8 py-3.5 inline-flex items-center gap-2 transition-transform hover:scale-105"
           >
             Hacer mi primera reserva <i class="bi bi-arrow-right"></i>
@@ -104,7 +104,7 @@
                 <i class="bi bi-calendar3 text-gray-400 text-[0.7rem]"></i>
                 <span
                   class="font-sans text-[0.75rem] text-gray-500"
-                  th:text="${h.fechaInicio} + ' &rarr; ' + ${h.fechaFin}"
+                  th:text="${h.fechaInicio + ' → ' + h.fechaFin}"
                 ></span>
               </div>
             </div>
@@ -113,7 +113,7 @@
             <div class="flex-none">
               <span
                 class="font-serif text-lg md:text-xl font-bold text-[var(--azul)]"
-                th:text="'$' + ${h.total}"
+                th:text="${'$' + h.total}"
               ></span>
             </div>
 

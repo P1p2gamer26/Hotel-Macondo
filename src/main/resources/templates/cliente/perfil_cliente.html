@@ -36,7 +36,7 @@
         <div class="flex-1 min-w-[200px]">
           <h2
             class="font-serif text-2xl font-bold text-[#0e2a3f] mb-1"
-            th:text="${cliente.nombre} + ' ' + ${cliente.apellido}"
+            th:text="${cliente.nombre + ' ' + cliente.apellido}"
           ></h2>
           <p
             class="font-sans text-sm text-gray-500 mb-2"
@@ -95,7 +95,7 @@
 
         <form
           action="#"
-          th:action="@{/cliente/perfil/actualizar}"
+          th:action="@{/cliente/{id}/perfil(id=${cliente.id})}"
           th:object="${cliente}"
           method="post"
         >

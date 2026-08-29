@@ -108,7 +108,7 @@
                 <i class="bi bi-calendar3 text-gray-400 text-xs"></i>
                 <span
                   class="font-sans text-[0.78rem] text-gray-600"
-                  th:text="${r.fechaInicio} + ' &rarr; ' + ${r.fechaFin}"
+                  th:text="${r.fechaInicio + ' → ' + r.fechaFin}"
                 ></span>
               </div>
             </div>
@@ -124,7 +124,7 @@
               <!-- Mostrar el precio real -->
               <span
                 class="font-serif text-lg font-bold text-[#0e2a3f]"
-                th:text="'$' + ${r.total}"
+                th:text="${'$' + r.total}"
               ></span>
             </div>
 

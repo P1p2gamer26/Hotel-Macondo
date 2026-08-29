@@ -83,7 +83,7 @@ public class ServicioRepository {
             String duracion, String descripcion, String descripcionDetalle,
             String imagen, boolean destacado, long precio, String horario,
             List<String> incluidos, List<String> etiquetas) {
-        Servicio servicio = new Servicio(id, nombre, descripcion, imagen, destacado,
+        Servicio servicio = new Servicio(id, nombre, descripcion, categoria, imagen, destacado,
                 BigDecimal.valueOf(precio), true);
         servicio.setCategoria(categoria);
         servicio.setDuracion(duracion);
