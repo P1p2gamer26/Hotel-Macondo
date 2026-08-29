@@ -26,21 +26,12 @@ import com.hotel.macondo.service.ServicioService;
 @RequestMapping("/admin")
 public class AdminController {
 
-    private final OperadorService operadorService;
-    private final ServicioService servicioService;
-    private final HabitacionService habitacionService;
-
-    /**
-     * Conecta el panel con los tres servicios que administra.
-     */
     @Autowired
-    public AdminController(OperadorService operadorService,
-            ServicioService servicioService,
-            HabitacionService habitacionService) {
-        this.operadorService = operadorService;
-        this.servicioService = servicioService;
-        this.habitacionService = habitacionService;
-    }
+    private OperadorService operadorService;
+    @Autowired
+    private ServicioService servicioService;
+    @Autowired
+    private HabitacionService habitacionService;
 
     /**
      * Tablero de entrada del panel: resume en cuantos elementos activos hay

@@ -15,15 +15,8 @@ import com.hotel.macondo.service.ClienteService;
 @RequestMapping("/clientes")
 public class ClienteController {
 
-    private final ClienteService service;
-
-    /**
-     * Conecta el controlador con la interfaz de clientes.
-     */
     @Autowired
-    public ClienteController(ClienteService service) {
-        this.service = service;
-    }
+    private ClienteService service;
 
     /**
      * Retorna los clientes guardados temporalmente.

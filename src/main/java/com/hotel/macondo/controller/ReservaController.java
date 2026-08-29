@@ -1,5 +1,6 @@
 package com.hotel.macondo.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -18,11 +19,8 @@ import com.hotel.macondo.service.ClienteService;
 @RequestMapping("/cliente/{id}")
 public class ReservaController {
 
-    private final ClienteService clienteService;
-
-    public ReservaController(ClienteService clienteService) {
-        this.clienteService = clienteService;
-    }
+    @Autowired
+    private ClienteService clienteService;
 
     /** Muestra las reservas activas y futuras que pertenecen al cliente. */
     @GetMapping("/reservas")

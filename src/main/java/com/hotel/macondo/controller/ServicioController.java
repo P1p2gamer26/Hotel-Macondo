@@ -20,20 +20,14 @@ import com.hotel.macondo.service.ServicioService;
 @RequestMapping("/servicios")
 public class ServicioController {
 
-    private final ServicioService service;
-
-    /**
-     * Conecta el controlador con la interfaz de servicios.
-     */
     @Autowired
-    public ServicioController(ServicioService service) {
-        this.service = service;
-    }
+    private ServicioService service;
 
     /** Construye el catalogo publico de experiencias del hotel. */
     @GetMapping
     public String listar(Model model) {
-        // El catalogo publico solo incluye servicios activos y se presenta por identificador.
+        // El catalogo publico solo incluye servicios activos y se presenta por
+        // identificador.
         Collection<Servicio> catalogo = service.buscarTodos().stream()
                 .filter(Servicio::isActivo)
                 .sorted(Comparator.comparing(Servicio::getId))
@@ -57,7 +51,8 @@ public class ServicioController {
                     "Servicio no encontrado");
         }
 
-        // La vista de detalle recibe servicios alternativos para continuar la exploracion.
+        // La vista de detalle recibe servicios alternativos para continuar la
+        // exploracion.
         List<Servicio> relacionados = service.buscarTodos().stream()
                 .filter(Servicio::isActivo)
                 .filter(item -> !item.getId().equals(id))

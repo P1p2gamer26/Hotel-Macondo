@@ -15,15 +15,8 @@ import com.hotel.macondo.service.CuentaService;
 @RequestMapping("/cuentas")
 public class CuentaController {
 
-    private final CuentaService service;
-
-    /**
-     * Conecta el controlador con la interfaz de cuentas.
-     */
     @Autowired
-    public CuentaController(CuentaService service) {
-        this.service = service;
-    }
+    private CuentaService service;
 
     /**
      * Retorna las cuentas guardadas temporalmente.

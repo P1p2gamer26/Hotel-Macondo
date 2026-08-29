@@ -1,5 +1,6 @@
 package com.hotel.macondo.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -19,11 +20,8 @@ import com.hotel.macondo.service.ClienteService;
 @RequestMapping("/cliente/{id}")
 public class PerfilController {
 
-    private final ClienteService clienteService;
-
-    public PerfilController(ClienteService clienteService) {
-        this.clienteService = clienteService;
-    }
+    @Autowired
+    private ClienteService clienteService;
 
     /** Renderiza el perfil del cliente solicitado. */
     @GetMapping("/perfil")

@@ -22,15 +22,8 @@ import com.hotel.macondo.service.OperadorService;
 @RequestMapping("/operador")
 public class OperadorController {
 
-    private final OperadorService service;
-
-    /**
-     * Conecta el controlador con la interfaz de operadores.
-     */
     @Autowired
-    public OperadorController(OperadorService service) {
-        this.service = service;
-    }
+    private OperadorService service;
 
     @GetMapping
     public String inicio(Model model) {
@@ -51,7 +44,7 @@ public class OperadorController {
 
     // ===== CUENTA DE LA HABITACION =====
 
-       /**
+    /**
      * Formulario para buscar la cuenta de una habitacion por su id.
      */
     @GetMapping("/cuenta")

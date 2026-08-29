@@ -15,15 +15,8 @@ import com.hotel.macondo.service.HabitacionService;
 @Controller
 public class HabitacionController {
 
-    private final HabitacionService service;
-
-    /**
-     * Conecta el controlador con la interfaz de habitaciones.
-     */
     @Autowired
-    public HabitacionController(HabitacionService service) {
-        this.service = service;
-    }
+    private HabitacionService service;
 
     /**
      * Muestra todas las habitaciones.
@@ -40,7 +33,8 @@ public class HabitacionController {
      */
     @GetMapping(params = "personas")
     public String buscarPorPersonas(@RequestParam int personas, Model model) {
-        // El servicio aplica la capacidad minima solicitada antes de renderizar la vista.
+        // El servicio aplica la capacidad minima solicitada antes de renderizar la
+        // vista.
         model.addAttribute("habitaciones", service.buscarPorPersonas(personas));
         model.addAttribute("personas", personas);
         return "habitacion/habitaciones";
