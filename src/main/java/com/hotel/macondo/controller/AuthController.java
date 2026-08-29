@@ -40,4 +40,13 @@ public class AuthController {
         model.addAttribute("rol", usuario.getRol());
         return "bienvenida";
     }
+
+    /**
+     * Muestra el formulario de registro de usuario en Bootstrap 5.
+     */
+    @GetMapping("/registro")
+    public String mostrarRegistro() {
+        return "registro";
+    }
+
 }
