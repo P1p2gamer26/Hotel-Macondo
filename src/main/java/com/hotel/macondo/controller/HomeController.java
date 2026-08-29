@@ -12,20 +12,12 @@ import com.hotel.macondo.service.TestimonioService;
 @Controller
 public class HomeController {
 
-    private final HabitacionService habitacionService;
-    private final ServicioService servicioService;
-    private final TestimonioService testimonioService;
-
-    /**
-     * Conecta la pagina principal con los servicios de cada responsabilidad.
-     */
     @Autowired
-    public HomeController(HabitacionService habitacionService,
-            ServicioService servicioService, TestimonioService testimonioService) {
-        this.habitacionService = habitacionService;
-        this.servicioService = servicioService;
-        this.testimonioService = testimonioService;
-    }
+    private HabitacionService habitacionService;
+    @Autowired
+    private ServicioService servicioService;
+    @Autowired
+    private TestimonioService testimonioService;
 
     /**
      * Construye la pagina principal con la informacion de sus tres secciones.

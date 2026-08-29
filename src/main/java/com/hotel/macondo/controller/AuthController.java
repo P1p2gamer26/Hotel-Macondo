@@ -13,15 +13,8 @@ import com.hotel.macondo.service.UsuarioService;
 @Controller
 public class AuthController {
 
-    private final UsuarioService service;
-
-    /**
-     * Conecta el controlador de autenticacion con UsuarioService.
-     */
     @Autowired
-    public AuthController(UsuarioService service) {
-        this.service = service;
-    }
+    private UsuarioService service;
 
     /**
      * Muestra el formulario de inicio de sesion.
