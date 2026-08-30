@@ -5,6 +5,7 @@ import java.util.Collection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -25,5 +26,11 @@ public class ClienteController {
     @ResponseBody
     public Collection<Cliente> listar() {
         return service.buscarTodos();
+    }
+
+    @GetMapping("/delete/{id}")
+    public String eliminarCuenta(@PathVariable Integer id){
+        service.eliminar(id);
+        return "redirect:/logout";
     }
 }
