@@ -48,4 +48,13 @@ public class UsuarioRepository {
     public void delete(String correo){
         data.remove(correo);
     }
+
+    public Usuario updatePassword(String correo, String nuevaContrasena) {
+        Usuario usuario = findByCorreo(correo);
+        if (usuario != null && nuevaContrasena != null && !nuevaContrasena.isBlank()) {
+            usuario.setContrasena(nuevaContrasena);
+            return save(usuario);
+        }
+        return null;
+    }
 }

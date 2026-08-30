@@ -184,14 +184,13 @@
               Actualiza tu contraseña de acceso al portal
             </p>
           </div>
-          <button
-            class="font-sans text-sm font-semibold text-[var(--azul)] bg-transparent border-[1.5px] border-[var(--azul)] rounded-lg px-4 py-2 flex items-center gap-2 hover:bg-[var(--azul)] hover:text-white transition-colors"
-          >
-            <i class="bi bi-pencil-square"></i> Cambiar
-          </button>
         </div>
 
-        <div class="flex flex-col gap-5 max-w-[420px]">
+        <form
+          th:action="@{/cliente/{id}/password(id=${cliente.id})}"
+          method="post"
+          class="flex flex-col gap-5 max-w-[420px]"
+        >
           <div>
             <label
               class="block font-sans text-[0.7rem] font-bold text-[var(--azul)] mb-1.5 uppercase tracking-wider"
@@ -199,11 +198,52 @@
             >
             <input
               type="password"
-              disabled
-              class="w-full bg-[#faf8f6] border-[1.5px] border-[rgba(26,117,159,0.2)] rounded-xl px-4 py-3 opacity-70"
+              name="contrasenaActual"
+              class="w-full bg-[#faf8f6] border-[1.5px] border-[rgba(26,117,159,0.2)] rounded-xl px-4 py-3"
+              required
             />
           </div>
-        </div>
+
+          <div>
+            <label
+              class="block font-sans text-[0.7rem] font-bold text-[var(--azul)] mb-1.5 uppercase tracking-wider"
+              >Nueva contraseña</label
+            >
+            <input
+              type="password"
+              name="nuevaContrasena"
+              class="w-full bg-[#faf8f6] border-[1.5px] border-[rgba(26,117,159,0.2)] rounded-xl px-4 py-3"
+              required
+            />
+          </div>
+
+          <div>
+            <label
+              class="block font-sans text-[0.7rem] font-bold text-[var(--azul)] mb-1.5 uppercase tracking-wider"
+              >Confirmar contraseña</label
+            >
+            <input
+              type="password"
+              name="confirmarContrasena"
+              class="w-full bg-[#faf8f6] border-[1.5px] border-[rgba(26,117,159,0.2)] rounded-xl px-4 py-3"
+              required
+            />
+          </div>
+
+          <div
+            th:if="${errorPassword != null}"
+            class="text-red-600 text-xs font-medium"
+          >
+            <span th:text="${errorPassword}"></span>
+          </div>
+
+          <button
+            type="submit"
+            class="font-sans text-sm font-semibold text-[var(--azul)] bg-transparent border-[1.5px] border-[var(--azul)] rounded-lg px-4 py-2 flex items-center gap-2 hover:bg-[var(--azul)] hover:text-white transition-colors cursor-pointer w-fit"
+          >
+            <i class="bi bi-pencil-square"></i> Cambiar
+          </button>
+        </form>
       </div>
 
       <!-- ZONA DE PELIGRO -->

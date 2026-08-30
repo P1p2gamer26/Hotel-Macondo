@@ -55,6 +55,22 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     /** {@inheritDoc} */
     @Override
+    public Usuario actualizarContrasena(String correo, String nuevaContrasena) {
+        if (correo == null || nuevaContrasena == null || nuevaContrasena.isBlank()) {
+            return null;
+        }
+
+        Usuario usuario = repository.findByCorreo(correo);
+        if (usuario == null) {
+            return null;
+        }
+
+        usuario.setContrasena(nuevaContrasena);
+        return repository.save(usuario);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public boolean autorizar(Usuario usuario, Rol rol) {
         return usuario != null && usuario.tieneRol(rol);
     }

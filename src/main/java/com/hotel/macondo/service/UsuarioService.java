@@ -20,6 +20,9 @@ public interface UsuarioService {
     /** Registra un usuario cuando el correo no esta en uso. */
     Usuario registrar(Usuario usuario);
 
+    /** Actualiza la contraseña asociada al correo indicado. */
+    Usuario actualizarContrasena(String correo, String nuevaContrasena);
+
     /** Verifica que el usuario tenga el rol solicitado. */
     boolean autorizar(Usuario usuario, Rol rol);
 
