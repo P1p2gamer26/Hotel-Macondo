@@ -82,7 +82,24 @@ public class AuthController {
     * no al cliente
     */
     @PostMapping("/registro")
-    public String agregarCliente(@ModelAttribute("cliente") Cliente clienteNuevo, @RequestParam("contrasena") String contrasena){
+    public String agregarCliente(@ModelAttribute("cliente") Cliente clienteNuevo, @RequestParam("contrasena") String contrasena, Model model){
+
+        // Validacion y estandarizacion del correo
+        String correo = clienteNuevo.getCorreo() != null
+        ? clienteNuevo.getCorreo().trim().toLowerCase()
+        : null;
+
+        // Confirmacion de que el correo no es nulo
+        if( correo == null || correo.isBlank()){
+            model.addAttribute("error","El correo no puede ser vacio");
+            return "registro";
+        }
+
+        // Confirmacion de que el correo no esta vinculado a otro usuario
+        if(serviceUsuario.buscarPorCorreo(correo) != null){
+            model.addAttribute("error","Este correo ya esta en uso");
+            return "registro";
+        }
 
         // Guarda el cliente en el repository y crea una copia que tiene el id asignado
         Cliente clienteGuardado = serviceCliente.guardar(clienteNuevo);
@@ -95,7 +112,14 @@ public class AuthController {
         usuario.setRol(Rol.CLIENTE);
 
         // Guarda al usuario en el repository
-        serviceUsuario.registrar(usuario);
+        Usuario usuarioGuardado = serviceUsuario.registrar(usuario);
+
+        // Confirmacion de que la creacion del usuario
+        if (usuarioGuardado == null) {
+            serviceCliente.eliminar(clienteGuardado.getId());
+            model.addAttribute("error", "No se pudo crear la cuenta asociada");
+            return "registro";
+        }
 
         // Cuando se termina de crear la cuenta del cliente se redirecciona a la pagina de su cuenta
         return "redirect:/cliente/" + clienteNuevo.getId();

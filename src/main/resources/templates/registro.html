@@ -112,6 +112,16 @@
               </p>
             </div>
 
+            <!-- Mensaje de error al registrar -->
+            <div
+              th:if="${error != null}"
+              class="alert alert-danger d-flex align-items-center mb-4"
+              role="alert"
+            >
+              <i class="bi bi-exclamation-triangle-fill me-2"></i>
+              <span th:text="${error}"></span>
+            </div>
+
             <!-- Formulario de registro -->
             <form th:object="${cliente}" th:action="@{/registro}" method="post">
               <!-- Fila: Nombre y Apellido -->
