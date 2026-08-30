@@ -39,6 +39,15 @@ public class AuthController {
     }
 
     /**
+     * Permite cerrar sesión desde formularios que usan POST,
+     * como la barra de navegación del cliente.
+     */
+    @PostMapping("/logout")
+    public String cerrarSesionPost() {
+        return "redirect:/login";
+    }
+
+    /**
      * Muestra el formulario de registro de usuario en Bootstrap 5.
      */
     @GetMapping("/registro")
