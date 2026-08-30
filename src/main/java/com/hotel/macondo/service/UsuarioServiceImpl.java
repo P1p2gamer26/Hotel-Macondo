@@ -1,8 +1,11 @@
 package com.hotel.macondo.service;
 
+import java.util.Collection;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.hotel.macondo.entities.Cliente;
 import com.hotel.macondo.entities.Rol;
 import com.hotel.macondo.entities.Usuario;
 import com.hotel.macondo.repository.UsuarioRepository;
@@ -11,13 +14,18 @@ import com.hotel.macondo.repository.UsuarioRepository;
 public class UsuarioServiceImpl implements UsuarioService {
 
     private final UsuarioRepository repository;
-
     /**
      * Crea el servicio con su repositorio de usuarios.
      */
     @Autowired
     public UsuarioServiceImpl(UsuarioRepository repository) {
         this.repository = repository;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Collection<Usuario> buscarTodos(){
+        return repository.findAll();
     }
 
     /** {@inheritDoc} */

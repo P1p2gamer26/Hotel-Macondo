@@ -1,9 +1,15 @@
 package com.hotel.macondo.service;
 
+import java.util.Collection;
+
+import com.hotel.macondo.entities.Cliente;
 import com.hotel.macondo.entities.Rol;
 import com.hotel.macondo.entities.Usuario;
 
 public interface UsuarioService {
+
+    /** Retorna todos los usuarios registrados. */
+    Collection<Usuario> buscarTodos();
 
     /** Busca un usuario por correo. */
     Usuario buscarPorCorreo(String correo);
