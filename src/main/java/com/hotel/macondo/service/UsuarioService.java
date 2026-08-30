@@ -22,4 +22,7 @@ public interface UsuarioService {
 
     /** Verifica que el usuario tenga el rol solicitado. */
     boolean autorizar(Usuario usuario, Rol rol);
+
+    /** Elimina un usuario por correo*/
+    void eliminar(String correo);
 }

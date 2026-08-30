@@ -58,4 +58,10 @@ public class UsuarioServiceImpl implements UsuarioService {
     public boolean autorizar(Usuario usuario, Rol rol) {
         return usuario != null && usuario.tieneRol(rol);
     }
+
+    /** {@inheritDoc} */
+    @Override
+    public void eliminar(String correo){
+        repository.delete(correo);
+    }
 }
