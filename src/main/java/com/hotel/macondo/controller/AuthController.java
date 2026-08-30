@@ -1,21 +1,28 @@
 package com.hotel.macondo.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.actuate.autoconfigure.metrics.MetricsProperties.Web.Client;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.hotel.macondo.entities.Rol;
 import com.hotel.macondo.entities.Usuario;
 import com.hotel.macondo.service.UsuarioService;
+import com.hotel.macondo.entities.Cliente;
+import com.hotel.macondo.service.ClienteService;
 
 @Controller
 public class AuthController {
 
     @Autowired
-    private UsuarioService service;
+    private UsuarioService serviceUsuario;
+    @Autowired
+    private ClienteService serviceCliente;
 
     /**
      * Muestra el formulario de inicio de sesion.
@@ -29,7 +36,14 @@ public class AuthController {
      * Muestra el formulario de registro de usuario en Bootstrap 5.
      */
     @GetMapping("/registro")
-    public String mostrarRegistro() {
+    public String mostrarRegistro(Model model) {
+        // Crea un cliente vacio que se llenara con la informacion del formulario
+        Cliente cliente = new Cliente(null, "", "", "", "", "");
+
+        // Le pasa el objeto cliente al model para que se pueda llenar con el formulario
+        model.addAttribute("cliente", cliente);
+
+        // Redirecciona a la pagina con el formulario
         return "registro";
     }
 
@@ -42,7 +56,7 @@ public class AuthController {
             @RequestParam(name = "password") String contrasena,
             Model model) {
 
-        Usuario usuario = service.autenticar(correo, contrasena);
+        Usuario usuario = serviceUsuario.autenticar(correo, contrasena);
 
         if (usuario == null) {
             model.addAttribute("error", "Correo o contraseña incorrectos");
@@ -60,6 +74,31 @@ public class AuthController {
         }
 
         return "redirect:/";
+    }
+
+    /*
+    * Obtiene la informacion del cliente desde el formulario para poder guardarlo,
+    * la contraseña la obtiene por separado ya que esta esta vinculada al usuario
+    * no al cliente
+    */
+    @PostMapping("/registro")
+    public String agregarCliente(@ModelAttribute("cliente") Cliente clienteNuevo, @RequestParam("contrasena") String contrasena){
+
+        // Guarda el cliente en el repository y crea una copia que tiene el id asignado
+        Cliente clienteGuardado = serviceCliente.guardar(clienteNuevo);
+
+        // Crea el usuario relacionado al cliente
+        Usuario usuario = new Usuario();
+        usuario.setId(clienteGuardado.getId());
+        usuario.setCorreo(clienteGuardado.getCorreo());
+        usuario.setContrasena(contrasena);
+        usuario.setRol(Rol.CLIENTE);
+
+        // Guarda al usuario en el repository
+        serviceUsuario.registrar(usuario);
+
+        // Cuando se termina de crear la cuenta del cliente se redirecciona a la pagina de su cuenta
+        return "redirect:/cliente/" + clienteNuevo.getId();
     }
 
 }
