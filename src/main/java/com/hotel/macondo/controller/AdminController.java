@@ -14,9 +14,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.hotel.macondo.entities.Habitacion;
 import com.hotel.macondo.entities.Operador;
 import com.hotel.macondo.entities.Servicio;
+import com.hotel.macondo.entities.TipoHabitacion;
 import com.hotel.macondo.service.HabitacionService;
 import com.hotel.macondo.service.OperadorService;
 import com.hotel.macondo.service.ServicioService;
+import com.hotel.macondo.service.TipoHabitacionService;
 
 /**
  * Unico punto de entrada del panel administrativo. Todas las pantallas de
@@ -32,6 +34,9 @@ public class AdminController {
     private ServicioService servicioService;
     @Autowired
     private HabitacionService habitacionService;
+
+    @Autowired
+    private TipoHabitacionService tipoHabitacionService;
 
     /**
      * Tablero de entrada del panel: resume en cuantos elementos activos hay
@@ -161,5 +166,38 @@ public class AdminController {
             }
         }
         return "redirect:/admin/habitaciones";
+    }
+
+    /**
+     * Lista todos los tipos de habitacion registrados en el sistema.
+     */
+    @GetMapping("/tipos_habitacion")
+    public String listarTiposHabitacion(Model model) {
+        model.addAttribute("tiposHabitacion", tipoHabitacionService.buscarTodos());
+        return "admin/tipos_habitacion";
+    }
+
+    /**
+     * Guarda o actualiza un tipo de habitacion.
+     */
+    @PostMapping("/tipos_habitacion")
+    public String guardarTipoHabitacion(@RequestParam(required = false) Integer id,
+            @RequestParam String nombre,
+            @RequestParam String descripcion,
+            @RequestParam BigDecimal precioNoche,
+            @RequestParam Integer capacidadPersonas) {
+
+        TipoHabitacion tipo = new TipoHabitacion(id, nombre, descripcion, precioNoche, capacidadPersonas);
+        tipoHabitacionService.guardar(tipo);
+        return "redirect:/admin/tipos_habitacion";
+    }
+
+    /**
+     * Elimina un tipo de habitacion por su ID.
+     */
+    @PostMapping("/tipos_habitacion/{id}/eliminar")
+    public String eliminarTipoHabitacion(@PathVariable Integer id) {
+        tipoHabitacionService.eliminar(id);
+        return "redirect:/admin/tipos_habitacion";
     }
 }

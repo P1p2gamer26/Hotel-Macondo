@@ -8,17 +8,27 @@ import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class TipoHabitacion {
 
+    private Integer id;
     private String nombre;
     private String descripcion;
     private BigDecimal precioNoche;
     private Integer capacidadPersonas;
 
-
+    /**
+     * Constructor auxiliar para crear instancias antes de asignar ID.
+     */
+    public TipoHabitacion(String nombre, String descripcion, BigDecimal precioNoche, Integer capacidadPersonas) {
+        this.nombre = nombre;
+        this.descripcion = descripcion;
+        this.precioNoche = precioNoche;
+        this.capacidadPersonas = capacidadPersonas;
+    }
 
     /**
-     * Calcula el costo de una estadia para la cantidad de noches indicada.
+     * Calcula el costo total para una cantidad determinada de noches.
      */
     public BigDecimal calcularCosto(long noches) {
         if (precioNoche == null || noches <= 0) {

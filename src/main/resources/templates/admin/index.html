@@ -10,12 +10,12 @@
 
       <main class="flex-1 p-6 md:p-10">
         <header
-          th:replace="~{admin/fragmentos_admin :: titulo('Panel de administracion', 'Resumen del hotel y acceso a las tres secciones de gestion.')}"
+          th:replace="~{admin/fragmentos_admin :: titulo('Panel de administracion', 'Resumen del hotel y acceso a las secciones de gestion.')}"
         ></header>
 
-        <!-- Tarjetas de resumen: cada una lleva a su seccion, por eso el
-             bloque completo es un enlace y no solo el titulo. -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+        <!-- Cuadricula de 4 tarjetas de resumen -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+          <!-- 1. Operadores -->
           <a
             class="bg-white rounded-2xl shadow-sm p-6 hover:shadow-md transition block"
             th:href="@{/admin/operadores}"
@@ -31,7 +31,7 @@
               class="font-serif text-4xl font-bold text-[var(--azul-oscuro)]"
               th:text="${totalOperadores}"
             ></p>
-            <p class="mt-1">
+            <p class="mt-1 text-sm text-gray-500">
               Operadores,
               <strong
                 class="text-[var(--azul-oscuro)]"
@@ -41,6 +41,7 @@
             </p>
           </a>
 
+          <!-- 2. Servicios -->
           <a
             class="bg-white rounded-2xl shadow-sm p-6 hover:shadow-md transition block"
             th:href="@{/admin/servicios}"
@@ -56,7 +57,7 @@
               class="font-serif text-4xl font-bold text-[var(--azul-oscuro)]"
               th:text="${totalServicios}"
             ></p>
-            <p class="mt-1">
+            <p class="mt-1 text-sm text-gray-500">
               Servicios,
               <strong
                 class="text-[var(--azul-oscuro)]"
@@ -66,6 +67,29 @@
             </p>
           </a>
 
+          <!-- 3. Tipos de Habitacion -->
+          <a
+            class="bg-white rounded-2xl shadow-sm p-6 hover:shadow-md hover:border-[var(--dorado)] transition block border border-transparent"
+            th:href="@{/admin/tipos_habitacion}"
+          >
+            <div class="flex items-center justify-between mb-4">
+              <span
+                class="text-[0.7rem] tracking-[3px] uppercase text-[var(--azul)] font-bold"
+                >Categorias</span
+              >
+              <i class="bi bi-tag text-2xl text-[var(--dorado)]"></i>
+            </div>
+            <p
+              class="font-serif text-2xl font-bold text-[var(--azul-oscuro)] mb-1"
+            >
+              Tipos
+            </p>
+            <p class="text-sm text-gray-500">
+              Gestion de tarifas y capacidades
+            </p>
+          </a>
+
+          <!-- 4. Habitaciones -->
           <a
             class="bg-white rounded-2xl shadow-sm p-6 hover:shadow-md transition block"
             th:href="@{/admin/habitaciones}"
@@ -81,7 +105,7 @@
               class="font-serif text-4xl font-bold text-[var(--azul-oscuro)]"
               th:text="${totalHabitaciones}"
             ></p>
-            <p class="mt-1">
+            <p class="mt-1 text-sm text-gray-500">
               Habitaciones,
               <strong
                 class="text-[var(--azul-oscuro)]"
@@ -92,8 +116,7 @@
           </a>
         </div>
 
-        <!-- Franja de bienvenida con el mismo degradado dorado del cierre
-             de la pagina publica, para que el panel se sienta del hotel. -->
+        <!-- Seccion de Bienvenida -->
         <section
           class="rounded-2xl bg-gradient-to-b from-[var(--crema-claro)] to-[var(--dorado)] p-10 text-center"
         >
@@ -108,8 +131,8 @@
             Bienvenido al panel
           </h2>
           <p class="max-w-xl mx-auto text-[var(--azul-oscuro)]">
-            Desde aqui se administra el personal, el catalogo de servicios y el
-            inventario de habitaciones del Hotel Macondo.
+            Desde aqui se administra el personal, el catalogo de servicios, los
+            tipos de habitacion y el inventario del Hotel Macondo.
           </p>
         </section>
       </main>

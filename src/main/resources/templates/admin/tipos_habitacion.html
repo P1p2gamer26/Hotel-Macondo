@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+  <head
+    th:replace="~{fragmentos :: cabecera('Tipos de Habitacion | Panel Macondo')}"
+  ></head>
+
+  <!-- Inyeccion de fondo claro y tipografia general -->
+  <body class="bg-[var(--crema-claro)] text-[var(--texto)] font-sans">
+    <div class="flex flex-col md:flex-row">
+      <!-- Menu lateral de administracion con la seccion activa -->
+      <aside
+        th:replace="~{admin/fragmentos_admin :: menu('tipos_habitacion')}"
+      ></aside>
+
+      <main class="flex-1 p-6 md:p-10">
+        <!-- Encabezado con titulo y boton de accion principal -->
+        <div
+          class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8"
+        >
+          <div>
+            <h1
+              class="text-3xl md:text-4xl font-serif font-bold text-[var(--azul-oscuro)]"
+            >
+              Tipos de Habitación
+            </h1>
+            <p class="text-[var(--texto)] mt-1">
+              Catalogo de categorias, capacidades y tarifas base de hospedaje.
+            </p>
+          </div>
+
+          <button
+            type="button"
+            onclick="abrirNuevaHabitacion()"
+            class="bg-[var(--dorado)] text-[var(--azul-oscuro)] font-bold px-5 py-2.5 rounded-lg border-2 border-[var(--dorado)] hover:bg-[var(--dorado-oscuro)] transition flex items-center gap-2 shadow-sm text-sm"
+          >
+            <i class="bi bi-plus-lg font-bold"></i>
+            <span>Nuevo Tipo</span>
+          </button>
+        </div>
+
+        <!-- Tabla principal con la misma estructura y tipografia de habitaciones.html -->
+        <div class="bg-white rounded-2xl shadow-sm overflow-x-auto">
+          <table class="w-full text-left min-w-[760px]">
+            <thead
+              class="bg-[var(--crema)] text-[var(--azul-oscuro)] text-sm uppercase tracking-wider"
+            >
+              <tr>
+                <th class="px-6 py-4">ID</th>
+                <th class="px-6 py-4">Tipo</th>
+                <th class="px-6 py-4">Descripcion</th>
+                <th class="px-6 py-4">Capacidad</th>
+                <th class="px-6 py-4">Precio / noche</th>
+                <th class="px-6 py-4 text-right">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Iteracion de tipos de habitacion desde el repositorio -->
+              <tr
+                class="border-t border-gray-100"
+                th:each="tipo : ${tiposHabitacion}"
+              >
+                <!-- ID con tipografia limpia y alineada -->
+                <td class="px-6 py-4" th:text="${tipo.id}"></td>
+
+                <!-- Nombre de la categoria con icono tematico -->
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-3">
+                    <div
+                      class="w-10 h-10 rounded-lg bg-[var(--crema)] text-[var(--azul)] flex items-center justify-center font-bold"
+                    >
+                      <i class="bi bi-tag text-lg"></i>
+                    </div>
+                    <div>
+                      <p
+                        class="font-medium text-[var(--azul-oscuro)]"
+                        th:text="${tipo.nombre}"
+                      ></p>
+                      <p class="text-sm text-[var(--texto)]">Categoría</p>
+                    </div>
+                  </div>
+                </td>
+
+                <!-- Descripcion -->
+                <td
+                  class="px-6 py-4 text-sm text-[var(--texto)] max-w-xs truncate"
+                  th:text="${tipo.descripcion}"
+                ></td>
+
+                <!-- Capacidad identica a habitaciones.html -->
+                <td
+                  class="px-6 py-4"
+                  th:text="${tipo.capacidadPersonas} + ' pers.'"
+                ></td>
+
+                <!-- Precio por noche -->
+                <td
+                  class="px-6 py-4 font-medium"
+                  th:text="'$ ' + ${#numbers.formatInteger(tipo.precioNoche, 1, 'POINT')}"
+                ></td>
+
+                <!-- Acciones CRUD: Editar y Eliminar -->
+                <td class="px-6 py-4 text-right whitespace-nowrap">
+                  <!-- Boton Editar -->
+                  <button
+                    type="button"
+                    th:data-id="${tipo.id}"
+                    th:data-nombre="${tipo.nombre}"
+                    th:data-descripcion="${tipo.descripcion}"
+                    th:data-precio="${tipo.precioNoche}"
+                    th:data-capacidad="${tipo.capacidadPersonas}"
+                    onclick="abrirEditarHabitacion(this)"
+                    class="text-[var(--azul)] hover:underline font-medium text-sm inline-flex items-center gap-1 mr-4"
+                  >
+                    <i class="bi bi-pencil-square"></i>
+                    <span>Editar</span>
+                  </button>
+
+                  <!-- Formulario Eliminar -->
+                  <form
+                    class="inline"
+                    method="post"
+                    th:action="@{/admin/tipos_habitacion/{id}/eliminar(id=${tipo.id})}"
+                    onsubmit="
+                      return confirm(
+                        '¿Seguro que deseas eliminar este tipo de habitacion?',
+                      );
+                    "
+                  >
+                    <button
+                      class="text-red-500 hover:text-red-700 hover:underline font-medium text-sm inline-flex items-center gap-1"
+                      type="submit"
+                    >
+                      <i class="bi bi-trash"></i>
+                      <span>Eliminar</span>
+                    </button>
+                  </form>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </main>
+    </div>
+
+    <!-- CREAR / EDITAR TIPO DE HABITACION -->
+    <div
+      id="Tipo"
+      class="fixed inset-0 bg-black/50 backdrop-blur-xs hidden z-50 flex items-center justify-center p-4"
+    >
+      <div
+        class="bg-white rounded-2xl max-w-lg w-full p-6 md:p-8 shadow-2xl relative"
+      >
+        <div class="flex justify-between items-center mb-6">
+          <h2
+            id="Titulo"
+            class="text-2xl font-serif font-bold text-[var(--azul-oscuro)]"
+          >
+            Nuevo Tipo de Habitación
+          </h2>
+          <button
+            type="button"
+            onclick="cerrar()"
+            class="text-gray-400 hover:text-gray-600 text-2xl font-light leading-none"
+          >
+            &times;
+          </button>
+        </div>
+
+        <form
+          th:action="@{/admin/tipos_habitacion}"
+          method="post"
+          class="space-y-4"
+        >
+          <!-- Campo oculto para el ID en caso de edicion -->
+          <input type="hidden" id="formId" name="id" />
+
+          <div>
+            <label
+              for="formNombre"
+              class="block text-xs font-bold uppercase tracking-wider text-[var(--azul)] mb-1"
+              >Nombre</label
+            >
+            <input
+              type="text"
+              id="formNombre"
+              name="nombre"
+              placeholder="Ej: Suite Presidencial"
+              required
+              class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3.5 py-2.5 text-sm focus:outline-none focus:border-[var(--azul)]"
+            />
+          </div>
+
+          <div>
+            <label
+              for="formDescripcion"
+              class="block text-xs font-bold uppercase tracking-wider text-[var(--azul)] mb-1"
+              >Descripción</label
+            >
+            <textarea
+              id="formDescripcion"
+              name="descripcion"
+              rows="3"
+              placeholder="Detalla comodidades y características..."
+              required
+              class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3.5 py-2.5 text-sm focus:outline-none focus:border-[var(--azul)]"
+            ></textarea>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label
+                for="formCapacidad"
+                class="block text-xs font-bold uppercase tracking-wider text-[var(--azul)] mb-1"
+                >Capacidad (Personas)</label
+              >
+              <input
+                type="number"
+                id="formCapacidad"
+                name="capacidadPersonas"
+                min="1"
+                max="10"
+                placeholder="2"
+                required
+                class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3.5 py-2.5 text-sm focus:outline-none focus:border-[var(--azul)]"
+              />
+            </div>
+            <div>
+              <label
+                for="formPrecio"
+                class="block text-xs font-bold uppercase tracking-wider text-[var(--azul)] mb-1"
+                >Precio por Noche ($)</label
+              >
+              <input
+                type="number"
+                id="formPrecio"
+                name="precioNoche"
+                min="0"
+                step="10000"
+                placeholder="500000"
+                required
+                class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3.5 py-2.5 text-sm focus:outline-none focus:border-[var(--azul)]"
+              />
+            </div>
+          </div>
+
+          <div class="flex justify-end gap-3 pt-4 border-t border-gray-100">
+            <button
+              type="button"
+              onclick="cerrar()"
+              class="px-5 py-2.5 rounded-lg text-sm font-semibold text-gray-600 hover:bg-gray-100 transition"
+            >
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              class="bg-[var(--dorado)] text-[var(--azul-oscuro)] font-bold px-6 py-2.5 rounded-lg border-2 border-[var(--dorado)] hover:bg-[var(--dorado-oscuro)] transition text-sm"
+            >
+              Guardar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+    <script th:src="@{/js/script_tipo_habitacion.js}"></script>
+  </body>
+</html>
