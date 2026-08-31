@@ -23,6 +23,9 @@ public interface UsuarioService {
     /** Actualiza la contraseña asociada al correo indicado. */
     Usuario actualizarContrasena(String correo, String nuevaContrasena);
 
+    /** Actualiza el correo tomando el correo previo */
+    Usuario actualizarCorreo(String correoPrevio, String correoNuevo);
+
     /** Verifica que el usuario tenga el rol solicitado. */
     boolean autorizar(Usuario usuario, Rol rol);
 

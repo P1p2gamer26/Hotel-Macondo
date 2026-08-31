@@ -38,14 +38,30 @@ public class PerfilController {
 
     /** Actualiza solamente los datos personales editables del cliente. */
     @PostMapping("/perfil")
-    public String actualizarPerfil(@PathVariable Integer id, Cliente cliente) {
+    public String actualizarPerfil(@PathVariable Integer id, Cliente cliente, Model model) {
         Cliente existente = obtenerCliente(id);
+        // Obtenemos el usuario asociado al cliente para modificarlo
+        String correPrevio = existente.getCorreo();
+        String correoNuevo = cliente.getCorreo();
+        Usuario usuarioAsociado = usuarioService.buscarPorCorreo(correPrevio);
+
+
+        if(correoNuevo.equals("") || correoNuevo == null){
+            model.addAttribute("error","El nuevo correo no puede ser nulo o vacio");
+        }
+
+        // Actualiza los datos del cliente
         existente.actualizarInformacion(
                 cliente.getNombre(),
                 cliente.getApellido(),
                 cliente.getTelefono(),
                 cliente.getCorreo());
         clienteService.guardar(existente);
+        // Se cambia el correo de la cuenta asociada al cliente
+        if(!correPrevio.equals(correoNuevo)){
+            usuarioService.actualizarCorreo(correPrevio, correoNuevo);
+        }
+
         return "redirect:/cliente/" + id + "/perfil?exito=true";
     }
 

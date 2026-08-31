@@ -71,6 +71,23 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     /** {@inheritDoc} */
     @Override
+    public Usuario actualizarCorreo(String correoPrevio, String correoNuevo){
+        if(correoNuevo == null || correoPrevio == null){
+            return null;
+        }
+
+        Usuario usuario = repository.findByCorreo(correoPrevio);
+        if(usuario == null) return null;
+
+        usuario.setCorreo(correoNuevo);
+        // Se elimina el usuario previo ya que como el correo es la key del map si solo lo 
+        // actualizamos entonces duplicaremos la informacion
+        repository.delete(correoPrevio);
+        return repository.save(usuario);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public boolean autorizar(Usuario usuario, Rol rol) {
         return usuario != null && usuario.tieneRol(rol);
     }
