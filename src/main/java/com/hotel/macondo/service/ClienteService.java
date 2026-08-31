@@ -20,4 +20,7 @@ public interface ClienteService {
 
     /** Elimina un cliente por identificador. */
     void eliminar(Integer id);
+
+    /** Actualiza toda la informacion del cliente */
+    Cliente actualizarInformacion(Cliente cliente, Cliente informacion);
 }
