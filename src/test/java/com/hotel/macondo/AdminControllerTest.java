@@ -119,4 +119,34 @@ class AdminControllerTest {
         mockMvc.perform(post("/admin/habitaciones/{id}/estado", 1));
         assertEquals("DISPONIBLE", habitacion.getEstado());
     }
+
+    @Test
+    void muestraFormularioInlineYGuardaHabitacion() throws Exception {
+        // El listado incluye el formulario inline para crear/editar
+        mockMvc.perform(get("/admin/habitaciones"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(
+                        org.hamcrest.Matchers.containsString("Nueva habitacion")))
+                .andExpect(content().string(
+                        org.hamcrest.Matchers.containsString("form-habitacion")));
+
+        int iniciales = habitacionService.buscarTodas().size();
+        mockMvc.perform(post("/admin/habitaciones/guardar")
+                .param("nombre", "Familiar")
+                .param("etiqueta", "NUEVA")
+                .param("descripcion", "Habitacion para toda la familia")
+                .param("precio", "700000")
+                .param("capacidad", "5")
+                .param("imagen", "/images/HabitacionLuxury.avif")
+                .param("numero", "501")
+                .param("estado", "DISPONIBLE")
+                .param("piso", "5"))
+                .andExpect(redirectedUrl("/admin/habitaciones"));
+
+        assertEquals(iniciales + 1, habitacionService.buscarTodas().size());
+        Habitacion nueva = habitacionService.buscarPorNombre("Familiar");
+        assertNotNull(nueva);
+        assertEquals("501", nueva.getNumero());
+        assertEquals("Familiar", nueva.getTipoHabitacion().getNombre());
+    }
 }

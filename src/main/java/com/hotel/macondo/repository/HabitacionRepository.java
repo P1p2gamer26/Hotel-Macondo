@@ -17,6 +17,7 @@ public class HabitacionRepository {
     // las habitaciones importa: en la landing deben salir de la mas economica
     // a la mas costosa, igual que en el diseño.
     private Map<Integer, Habitacion> data = new LinkedHashMap<>();
+    private int siguienteId = 5;
 
     /** Carga las habitaciones de prueba del catalogo. */
     public HabitacionRepository() {
@@ -63,6 +64,25 @@ public class HabitacionRepository {
             }
         }
         return result;
+    }
+
+    /**
+     * Crea o actualiza una habitacion en memoria.
+     */
+    public Habitacion save(Habitacion habitacion) {
+        if (habitacion.getId() == null) {
+            habitacion.setId(siguienteId++);
+        }
+        habitacion.sincronizarTipo();
+        data.put(habitacion.getId(), habitacion);
+        return habitacion;
+    }
+
+    /**
+     * Elimina una habitacion por identificador.
+     */
+    public void delete(Integer id) {
+        data.remove(id);
     }
 
 }

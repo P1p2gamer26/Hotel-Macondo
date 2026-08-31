@@ -11,12 +11,228 @@
       ></aside>
 
       <main class="flex-1 p-6 md:p-10">
-        <header
-          th:replace="~{admin/fragmentos_admin :: titulo('Habitaciones', 'Inventario del hotel y disponibilidad para nuevas reservas.')}"
-        ></header>
+        <div
+          class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8"
+        >
+          <header
+            th:replace="~{admin/fragmentos_admin :: titulo('Habitaciones', 'Inventario del hotel: crear, editar, visualizar y retirar habitaciones.')}"
+          ></header>
+          <button
+            id="btn-nueva"
+            class="bg-[var(--dorado)] hover:bg-[var(--dorado-oscuro)] text-[var(--azul-oscuro)] font-bold rounded-lg px-8 py-3 transition text-center shrink-0"
+            type="button"
+            onclick="mostrarFormulario()"
+          >
+            Nueva habitacion
+          </button>
+        </div>
 
+        <!-- Ventana flotante (modal): overlay + panel centrado, patron del profe -->
+        <div
+          id="overlay-habitacion"
+          class="fixed inset-0 bg-black bg-opacity-40 z-50 hidden items-center justify-center p-4"
+        >
+          <div
+            id="formulario-habitacion"
+            class="bg-white rounded-2xl shadow-2xl p-6 md:p-8 max-w-4xl w-full max-h-[90vh] overflow-y-auto relative"
+          >
+            <h3
+              id="formulario-titulo"
+              class="font-serif text-xl font-bold text-[var(--azul-oscuro)] mb-6"
+            >
+              Nueva habitacion
+            </h3>
+            <button
+              class="absolute top-4 right-4 text-gray-500 hover:text-[var(--azul)] text-2xl leading-none"
+              type="button"
+              onclick="ocultarFormulario()"
+              aria-label="Cerrar"
+            >
+              &times;
+            </button>
+
+          <form
+            method="post"
+            th:action="@{/admin/habitaciones/guardar}"
+            id="form-habitacion"
+          >
+            <input type="hidden" name="id" id="campo-id" value="" />
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label
+                  class="block text-sm font-bold text-[var(--azul-oscuro)] mb-2"
+                  for="campo-nombre"
+                  >Nombre</label
+                >
+                <input
+                  class="w-full border border-gray-200 rounded-lg px-4 py-3 focus:outline-none focus:border-[var(--azul)]"
+                  type="text"
+                  id="campo-nombre"
+                  name="nombre"
+                  placeholder="VIP"
+                  required
+                />
+              </div>
+
+              <div>
+                <label
+                  class="block text-sm font-bold text-[var(--azul-oscuro)] mb-2"
+                  for="campo-etiqueta"
+                  >Etiqueta</label
+                >
+                <input
+                  class="w-full border border-gray-200 rounded-lg px-4 py-3 focus:outline-none focus:border-[var(--azul)]"
+                  type="text"
+                  id="campo-etiqueta"
+                  name="etiqueta"
+                  placeholder="EXCLUSIVA"
+                  required
+                />
+              </div>
+
+              <div>
+                <label
+                  class="block text-sm font-bold text-[var(--azul-oscuro)] mb-2"
+                  for="campo-numero"
+                  >Numero</label
+                >
+                <input
+                  class="w-full border border-gray-200 rounded-lg px-4 py-3 focus:outline-none focus:border-[var(--azul)]"
+                  type="text"
+                  id="campo-numero"
+                  name="numero"
+                  placeholder="301"
+                  required
+                />
+              </div>
+
+              <div>
+                <label
+                  class="block text-sm font-bold text-[var(--azul-oscuro)] mb-2"
+                  for="campo-piso"
+                  >Piso</label
+                >
+                <input
+                  class="w-full border border-gray-200 rounded-lg px-4 py-3 focus:outline-none focus:border-[var(--azul)]"
+                  type="number"
+                  id="campo-piso"
+                  name="piso"
+                  min="1"
+                  required
+                />
+              </div>
+
+              <div>
+                <label
+                  class="block text-sm font-bold text-[var(--azul-oscuro)] mb-2"
+                  for="campo-capacidad"
+                  >Capacidad (personas)</label
+                >
+                <input
+                  class="w-full border border-gray-200 rounded-lg px-4 py-3 focus:outline-none focus:border-[var(--azul)]"
+                  type="number"
+                  id="campo-capacidad"
+                  name="capacidad"
+                  min="1"
+                  required
+                />
+              </div>
+
+              <div>
+                <label
+                  class="block text-sm font-bold text-[var(--azul-oscuro)] mb-2"
+                  for="campo-precio"
+                  >Precio / noche (COP)</label
+                >
+                <input
+                  class="w-full border border-gray-200 rounded-lg px-4 py-3 focus:outline-none focus:border-[var(--azul)]"
+                  type="number"
+                  id="campo-precio"
+                  name="precio"
+                  min="0"
+                  step="1000"
+                  required
+                />
+              </div>
+
+              <div>
+                <label
+                  class="block text-sm font-bold text-[var(--azul-oscuro)] mb-2"
+                  for="campo-estado"
+                  >Estado</label
+                >
+                <select
+                  class="w-full border border-gray-200 rounded-lg px-4 py-3 focus:outline-none focus:border-[var(--azul)] bg-white"
+                  id="campo-estado"
+                  name="estado"
+                  required
+                >
+                  <option value="DISPONIBLE">Disponible</option>
+                  <option value="NO_DISPONIBLE">No disponible</option>
+                </select>
+              </div>
+
+              <div>
+                <label
+                  class="block text-sm font-bold text-[var(--azul-oscuro)] mb-2"
+                  for="campo-imagen"
+                  >Imagen</label
+                >
+                <input
+                  class="w-full border border-gray-200 rounded-lg px-4 py-3 focus:outline-none focus:border-[var(--azul)]"
+                  type="text"
+                  id="campo-imagen"
+                  name="imagen"
+                  list="imagenes-habitacion"
+                  placeholder="/images/HabitacionVIP.avif"
+                  required
+                />
+                <datalist id="imagenes-habitacion">
+                  <option value="/images/HabitacionNormal.avif"></option>
+                  <option value="/images/HabitacionExecutive.avif"></option>
+                  <option value="/images/HabitacionVIP.avif"></option>
+                  <option value="/images/HabitacionLuxury.avif"></option>
+                </datalist>
+              </div>
+            </div>
+
+            <div class="mt-6">
+              <label
+                class="block text-sm font-bold text-[var(--azul-oscuro)] mb-2"
+                for="campo-descripcion"
+                >Descripcion</label
+              >
+              <textarea
+                class="w-full border border-gray-200 rounded-lg px-4 py-3 focus:outline-none focus:border-[var(--azul)] min-h-32"
+                id="campo-descripcion"
+                name="descripcion"
+                required
+              ></textarea>
+            </div>
+
+            <div class="flex flex-wrap gap-4 mt-8">
+              <button
+                class="bg-[var(--dorado)] hover:bg-[var(--dorado-oscuro)] text-[var(--azul-oscuro)] font-bold rounded-lg px-8 py-3 transition"
+                type="submit"
+              >
+                Guardar
+              </button>
+              <button
+                class="border-2 border-[var(--azul)] text-[var(--azul)] font-bold rounded-lg px-8 py-3 hover:bg-[var(--azul)] hover:text-white transition"
+                type="button"
+                onclick="ocultarFormulario()"
+              >
+                Cancelar
+              </button>
+            </div>
+          </form>
+        </div>
+        </div>
+
+        <!-- Tabla de habitaciones -->
         <div class="bg-white rounded-2xl shadow-sm overflow-x-auto">
-          <table class="w-full text-left min-w-[760px]">
+          <table class="w-full text-left min-w-[960px]">
             <thead
               class="bg-[var(--crema)] text-[var(--azul-oscuro)] text-sm uppercase tracking-wider"
             >
@@ -33,62 +249,95 @@
             <tbody>
               <tr
                 class="border-t border-gray-100"
-                th:each="habitacion : ${habitaciones}"
+                th:each="h : ${habitaciones}"
               >
                 <td class="px-6 py-4">
                   <div class="flex items-center gap-3">
                     <img
                       class="w-14 h-14 rounded-lg object-cover bg-[var(--crema)]"
-                      th:src="@{${habitacion.imagen}}"
-                      th:alt="${habitacion.nombre}"
+                      th:src="@{${h.imagen}}"
+                      th:alt="${h.nombre}"
                     />
                     <div>
                       <p
                         class="font-medium text-[var(--azul-oscuro)]"
-                        th:text="${habitacion.nombre}"
+                        th:text="${h.nombre}"
                       ></p>
                       <p
                         class="text-sm text-[var(--texto)]"
-                        th:text="${habitacion.etiqueta}"
+                        th:text="${h.etiqueta}"
                       ></p>
                     </div>
                   </div>
                 </td>
-                <td class="px-6 py-4" th:text="${habitacion.numero}"></td>
-                <td class="px-6 py-4" th:text="${habitacion.piso}"></td>
+                <td class="px-6 py-4" th:text="${h.numero}"></td>
+                <td class="px-6 py-4" th:text="${h.piso}"></td>
                 <td
                   class="px-6 py-4"
-                  th:text="${habitacion.capacidad} + ' pers.'"
+                  th:text="${h.capacidad} + ' pers.'"
                 ></td>
-                <!-- formatInteger con POINT separa los miles al estilo colombiano -->
                 <td
                   class="px-6 py-4 font-medium"
-                  th:text="'$ ' + ${#numbers.formatInteger(habitacion.precio, 1, 'POINT')}"
+                  th:text="'$ ' + ${#numbers.formatInteger(h.precio, 1, 'POINT')}"
                 ></td>
                 <td class="px-6 py-4">
                   <span
                     class="rounded-full px-3 py-1 text-xs font-bold"
-                    th:classappend="${habitacion.estado == 'DISPONIBLE'} ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-gray-600'"
-                    th:text="${habitacion.estado == 'DISPONIBLE'} ? 'Disponible' : 'No disponible'"
+                    th:classappend="${h.estado == 'DISPONIBLE'} ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-gray-600'"
+                    th:text="${h.estado == 'DISPONIBLE'} ? 'Disponible' : 'No disponible'"
                   ></span>
                 </td>
                 <td class="px-6 py-4 text-right whitespace-nowrap">
+                  <a
+                    class="text-[var(--azul)] hover:underline font-medium"
+                    th:href="@{/habitaciones/{id}(id=${h.id})}"
+                    target="_blank"
+                    >Ver</a
+                  >
+                  <button
+                    class="js-editar ml-4 text-[var(--azul)] hover:underline font-medium"
+                    type="button"
+                    th:data-id="${h.id}"
+                    th:data-nombre="${h.nombre}"
+                    th:data-etiqueta="${h.etiqueta}"
+                    th:data-descripcion="${h.descripcion}"
+                    th:data-precio="${h.precio}"
+                    th:data-capacidad="${h.capacidad}"
+                    th:data-imagen="${h.imagen}"
+                    th:data-numero="${h.numero}"
+                    th:data-estado="${h.estado}"
+                    th:data-piso="${h.piso}"
+                  >
+                    Editar
+                  </button>
                   <form
-                    class="inline"
+                    class="inline ml-4"
                     method="post"
-                    th:action="@{/admin/habitaciones/{id}/estado(id=${habitacion.id})}"
+                    th:action="@{/admin/habitaciones/{id}/estado(id=${h.id})}"
                   >
                     <button
                       class="text-[var(--azul)] hover:underline font-medium"
                       type="submit"
-                      th:text="${habitacion.estado == 'DISPONIBLE'} ? 'Deshabilitar' : 'Habilitar'"
+                      th:text="${h.estado == 'DISPONIBLE'} ? 'Deshabilitar' : 'Habilitar'"
                     ></button>
                   </form>
-                  <a
-                    class="ml-4 text-[var(--texto)] hover:underline font-medium"
-                    th:href="@{/habitaciones/{id}(id=${habitacion.id})}"
-                    >Ver ficha</a
+                  <form
+                    class="inline ml-4"
+                    method="post"
+                    th:action="@{/admin/habitaciones/{id}/eliminar(id=${h.id})}"
                   >
+                    <button
+                      class="text-red-600 hover:underline font-medium"
+                      type="submit"
+                    >
+                      Eliminar
+                    </button>
+                  </form>
+                </td>
+              </tr>
+              <tr th:if="${habitaciones.isEmpty()}">
+                <td class="px-6 py-10 text-center" colspan="7">
+                  Aun no hay habitaciones registradas.
                 </td>
               </tr>
             </tbody>
@@ -96,5 +345,65 @@
         </div>
       </main>
     </div>
+
+    <script>
+      var overlay = document.getElementById("overlay-habitacion");
+      var formulario = document.getElementById("formulario-habitacion");
+      var titulo = document.getElementById("formulario-titulo");
+
+      function mostrarFormulario() {
+        limpiarFormulario();
+        titulo.textContent = "Nueva habitacion";
+        overlay.classList.remove("hidden");
+        overlay.classList.add("flex");
+      }
+
+      function ocultarFormulario() {
+        overlay.classList.add("hidden");
+        overlay.classList.remove("flex");
+        limpiarFormulario();
+      }
+
+      function limpiarFormulario() {
+        document.getElementById("campo-id").value = "";
+        document.getElementById("campo-nombre").value = "";
+        document.getElementById("campo-etiqueta").value = "";
+        document.getElementById("campo-descripcion").value = "";
+        document.getElementById("campo-precio").value = "";
+        document.getElementById("campo-capacidad").value = "";
+        document.getElementById("campo-imagen").value = "";
+        document.getElementById("campo-numero").value = "";
+        document.getElementById("campo-estado").value = "DISPONIBLE";
+        document.getElementById("campo-piso").value = "1";
+      }
+
+      function editarHabitacion(boton) {
+        document.getElementById("campo-id").value = boton.dataset.id;
+        document.getElementById("campo-nombre").value = boton.dataset.nombre;
+        document.getElementById("campo-etiqueta").value = boton.dataset.etiqueta;
+        document.getElementById("campo-descripcion").value = boton.dataset.descripcion;
+        document.getElementById("campo-precio").value = boton.dataset.precio;
+        document.getElementById("campo-capacidad").value = boton.dataset.capacidad;
+        document.getElementById("campo-imagen").value = boton.dataset.imagen;
+        document.getElementById("campo-numero").value = boton.dataset.numero;
+        document.getElementById("campo-estado").value = boton.dataset.estado;
+        document.getElementById("campo-piso").value = boton.dataset.piso;
+        titulo.textContent = "Editar habitacion";
+        overlay.classList.remove("hidden");
+        overlay.classList.add("flex");
+      }
+
+      document.querySelectorAll(".js-editar").forEach(function (boton) {
+        boton.addEventListener("click", function () {
+          editarHabitacion(boton);
+        });
+      });
+
+      overlay.addEventListener("click", function (evento) {
+        if (evento.target === overlay) {
+          ocultarFormulario();
+        }
+      });
+    </script>
   </body>
 </html>

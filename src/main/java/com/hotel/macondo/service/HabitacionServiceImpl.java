@@ -44,4 +44,16 @@ public class HabitacionServiceImpl implements HabitacionService {
     public Collection<Habitacion> buscarPorPersonas(int personas) {
         return repository.findByPersonas(personas);
     }
+
+    /** {@inheritDoc} */
+    @Override
+    public Habitacion guardar(Habitacion habitacion) {
+        return repository.save(habitacion);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void eliminar(Integer id) {
+        repository.delete(id);
+    }
 }
