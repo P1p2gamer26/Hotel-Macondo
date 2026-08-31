@@ -3,10 +3,14 @@ package com.hotel.macondo.entities;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 // lombok: getters, setters, toString, equals
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Habitacion {
 
     private Integer id;
@@ -53,6 +57,19 @@ public class Habitacion {
         this.descripcion = tipoHabitacion.getDescripcion();
         this.precio = tipoHabitacion.getPrecioNoche().longValue();
         this.capacidad = tipoHabitacion.getCapacidadPersonas();
+    }
+
+    /**
+     * Sincroniza el tipo embebido con los datos comerciales de la habitacion.
+     */
+    public void sincronizarTipo() {
+        if (tipoHabitacion == null) {
+            tipoHabitacion = new TipoHabitacion();
+        }
+        tipoHabitacion.setNombre(nombre);
+        tipoHabitacion.setDescripcion(descripcion);
+        tipoHabitacion.setPrecioNoche(BigDecimal.valueOf(precio));
+        tipoHabitacion.setCapacidadPersonas(capacidad);
     }
 
     /**

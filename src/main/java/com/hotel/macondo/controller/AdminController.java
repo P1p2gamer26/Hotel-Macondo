@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -144,12 +145,22 @@ public class AdminController {
     // ===== HABITACIONES =====
 
     /**
-     * Lista las habitaciones con su estado operativo.
+     * Lista las habitaciones con su estado operativo. El formulario de
+     * creacion y edicion se maneja de forma inline con JavaScript.
      */
     @GetMapping("/habitaciones")
     public String listarHabitaciones(Model model) {
         model.addAttribute("habitaciones", habitacionService.buscarTodas());
         return "admin/habitaciones";
+    }
+
+    /**
+     * Crea o actualiza una habitacion a partir del formulario inline.
+     */
+    @PostMapping("/habitaciones/guardar")
+    public String guardarHabitacion(@ModelAttribute("habitacion") Habitacion habitacion) {
+        habitacionService.guardar(habitacion);
+        return "redirect:/admin/habitaciones";
     }
 
     /**
@@ -199,5 +210,14 @@ public class AdminController {
     public String eliminarTipoHabitacion(@PathVariable Integer id) {
         tipoHabitacionService.eliminar(id);
         return "redirect:/admin/tipos_habitacion";
+    }
+
+    /**
+     * Elimina una habitacion del inventario.
+     */
+    @PostMapping("/habitaciones/{id}/eliminar")
+    public String eliminarHabitacion(@PathVariable Integer id) {
+        habitacionService.eliminar(id);
+        return "redirect:/admin/habitaciones";
     }
 }
