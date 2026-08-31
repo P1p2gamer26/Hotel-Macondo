@@ -45,22 +45,19 @@ public class PerfilController {
         String correoNuevo = cliente.getCorreo();
         Usuario usuarioAsociado = usuarioService.buscarPorCorreo(correPrevio);
 
-
         if(correoNuevo.equals("") || correoNuevo == null){
             model.addAttribute("error","El nuevo correo no puede ser nulo o vacio");
         }
 
-        // Actualiza los datos del cliente
-        existente.actualizarInformacion(
-                cliente.getNombre(),
-                cliente.getApellido(),
-                cliente.getTelefono(),
-                cliente.getCorreo());
-        clienteService.guardar(existente);
-        // Se cambia el correo de la cuenta asociada al cliente
         if(!correPrevio.equals(correoNuevo)){
-            usuarioService.actualizarCorreo(correPrevio, correoNuevo);
+            model.addAttribute("error","El nuevo correo no puede ser igual al anterior");
         }
+
+        // Actualiza los datos del cliente
+        clienteService.actualizarInformacion(existente, cliente);
+
+        // Se cambia el correo de la cuenta asociada al cliente
+        usuarioService.actualizarCorreo(correPrevio, correoNuevo);
 
         return "redirect:/cliente/" + id + "/perfil?exito=true";
     }
