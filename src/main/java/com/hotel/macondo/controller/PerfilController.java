@@ -70,6 +70,7 @@ public class PerfilController {
             @RequestParam("confirmarContrasena") String confirmarContrasena,
             Model model) {
 
+        // Toma de datos
         Cliente cliente = obtenerCliente(id);
         Usuario usuario = usuarioService.buscarPorCorreo(cliente.getCorreo());
 
