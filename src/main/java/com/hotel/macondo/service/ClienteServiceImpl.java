@@ -50,4 +50,15 @@ public class ClienteServiceImpl implements ClienteService {
     public void eliminar(Integer id) {
         repository.delete(id);
     }
+
+    /** {@inheritDoc} */
+    @Override
+    public Cliente actualizarInformacion(Cliente cliente, Cliente informacion){
+        cliente.actualizarInformacion(
+                informacion.getNombre(),
+                informacion.getApellido(),
+                informacion.getTelefono(),
+                informacion.getCorreo());
+        return guardar(cliente);
+    }
 }

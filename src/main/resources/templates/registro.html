@@ -112,8 +112,18 @@
               </p>
             </div>
 
+            <!-- Mensaje de error al registrar -->
+            <div
+              th:if="${error != null}"
+              class="alert alert-danger d-flex align-items-center mb-4"
+              role="alert"
+            >
+              <i class="bi bi-exclamation-triangle-fill me-2"></i>
+              <span th:text="${error}"></span>
+            </div>
+
             <!-- Formulario de registro -->
-            <form th:action="@{/registro}" method="post">
+            <form th:object="${cliente}" th:action="@{/registro}" method="post">
               <!-- Fila: Nombre y Apellido -->
               <div class="row g-2 mb-3">
                 <div class="col-6">
@@ -125,6 +135,7 @@
                       ><i class="bi bi-person"></i
                     ></span>
                     <input
+                      th:field="*{nombre}"
                       type="text"
                       class="form-control"
                       id="nombre"
@@ -143,6 +154,7 @@
                       ><i class="bi bi-person"></i
                     ></span>
                     <input
+                      th:field="*{apellido}"
                       type="text"
                       class="form-control"
                       id="apellido"
@@ -164,6 +176,7 @@
                     ><i class="bi bi-card-text"></i
                   ></span>
                   <input
+                    th:field="*{cedula}"
                     type="text"
                     class="form-control"
                     id="cedula"
@@ -184,6 +197,7 @@
                     ><i class="bi bi-telephone"></i
                   ></span>
                   <input
+                    th:field="*{telefono}"
                     type="tel"
                     class="form-control"
                     id="telefono"
@@ -204,6 +218,7 @@
                     ><i class="bi bi-envelope"></i
                   ></span>
                   <input
+                    th:field="*{correo}"
                     type="email"
                     class="form-control"
                     id="correo"
