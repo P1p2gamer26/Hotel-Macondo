@@ -17,4 +17,10 @@ public interface HabitacionService {
 
     /** Filtra las habitaciones que admiten la cantidad de personas indicada. */
     Collection<Habitacion> buscarPorPersonas(int personas);
+
+    /** Crea o actualiza una habitacion. */
+    Habitacion guardar(Habitacion habitacion);
+
+    /** Elimina una habitacion por identificador. */
+    void eliminar(Integer id);
 }
