@@ -36,11 +36,4 @@ public class Usuario {
     public boolean tieneRol(Rol rolSolicitado) {
         return rol != null && rol == rolSolicitado;
     }
-
-    /**
-     * Actualiza el correo del usuario
-     */
-    public void actualizarCorreo(String correo){
-        this.correo = correo;
-    } 
 }
