@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.hotel.macondo.entities.Habitacion;
 import com.hotel.macondo.entities.Operador;
@@ -151,15 +152,19 @@ public class AdminController {
     @GetMapping("/habitaciones")
     public String listarHabitaciones(Model model) {
         model.addAttribute("habitaciones", habitacionService.buscarTodas());
+        model.addAttribute("tiposHabitacion", tipoHabitacionService.buscarTodos());
         return "admin/habitaciones";
     }
 
     /**
      * Crea o actualiza una habitacion a partir del formulario inline.
+     * El tipo de habitacion llega como identificador y el servicio lo aplica
+     * como fuente de verdad de los datos comerciales de la habitacion.
      */
     @PostMapping("/habitaciones/guardar")
-    public String guardarHabitacion(@ModelAttribute("habitacion") Habitacion habitacion) {
-        habitacionService.guardar(habitacion);
+    public String guardarHabitacion(@ModelAttribute("habitacion") Habitacion habitacion,
+            @RequestParam Integer tipoId) {
+        habitacionService.guardar(habitacion, tipoId);
         return "redirect:/admin/habitaciones";
     }
 
@@ -204,11 +209,16 @@ public class AdminController {
     }
 
     /**
-     * Elimina un tipo de habitacion por su ID.
+     * Elimina un tipo de habitacion por su ID. No elimina si todavia hay
+     * habitaciones asignadas a ese tipo.
      */
     @PostMapping("/tipos_habitacion/{id}/eliminar")
-    public String eliminarTipoHabitacion(@PathVariable Integer id) {
-        tipoHabitacionService.eliminar(id);
+    public String eliminarTipoHabitacion(@PathVariable Integer id,
+            RedirectAttributes redirectAttributes) {
+        if (!tipoHabitacionService.eliminar(id)) {
+            redirectAttributes.addFlashAttribute("errorTipo",
+                    "No se puede eliminar: hay habitaciones asignadas a este tipo.");
+        }
         return "redirect:/admin/tipos_habitacion";
     }
 
