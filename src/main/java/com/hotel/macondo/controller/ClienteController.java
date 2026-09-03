@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.hotel.macondo.entities.Cliente;
 import com.hotel.macondo.service.ClienteService;
-import com.hotel.macondo.service.UsuarioService;
+import com.hotel.macondo.service.CuentaClienteService;
 
 @Controller
 @RequestMapping("/clientes")
@@ -20,7 +20,7 @@ public class ClienteController {
     @Autowired
     private ClienteService service;
     @Autowired
-    private UsuarioService usuarioService;
+    private CuentaClienteService cuentaClienteService;
 
     /**
      * Retorna los clientes guardados temporalmente.
@@ -37,12 +37,8 @@ public class ClienteController {
     @GetMapping("/delete/{id}")
     public String eliminarCuenta(@PathVariable Integer id){
 
-        // Se busca el usuario asociado al cliente
-        String correoUsuario = (service.buscarPorId(id)).getCorreo();
+        cuentaClienteService.eliminarCuenta(id);
 
-        service.eliminar(id);
-        // Se elimina el usuario asociado al cliente usando el correo
-        usuarioService.eliminar(correoUsuario);
         return "redirect:/logout";
     }
 }
