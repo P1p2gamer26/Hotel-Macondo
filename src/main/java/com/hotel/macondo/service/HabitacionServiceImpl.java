@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.hotel.macondo.entities.Habitacion;
 import com.hotel.macondo.entities.TipoHabitacion;
+import com.hotel.macondo.exceptions.RecursoNoEncontradoException;
 import com.hotel.macondo.repository.HabitacionRepository;
 import com.hotel.macondo.repository.TipoHabitacionRepository;
 
@@ -36,7 +37,12 @@ public class HabitacionServiceImpl implements HabitacionService {
     /** {@inheritDoc} */
     @Override
     public Habitacion buscarPorId(Integer id) {
-        return repository.findById(id);
+        Habitacion habitacion = repository.findById(id);
+        if (habitacion == null) {
+            throw new RecursoNoEncontradoException(
+                    "No se encontro habitacion con id " + id);
+        }
+        return habitacion;
     }
 
     /** {@inheritDoc} */
