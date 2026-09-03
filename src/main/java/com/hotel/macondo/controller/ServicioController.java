@@ -1,7 +1,5 @@
 package com.hotel.macondo.controller;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -33,10 +31,16 @@ public class ServicioController {
     @GetMapping("/{id}")
     public String mostrarDetalle(@PathVariable Integer id, Model model) {
         Servicio servicio = service.buscarPorId(id);
+        // Un servicio inexistente o retirado del catalogo no tiene ficha publica.
+        if (servicio == null || !servicio.isActivo()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+                    "Servicio no encontrado");
+        }
 
-        List<Servicio> relacionados = service.obtenerRelacionados(id, 2);
         model.addAttribute("servicio", servicio);
-        model.addAttribute("relacionados", relacionados);
+        // La vista de detalle recibe servicios alternativos para continuar la
+        // exploracion.
+        model.addAttribute("relacionados", service.obtenerRelacionados(id, 2));
         return "servicio/detalle_servicio";
     }
 }

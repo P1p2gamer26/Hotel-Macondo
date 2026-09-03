@@ -1,5 +1,6 @@
 package com.hotel.macondo.service;
 
+import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
@@ -48,8 +49,7 @@ public class ServicioServiceImpl implements ServicioService {
 
     @Override
     public List<Servicio> obtenerRelacionados(Integer servicioActualId, int limite) {
-        return repository.findAll().stream()
-                .filter(Servicio::isActivo)
+        return obtenerCatalogoActivo().stream()
                 .filter(item -> !item.getId().equals(servicioActualId))
                 .limit(limite)
                 .toList();
@@ -57,9 +57,38 @@ public class ServicioServiceImpl implements ServicioService {
 
     @Override
     public List<Servicio> obtenerRecomendaciones(int limite) {
-        return repository.findAll().stream()
-                .filter(Servicio::isActivo)
+        return obtenerCatalogoActivo().stream()
                 .limit(limite)
                 .toList();
+    }
+
+    @Override
+    public long contarActivos() {
+        return obtenerCatalogoActivo().size();
+    }
+
+    @Override
+    public Servicio actualizarDatos(Integer id, String nombre, String categoria,
+            BigDecimal precio) {
+        Servicio servicio = repository.findById(id);
+        if (servicio == null) {
+            return null;
+        }
+        servicio.actualizarDatos(nombre, categoria, precio);
+        return repository.save(servicio);
+    }
+
+    @Override
+    public Servicio cambiarEstado(Integer id) {
+        Servicio servicio = repository.findById(id);
+        if (servicio == null) {
+            return null;
+        }
+        if (servicio.isActivo()) {
+            servicio.desactivar();
+        } else {
+            servicio.activar();
+        }
+        return repository.save(servicio);
     }
 }

@@ -71,12 +71,18 @@ public class ServicioRepository {
 
         /** Retorna todos los servicios del catalogo. */
         public Collection<Servicio> findAll() {
-                return data.values();
+                return List.copyOf(data.values());
         }
 
         /** Busca un servicio por identificador. */
         public Servicio findById(Integer id) {
                 return data.get(id);
+        }
+
+        /** Crea o actualiza un servicio en memoria. */
+        public Servicio save(Servicio servicio) {
+                data.put(servicio.getId(), servicio);
+                return servicio;
         }
 
         private Servicio crearServicio(Integer id, String nombre, String categoria,

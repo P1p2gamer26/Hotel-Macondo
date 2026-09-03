@@ -19,12 +19,24 @@ public interface HabitacionService {
     /** Filtra las habitaciones que admiten la cantidad de personas indicada. */
     Collection<Habitacion> buscarPorPersonas(int personas);
 
+    /** Cuenta las habitaciones que estan disponibles para reservar. */
+    long contarDisponibles();
+
     /**
      * Crea o actualiza una habitacion asignandole un tipo de habitacion por
-     * su identificador. El tipo es la fuente de verdad: de el se derivan el
-     * nombre, la descripcion, el precio y la capacidad de la habitacion.
+     * su identificador. El tipo es la fuente de verdad: de el se derivan la
+     * descripcion, el precio y la capacidad de la habitacion.
+     *
+     * Toda habitacion debe tener un tipo valido: si el identificador es nulo
+     * o no corresponde a ningun tipo, no se guarda nada y retorna null.
      */
     Habitacion guardar(Habitacion habitacion, Integer idTipo);
+
+    /**
+     * Invierte la disponibilidad de una habitacion: la pone en mantenimiento
+     * o la devuelve al catalogo. Retorna null si la habitacion no existe.
+     */
+    Habitacion cambiarEstado(Integer id);
 
     /**
      * Propaga los cambios de un tipo de habitacion a todas las habitaciones

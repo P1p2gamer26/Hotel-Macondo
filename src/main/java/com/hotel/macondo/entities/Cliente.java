@@ -1,6 +1,5 @@
 package com.hotel.macondo.entities;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -63,11 +62,8 @@ public class Cliente {
      * Retorna las reservas vigentes o futuras que no han sido canceladas.
      */
     public List<Reserva> verReservasActivas() {
-        LocalDate hoy = LocalDate.now();
         return reservas.stream()
-                .filter(reserva -> !"CANCELADA".equals(reserva.getEstado()))
-                .filter(reserva -> reserva.getFechaFin() != null
-                        && !reserva.getFechaFin().isBefore(hoy))
+                .filter(Reserva::estaVigente)
                 .toList();
     }
 
@@ -75,11 +71,8 @@ public class Cliente {
      * Retorna las reservas finalizadas o canceladas.
      */
     public List<Reserva> verHistorialReservas() {
-        LocalDate hoy = LocalDate.now();
         return reservas.stream()
-                .filter(reserva -> "CANCELADA".equals(reserva.getEstado())
-                        || (reserva.getFechaFin() != null
-                                && reserva.getFechaFin().isBefore(hoy)))
+                .filter(Reserva::esHistorica)
                 .toList();
     }
 }

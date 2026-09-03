@@ -107,9 +107,9 @@
             >
               <option value="">Seleccionar...</option>
               <option
-                th:each="habitacion : ${habitaciones}"
-                th:value="${habitacion.nombre}"
-                th:text="${habitacion.nombre}"
+                th:each="tipo : ${tiposHabitacion}"
+                th:value="${tipo.nombre}"
+                th:text="${tipo.nombre}"
               ></option>
             </select>
           </div>

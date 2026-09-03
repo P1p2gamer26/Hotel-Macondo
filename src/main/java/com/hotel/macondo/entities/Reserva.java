@@ -90,6 +90,48 @@ public class Reserva {
         return false;
     }
 
+    /**
+     * Indica si la reserva fue cancelada.
+     */
+    public boolean estaCancelada() {
+        return "CANCELADA".equals(estado);
+    }
+
+    /**
+     * Indica si la reserva sigue vigente: no fue cancelada y su fecha de fin
+     * no ha pasado todavia.
+     */
+    public boolean estaVigente() {
+        return !estaCancelada() && fechaFin != null
+                && !fechaFin.isBefore(LocalDate.now());
+    }
+
+    /**
+     * Indica si la reserva pertenece al historial: fue cancelada o su fecha
+     * de fin ya paso.
+     */
+    public boolean esHistorica() {
+        return estaCancelada() || (fechaFin != null && fechaFin.isBefore(LocalDate.now()));
+    }
+
+    /**
+     * Indica si la reserva esta en un estado operativo abierto.
+     */
+    public boolean estaEnCurso() {
+        return estadoEsUnoDe("ACTIVA", "CONFIRMADA", "PENDIENTE");
+    }
+
+    /**
+     * Indica si la reserva esta en un estado operativo cerrado.
+     */
+    public boolean estaCerrada() {
+        return estadoEsUnoDe("FINALIZADA", "CANCELADA");
+    }
+
+    private boolean estadoEsUnoDe(String... estados) {
+        return estado != null && List.of(estados).contains(estado.toUpperCase());
+    }
+
     private void recalcularTotal() {
         if (fechaInicio == null || fechaFin == null
                 || !fechaInicio.isBefore(fechaFin)) {
