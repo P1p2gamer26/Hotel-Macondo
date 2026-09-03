@@ -38,6 +38,13 @@
           </button>
         </div>
 
+        <!-- Aviso cuando no se pudo eliminar por tener habitaciones asignadas -->
+        <div
+          class="mb-4 rounded-lg border border-red-200 bg-red-50 px-5 py-4 text-red-700"
+          th:if="${errorTipo != null}"
+          th:text="${errorTipo}"
+        ></div>
+
         <!-- Tabla principal con la misma estructura y tipografia de habitaciones.html -->
         <div class="bg-white rounded-2xl shadow-sm overflow-x-auto">
           <table class="w-full text-left min-w-[760px]">

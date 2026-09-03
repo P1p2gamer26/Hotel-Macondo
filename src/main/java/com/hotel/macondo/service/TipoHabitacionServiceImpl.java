@@ -11,8 +11,15 @@ import com.hotel.macondo.repository.TipoHabitacionRepository;
 @Service
 public class TipoHabitacionServiceImpl implements TipoHabitacionService {
 
+    private final TipoHabitacionRepository repository;
+    private final HabitacionService habitacionService;
+
     @Autowired
-    private TipoHabitacionRepository repository;
+    public TipoHabitacionServiceImpl(TipoHabitacionRepository repository,
+            HabitacionService habitacionService) {
+        this.repository = repository;
+        this.habitacionService = habitacionService;
+    }
 
     @Override
     public Collection<TipoHabitacion> buscarTodos() {
@@ -26,11 +33,17 @@ public class TipoHabitacionServiceImpl implements TipoHabitacionService {
 
     @Override
     public TipoHabitacion guardar(TipoHabitacion tipo) {
-        return repository.save(tipo);
+        TipoHabitacion guardado = repository.save(tipo);
+        habitacionService.actualizarHabitacionesPorTipo(guardado);
+        return guardado;
     }
 
     @Override
-    public void eliminar(Integer id) {
+    public boolean eliminar(Integer id) {
+        if (habitacionService.existeHabitacionConTipo(id)) {
+            return false;
+        }
         repository.delete(id);
+        return true;
     }
 }

@@ -1,7 +1,5 @@
 package com.hotel.macondo.controller;
 
-import java.util.Collection;
-import java.util.Comparator;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,19 +24,8 @@ public class ServicioController {
     /** Construye el catalogo publico de experiencias del hotel. */
     @GetMapping
     public String listar(Model model) {
-        // El catalogo publico solo incluye servicios activos y se presenta por
-        // identificador.
-        Collection<Servicio> catalogo = service.buscarTodos().stream()
-                .filter(Servicio::isActivo)
-                .sorted(Comparator.comparing(Servicio::getId))
-                .toList();
-        model.addAttribute("servicios", catalogo);
-        // Las categorias se derivan de los datos del catalogo para el filtro visual.
-        model.addAttribute("categorias",
-                catalogo.stream()
-                        .map(Servicio::getCategoria)
-                        .distinct()
-                        .toList());
+        model.addAttribute("servicios", service.obtenerCatalogoActivo());
+        model.addAttribute("categorias", service.obtenerCategoriasDisponibles());
         return "servicio/servicios";
     }
 
@@ -46,21 +33,10 @@ public class ServicioController {
     @GetMapping("/{id}")
     public String mostrarDetalle(@PathVariable Integer id, Model model) {
         Servicio servicio = service.buscarPorId(id);
-        if (servicio == null || !servicio.isActivo()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
-                    "Servicio no encontrado");
-        }
 
-        // La vista de detalle recibe servicios alternativos para continuar la
-        // exploracion.
-        List<Servicio> relacionados = service.buscarTodos().stream()
-                .filter(Servicio::isActivo)
-                .filter(item -> !item.getId().equals(id))
-                .limit(2)
-                .toList();
+        List<Servicio> relacionados = service.obtenerRelacionados(id, 2);
         model.addAttribute("servicio", servicio);
         model.addAttribute("relacionados", relacionados);
         return "servicio/detalle_servicio";
     }
-
 }

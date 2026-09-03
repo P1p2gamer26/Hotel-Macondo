@@ -82,13 +82,4 @@ public class OperadorController {
         return "operador/checkout";
     }
 
-    // ===== CONSULTA DE APOYO =====
-
-    /**
-     * Retorna los operadores guardados temporalmente.
-     */
-    @ResponseBody
-    public Collection<Operador> listar() {
-        return service.buscarTodos();
-    }
 }

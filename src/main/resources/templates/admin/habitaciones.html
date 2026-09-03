@@ -62,6 +62,32 @@
               <div>
                 <label
                   class="block text-sm font-bold text-[var(--azul-oscuro)] mb-2"
+                  for="campo-tipo"
+                  >Tipo de habitacion</label
+                >
+                <select
+                  class="w-full border border-gray-200 rounded-lg px-4 py-3 focus:outline-none focus:border-[var(--azul)] bg-white"
+                  id="campo-tipo"
+                  name="tipoId"
+                  required
+                  onchange="rellenarDesdeTipo()"
+                >
+                  <option value="">Seleccionar tipo...</option>
+                  <option
+                    th:each="tipo : ${tiposHabitacion}"
+                    th:value="${tipo.id}"
+                    th:data-nombre="${tipo.nombre}"
+                    th:data-descripcion="${tipo.descripcion}"
+                    th:data-precio="${tipo.precioNoche}"
+                    th:data-capacidad="${tipo.capacidadPersonas}"
+                    th:text="${tipo.nombre}"
+                  ></option>
+                </select>
+              </div>
+
+              <div>
+                <label
+                  class="block text-sm font-bold text-[var(--azul-oscuro)] mb-2"
                   for="campo-nombre"
                   >Nombre</label
                 >
@@ -130,12 +156,12 @@
                   >Capacidad (personas)</label
                 >
                 <input
-                  class="w-full border border-gray-200 rounded-lg px-4 py-3 focus:outline-none focus:border-[var(--azul)]"
+                  class="w-full border border-gray-200 rounded-lg px-4 py-3 focus:outline-none focus:border-[var(--azul)] bg-gray-50"
                   type="number"
                   id="campo-capacidad"
                   name="capacidad"
                   min="1"
-                  required
+                  readonly
                 />
               </div>
 
@@ -146,13 +172,13 @@
                   >Precio / noche (COP)</label
                 >
                 <input
-                  class="w-full border border-gray-200 rounded-lg px-4 py-3 focus:outline-none focus:border-[var(--azul)]"
+                  class="w-full border border-gray-200 rounded-lg px-4 py-3 focus:outline-none focus:border-[var(--azul)] bg-gray-50"
                   type="number"
                   id="campo-precio"
                   name="precio"
                   min="0"
                   step="1000"
-                  required
+                  readonly
                 />
               </div>
 
@@ -203,12 +229,12 @@
                 for="campo-descripcion"
                 >Descripcion</label
               >
-              <textarea
-                class="w-full border border-gray-200 rounded-lg px-4 py-3 focus:outline-none focus:border-[var(--azul)] min-h-32"
-                id="campo-descripcion"
-                name="descripcion"
-                required
-              ></textarea>
+<textarea
+                  class="w-full border border-gray-200 rounded-lg px-4 py-3 focus:outline-none focus:border-[var(--azul)] min-h-32 bg-gray-50"
+                  id="campo-descripcion"
+                  name="descripcion"
+                  readonly
+                ></textarea>
             </div>
 
             <div class="flex flex-wrap gap-4 mt-8">
@@ -238,6 +264,7 @@
             >
               <tr>
                 <th class="px-6 py-4">Habitacion</th>
+                <th class="px-6 py-4">Tipo</th>
                 <th class="px-6 py-4">Numero</th>
                 <th class="px-6 py-4">Piso</th>
                 <th class="px-6 py-4">Capacidad</th>
@@ -270,6 +297,12 @@
                     </div>
                   </div>
                 </td>
+                <td class="px-6 py-4">
+                  <span
+                    class="rounded-full px-3 py-1 text-xs font-bold bg-[var(--crema)] text-[var(--azul)]"
+                    th:text="${h.tipoHabitacion.nombre}"
+                  ></span>
+                </td>
                 <td class="px-6 py-4" th:text="${h.numero}"></td>
                 <td class="px-6 py-4" th:text="${h.piso}"></td>
                 <td
@@ -298,6 +331,7 @@
                     class="js-editar ml-4 text-[var(--azul)] hover:underline font-medium"
                     type="button"
                     th:data-id="${h.id}"
+                    th:data-tipo="${h.tipoHabitacion.id}"
                     th:data-nombre="${h.nombre}"
                     th:data-etiqueta="${h.etiqueta}"
                     th:data-descripcion="${h.descripcion}"
@@ -336,7 +370,7 @@
                 </td>
               </tr>
               <tr th:if="${habitaciones.isEmpty()}">
-                <td class="px-6 py-10 text-center" colspan="7">
+                <td class="px-6 py-10 text-center" colspan="8">
                   Aun no hay habitaciones registradas.
                 </td>
               </tr>
@@ -366,6 +400,7 @@
 
       function limpiarFormulario() {
         document.getElementById("campo-id").value = "";
+        document.getElementById("campo-tipo").value = "";
         document.getElementById("campo-nombre").value = "";
         document.getElementById("campo-etiqueta").value = "";
         document.getElementById("campo-descripcion").value = "";
@@ -377,13 +412,27 @@
         document.getElementById("campo-piso").value = "1";
       }
 
+      function rellenarDesdeTipo() {
+        var select = document.getElementById("campo-tipo");
+        var opcion = select.options[select.selectedIndex];
+        document.getElementById("campo-descripcion").value =
+          opcion.dataset.descripcion || "";
+        document.getElementById("campo-precio").value = opcion.dataset.precio || "";
+        document.getElementById("campo-capacidad").value =
+          opcion.dataset.capacidad || "";
+
+        var campoNombre = document.getElementById("campo-nombre");
+        if (campoNombre.value === "") {
+          campoNombre.value = opcion.dataset.nombre || "";
+        }
+      }
+
       function editarHabitacion(boton) {
         document.getElementById("campo-id").value = boton.dataset.id;
-        document.getElementById("campo-nombre").value = boton.dataset.nombre;
+        document.getElementById("campo-tipo").value = boton.dataset.tipo || "";
+        document.getElementById("campo-nombre").value = boton.dataset.nombre || "";
+        rellenarDesdeTipo();
         document.getElementById("campo-etiqueta").value = boton.dataset.etiqueta;
-        document.getElementById("campo-descripcion").value = boton.dataset.descripcion;
-        document.getElementById("campo-precio").value = boton.dataset.precio;
-        document.getElementById("campo-capacidad").value = boton.dataset.capacidad;
         document.getElementById("campo-imagen").value = boton.dataset.imagen;
         document.getElementById("campo-numero").value = boton.dataset.numero;
         document.getElementById("campo-estado").value = boton.dataset.estado;
