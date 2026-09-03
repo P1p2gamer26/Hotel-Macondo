@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.hotel.macondo.entities.Cliente;
 import com.hotel.macondo.entities.Reserva;
 import com.hotel.macondo.repository.ReservaRepository;
 
@@ -17,22 +18,37 @@ public class ReservaServiceImpl implements ReservaService {
         this.repository = repository;
     }
 
+    /** {@inheritDoc} */
     @Override
     public List<Reserva> obtenerReservasActivas() {
         return repository.findAll().stream()
-                .filter(r -> List.of("ACTIVA", "CONFIRMADA", "PENDIENTE").contains(r.getEstado().toUpperCase()))
+                .filter(Reserva::estaEnCurso)
                 .toList();
     }
 
+    /** {@inheritDoc} */
     @Override
     public List<Reserva> obtenerHistorial() {
         return repository.findAll().stream()
-                .filter(r -> List.of("FINALIZADA", "CANCELADA").contains(r.getEstado().toUpperCase()))
+                .filter(Reserva::estaCerrada)
                 .toList();
     }
 
+    /** {@inheritDoc} */
     @Override
     public Reserva buscarPorId(String id) {
         return repository.findById(id);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public List<Reserva> buscarActivasDeCliente(Cliente cliente) {
+        return cliente == null ? List.of() : cliente.verReservasActivas();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public List<Reserva> buscarHistorialDeCliente(Cliente cliente) {
+        return cliente == null ? List.of() : cliente.verHistorialReservas();
     }
 }

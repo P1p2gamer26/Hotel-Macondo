@@ -63,4 +63,11 @@ public class Servicio {
     public void desactivar() {
         activo = false;
     }
+
+    /**
+     * Devuelve el servicio al catalogo publico.
+     */
+    public void activar() {
+        activo = true;
+    }
 }

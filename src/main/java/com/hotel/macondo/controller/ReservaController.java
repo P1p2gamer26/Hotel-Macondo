@@ -11,6 +11,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.hotel.macondo.entities.Cliente;
 import com.hotel.macondo.service.ClienteService;
+import com.hotel.macondo.service.ReservaService;
 
 /**
  * Expone las reservas privadas de un cliente identificado en la URL.
@@ -22,12 +23,15 @@ public class ReservaController {
     @Autowired
     private ClienteService clienteService;
 
+    @Autowired
+    private ReservaService reservaService;
+
     /** Muestra las reservas activas y futuras que pertenecen al cliente. */
     @GetMapping("/reservas")
     public String reservasActivas(@PathVariable Integer id, Model model) {
         Cliente cliente = obtenerCliente(id);
         model.addAttribute("cliente", cliente);
-        model.addAttribute("reservas", cliente.verReservasActivas());
+        model.addAttribute("reservas", reservaService.buscarActivasDeCliente(cliente));
         return "cliente/reservas_activas";
     }
 
@@ -36,7 +40,7 @@ public class ReservaController {
     public String historialReservas(@PathVariable Integer id, Model model) {
         Cliente cliente = obtenerCliente(id);
         model.addAttribute("cliente", cliente);
-        model.addAttribute("historial", cliente.verHistorialReservas());
+        model.addAttribute("historial", reservaService.buscarHistorialDeCliente(cliente));
         return "cliente/historial_reservas";
     }
 

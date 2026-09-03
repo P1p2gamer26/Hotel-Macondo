@@ -41,6 +41,25 @@ public class OperadorServiceImpl implements OperadorService {
 
     /** {@inheritDoc} */
     @Override
+    public long contarActivos() {
+        return repository.findAll().stream()
+                .filter(operador -> Boolean.TRUE.equals(operador.getActivo()))
+                .count();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Operador cambiarEstado(Integer id) {
+        Operador operador = repository.findById(id);
+        if (operador == null) {
+            return null;
+        }
+        operador.setActivo(!Boolean.TRUE.equals(operador.getActivo()));
+        return repository.save(operador);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public void eliminar(Integer id) {
         repository.delete(id);
     }

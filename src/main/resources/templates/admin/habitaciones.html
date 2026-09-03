@@ -256,6 +256,13 @@
         </div>
         </div>
 
+        <!-- Aviso cuando el guardado fue rechazado por una regla de negocio -->
+        <div
+          class="mb-4 rounded-lg border border-red-200 bg-red-50 px-5 py-4 text-red-700"
+          th:if="${errorHabitacion != null}"
+          th:text="${errorHabitacion}"
+        ></div>
+
         <!-- Tabla de habitaciones -->
         <div class="bg-white rounded-2xl shadow-sm overflow-x-auto">
           <table class="w-full text-left min-w-[960px]">
@@ -300,7 +307,7 @@
                 <td class="px-6 py-4">
                   <span
                     class="rounded-full px-3 py-1 text-xs font-bold bg-[var(--crema)] text-[var(--azul)]"
-                    th:text="${h.tipoHabitacion.nombre}"
+                    th:text="${h.tipoHabitacion != null} ? ${h.tipoHabitacion.nombre} : 'Sin tipo'"
                   ></span>
                 </td>
                 <td class="px-6 py-4" th:text="${h.numero}"></td>
@@ -331,7 +338,7 @@
                     class="js-editar ml-4 text-[var(--azul)] hover:underline font-medium"
                     type="button"
                     th:data-id="${h.id}"
-                    th:data-tipo="${h.tipoHabitacion.id}"
+                    th:data-tipo="${h.tipoHabitacion != null} ? ${h.tipoHabitacion.id} : ''"
                     th:data-nombre="${h.nombre}"
                     th:data-etiqueta="${h.etiqueta}"
                     th:data-descripcion="${h.descripcion}"
