@@ -54,4 +54,12 @@ public class ServicioServiceImpl implements ServicioService {
                 .limit(limite)
                 .toList();
     }
+
+    @Override
+    public List<Servicio> obtenerRecomendaciones(int limite) {
+        return repository.findAll().stream()
+                .filter(Servicio::isActivo)
+                .limit(limite)
+                .toList();
+    }
 }

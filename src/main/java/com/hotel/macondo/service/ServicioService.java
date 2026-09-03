@@ -21,4 +21,6 @@ public interface ServicioService {
 
     // Obtiene servicios recomendados/relacionados activos excluyendo el actual
     List<Servicio> obtenerRelacionados(Integer servicioActualId, int limite);
+
+    List<Servicio> obtenerRecomendaciones(int limite);
 }
