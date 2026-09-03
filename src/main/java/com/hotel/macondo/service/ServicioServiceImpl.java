@@ -1,6 +1,8 @@
 package com.hotel.macondo.service;
 
 import java.util.Collection;
+import java.util.Comparator;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,23 +15,43 @@ public class ServicioServiceImpl implements ServicioService {
 
     private final ServicioRepository repository;
 
-    /**
-     * Crea el servicio con su repositorio de servicios.
-     */
     @Autowired
     public ServicioServiceImpl(ServicioRepository repository) {
         this.repository = repository;
     }
 
-    /** {@inheritDoc} */
     @Override
     public Collection<Servicio> buscarTodos() {
         return repository.findAll();
     }
 
-    /** {@inheritDoc} */
     @Override
     public Servicio buscarPorId(Integer id) {
         return repository.findById(id);
+    }
+
+    @Override
+    public List<Servicio> obtenerCatalogoActivo() {
+        return repository.findAll().stream()
+                .filter(Servicio::isActivo)
+                .sorted(Comparator.comparing(Servicio::getId))
+                .toList();
+    }
+
+    @Override
+    public List<String> obtenerCategoriasDisponibles() {
+        return obtenerCatalogoActivo().stream()
+                .map(Servicio::getCategoria)
+                .distinct()
+                .toList();
+    }
+
+    @Override
+    public List<Servicio> obtenerRelacionados(Integer servicioActualId, int limite) {
+        return repository.findAll().stream()
+                .filter(Servicio::isActivo)
+                .filter(item -> !item.getId().equals(servicioActualId))
+                .limit(limite)
+                .toList();
     }
 }
