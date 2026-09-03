@@ -26,25 +26,6 @@ public class Habitacion {
     private TipoHabitacion tipoHabitacion;
 
     /**
-     * Conserva el constructor usado por los datos de la interfaz actual.
-     */
-    public Habitacion(Integer id, String nombre, String etiqueta, String descripcion,
-            long precio, int capacidad, String imagen) {
-        this.id = id;
-        this.nombre = nombre;
-        this.etiqueta = etiqueta;
-        this.descripcion = descripcion;
-        this.precio = precio;
-        this.capacidad = capacidad;
-        this.imagen = imagen;
-        this.numero = String.valueOf(id);
-        this.estado = "DISPONIBLE";
-        this.piso = 1;
-        this.tipoHabitacion = new TipoHabitacion(id, nombre, descripcion,
-                BigDecimal.valueOf(precio), capacidad);
-    }
-
-    /**
      * Crea una habitacion a partir de los atributos definidos por el dominio.
      */
     public Habitacion(String numero, String estado, Integer piso,
@@ -92,6 +73,14 @@ public class Habitacion {
     }
 
     /**
+     * Indica si la habitacion esta habilitada para recibir reservas. El
+     * significado del estado vive aqui y no en las capas que lo consultan.
+     */
+    public boolean estaHabilitada() {
+        return "DISPONIBLE".equals(estado);
+    }
+
+    /**
      * Calcula el costo de la habitacion para una cantidad de noches.
      */
     public BigDecimal calcularCosto(long noches) {
@@ -105,7 +94,7 @@ public class Habitacion {
      * la habitacion no mantiene una referencia inversa a ellas.
      */
     public boolean estaDisponible(LocalDate fechaInicio, LocalDate fechaFin) {
-        if (!"DISPONIBLE".equals(estado) || fechaInicio == null || fechaFin == null
+        if (!estaHabilitada() || fechaInicio == null || fechaFin == null
                 || !fechaInicio.isBefore(fechaFin)) {
             return false;
         }
