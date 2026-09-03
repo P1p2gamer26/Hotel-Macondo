@@ -1,7 +1,6 @@
 package com.hotel.macondo.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -9,12 +8,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.server.ResponseStatusException;
 
 import com.hotel.macondo.entities.Cliente;
-import com.hotel.macondo.entities.Usuario;
 import com.hotel.macondo.service.ClienteService;
-import com.hotel.macondo.service.UsuarioService;
+import com.hotel.macondo.service.CuentaClienteService;
 
 /**
  * Gestiona el perfil del cliente indicado en la ruta privada.
@@ -27,39 +24,23 @@ public class PerfilController {
     private ClienteService clienteService;
 
     @Autowired
-    private UsuarioService usuarioService;
+    private CuentaClienteService cuentaClienteService;
 
     /** Renderiza el perfil del cliente solicitado. */
     @GetMapping("/perfil")
     public String mostrarPerfil(@PathVariable Integer id, Model model) {
-        model.addAttribute("cliente", obtenerCliente(id));
+        Cliente cliente = clienteService.buscarPorId(id);
+        model.addAttribute("cliente", cliente);
         return "cliente/perfil_cliente";
     }
 
     /** Actualiza solamente los datos personales editables del cliente. */
     @PostMapping("/perfil")
     public String actualizarPerfil(@PathVariable Integer id, Cliente cliente, Model model) {
-        Cliente existente = obtenerCliente(id);
-        // Obtenemos el usuario asociado al cliente para modificarlo
-        String correPrevio = existente.getCorreo();
-        String correoNuevo = cliente.getCorreo();
-        Usuario usuarioAsociado = usuarioService.buscarPorCorreo(correPrevio);
+        
+        cuentaClienteService.actualizarPerfil(id, cliente);
 
-        if(correoNuevo.equals("") || correoNuevo == null){
-            model.addAttribute("error","El nuevo correo no puede ser nulo o vacio");
-        }
-
-        if(!correPrevio.equals(correoNuevo)){
-            model.addAttribute("error","El nuevo correo no puede ser igual al anterior");
-        }
-
-        // Actualiza los datos del cliente
-        clienteService.actualizarInformacion(existente, cliente);
-
-        // Se cambia el correo de la cuenta asociada al cliente
-        usuarioService.actualizarCorreo(correPrevio, correoNuevo);
-
-        return "redirect:/cliente/" + id + "/perfil?exito=true";
+        return "redirect:/cliente/" + id + "/perfil";
     }
 
     /** Actualiza la contraseña del usuario asociado al cliente. */
@@ -70,41 +51,9 @@ public class PerfilController {
             @RequestParam("confirmarContrasena") String confirmarContrasena,
             Model model) {
 
-        // Toma de datos
-        Cliente cliente = obtenerCliente(id);
-        Usuario usuario = usuarioService.buscarPorCorreo(cliente.getCorreo());
-
-        // Verifica que la contraseña actual del cliente sea correcta antes de permitir el cambio.
-        if (usuario == null || !usuario.iniciarSesion(cliente.getCorreo(), contrasenaActual)) {
-            model.addAttribute("cliente", cliente);
-            model.addAttribute("errorPassword", "La contraseña actual es incorrecta");
-            return "cliente/perfil_cliente";
-        }
-
-        // Comprueba que la nueva contraseña no esté vacía ni contenga solo espacios.
-        if (nuevaContrasena == null || nuevaContrasena.isBlank()) {
-            model.addAttribute("cliente", cliente);
-            model.addAttribute("errorPassword", "La nueva contraseña no puede estar vacía");
-            return "cliente/perfil_cliente";
-        }
-
-        // Verifica que la nueva contraseña coincida con la contraseña de confirmación.
-        if (!nuevaContrasena.equals(confirmarContrasena)) {
-            model.addAttribute("cliente", cliente);
-            model.addAttribute("errorPassword", "La nueva contraseña y la confirmación no coinciden");
-            return "cliente/perfil_cliente";
-        }
-
-        usuarioService.actualizarContrasena(cliente.getCorreo(), nuevaContrasena);
-        return "redirect:/cliente/" + id + "/perfil?password=true";
+        cuentaClienteService.actualizarContrasena(id, contrasenaActual, nuevaContrasena, confirmarContrasena);
+        
+        return "redirect:/cliente/" + id + "/perfil";
     }
 
-    /** Centraliza la validacion del identificador usado por ambas operaciones. */
-    private Cliente obtenerCliente(Integer id) {
-        Cliente cliente = clienteService.buscarPorId(id);
-        if (cliente == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Cliente no encontrado");
-        }
-        return cliente;
-    }
 }
