@@ -40,7 +40,7 @@ public class Habitacion {
         this.numero = String.valueOf(id);
         this.estado = "DISPONIBLE";
         this.piso = 1;
-        this.tipoHabitacion = new TipoHabitacion(nombre, descripcion,
+        this.tipoHabitacion = new TipoHabitacion(id, nombre, descripcion,
                 BigDecimal.valueOf(precio), capacidad);
     }
 
@@ -60,16 +60,21 @@ public class Habitacion {
     }
 
     /**
-     * Sincroniza el tipo embebido con los datos comerciales de la habitacion.
+     * Aplica un tipo de habitacion a esta habitacion: guarda la referencia y
+     * deriva la descripcion, el precio y la capacidad directamente del tipo.
+     * El nombre NO se sobrescribe: es un dato comercial independiente que el
+     * administrador edita por separado (dos conceptos distintos).
      */
-    public void sincronizarTipo() {
-        if (tipoHabitacion == null) {
-            tipoHabitacion = new TipoHabitacion();
+    public void aplicarTipo(TipoHabitacion tipo) {
+        if (tipo == null) {
+            return;
         }
-        tipoHabitacion.setNombre(nombre);
-        tipoHabitacion.setDescripcion(descripcion);
-        tipoHabitacion.setPrecioNoche(BigDecimal.valueOf(precio));
-        tipoHabitacion.setCapacidadPersonas(capacidad);
+        this.tipoHabitacion = tipo;
+        this.descripcion = tipo.getDescripcion();
+        this.precio = tipo.getPrecioNoche() == null ? 0L
+                : tipo.getPrecioNoche().longValue();
+        this.capacidad = tipo.getCapacidadPersonas() == null ? 0
+                : tipo.getCapacidadPersonas();
     }
 
     /**

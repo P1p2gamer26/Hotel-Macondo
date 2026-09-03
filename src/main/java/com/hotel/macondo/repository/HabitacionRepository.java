@@ -19,7 +19,8 @@ public class HabitacionRepository {
     private Map<Integer, Habitacion> data = new LinkedHashMap<>();
     private int siguienteId = 5;
 
-    /** Carga las habitaciones de prueba del catalogo. */
+    /** Carga las habitaciones de prueba del catalogo.
+     * mas raro q tenia una etiqueta ahhhhh */
     public HabitacionRepository() {
         data.put(1, new Habitacion(1, "Normal", "ACOGEDORA",
                 "Refugio íntimo con vista al jardín tropical. Cama queen, aire acondicionado y todo el confort que necesitas.",
@@ -68,12 +69,12 @@ public class HabitacionRepository {
 
     /**
      * Crea o actualiza una habitacion en memoria.
+     *
      */
     public Habitacion save(Habitacion habitacion) {
         if (habitacion.getId() == null) {
             habitacion.setId(siguienteId++);
         }
-        habitacion.sincronizarTipo();
         data.put(habitacion.getId(), habitacion);
         return habitacion;
     }
