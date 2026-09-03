@@ -53,10 +53,37 @@ public class HabitacionServiceImpl implements HabitacionService {
 
     /** {@inheritDoc} */
     @Override
+    public long contarDisponibles() {
+        return repository.findAll().stream()
+                .filter(Habitacion::estaHabilitada)
+                .count();
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public Habitacion guardar(Habitacion habitacion, Integer idTipo) {
-        if (idTipo != null) {
-            TipoHabitacion tipo = tipoHabitacionRepository.findById(idTipo);
-            habitacion.aplicarTipo(tipo);
+        if (idTipo == null) {
+            return null;
+        }
+        TipoHabitacion tipo = tipoHabitacionRepository.findById(idTipo);
+        if (tipo == null) {
+            return null;
+        }
+        habitacion.aplicarTipo(tipo);
+        return repository.save(habitacion);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Habitacion cambiarEstado(Integer id) {
+        Habitacion habitacion = repository.findById(id);
+        if (habitacion == null) {
+            return null;
+        }
+        if (habitacion.estaHabilitada()) {
+            habitacion.deshabilitar();
+        } else {
+            habitacion.habilitar();
         }
         return repository.save(habitacion);
     }
@@ -85,10 +112,7 @@ public class HabitacionServiceImpl implements HabitacionService {
         return repository.findAll().stream()
                 .anyMatch(habitacion -> habitacion.getTipoHabitacion() != null
                         && idTipo.equals(habitacion.getTipoHabitacion().getId()));
-    } /**
-     *No nos permite borrar la habitación a pesar de que tenga un tipo ya
-     */
-
+    }
 
     /** {@inheritDoc} */
     @Override
