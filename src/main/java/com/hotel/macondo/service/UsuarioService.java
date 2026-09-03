@@ -14,11 +14,17 @@ public interface UsuarioService {
     /** Busca un usuario por correo. */
     Usuario buscarPorCorreo(String correo);
 
+    /** Valida que un correo se pueda usar. */
+    boolean validarCorreo(String correo);
+
     /** Valida las credenciales y retorna el usuario autenticado. */
     Usuario autenticar(String correo, String contrasena);
 
     /** Registra un usuario cuando el correo no esta en uso. */
     Usuario registrar(Usuario usuario);
+
+    /** Registrar a un usuario con el rol de cliente. */
+    Usuario registrarCliente(Cliente cliente, String contraseña);
 
     /** Actualiza la contraseña asociada al correo indicado. */
     Usuario actualizarContrasena(String correo, String nuevaContrasena);

@@ -74,7 +74,6 @@ public class AuthController {
         Usuario usuario = serviceUsuario.autenticar(correo, contrasena);
 
         if (usuario == null) {
-            model.addAttribute("error", "Correo o contraseña incorrectos");
             return "login";
         }
 
@@ -101,38 +100,23 @@ public class AuthController {
 
         // Validacion y estandarizacion del correo
         String correo = clienteNuevo.getCorreo() != null
-        ? clienteNuevo.getCorreo().trim().toLowerCase()
-        : null;
+        ? clienteNuevo.getCorreo().trim().toLowerCase() // Si no es null entonces se estandariza
+        : null; // Si es null entonces se deja como null
 
-        // Confirmacion de que el correo no es nulo
-        if( correo == null || correo.isBlank()){
-            model.addAttribute("error","El correo no puede ser vacio");
-            return "registro";
-        }
-
-        // Confirmacion de que el correo no esta vinculado a otro usuario
-        if(serviceUsuario.buscarPorCorreo(correo) != null){
-            model.addAttribute("error","Este correo ya esta en uso");
+        // Valida que el correo no este en uso
+        if(!serviceUsuario.validarCorreo(correo)){
             return "registro";
         }
 
         // Guarda el cliente en el repository y crea una copia que tiene el id asignado
         Cliente clienteGuardado = serviceCliente.guardar(clienteNuevo);
 
-        // Crea el usuario relacionado al cliente
-        Usuario usuario = new Usuario();
-        usuario.setId(clienteGuardado.getId());
-        usuario.setCorreo(clienteGuardado.getCorreo());
-        usuario.setContrasena(contrasena);
-        usuario.setRol(Rol.CLIENTE);
-
         // Guarda al usuario en el repository
-        Usuario usuarioGuardado = serviceUsuario.registrar(usuario);
+        Usuario usuarioGuardado = serviceUsuario.registrarCliente(clienteGuardado, contrasena);
 
         // Confirmacion de que la creacion del usuario
         if (usuarioGuardado == null) {
             serviceCliente.eliminar(clienteGuardado.getId());
-            model.addAttribute("error", "No se pudo crear la cuenta asociada");
             return "registro";
         }
 

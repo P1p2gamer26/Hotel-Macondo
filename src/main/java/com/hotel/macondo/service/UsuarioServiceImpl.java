@@ -36,6 +36,12 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     /** {@inheritDoc} */
     @Override
+    public boolean validarCorreo(String correo){
+        return correo != null && correo.trim().isBlank() == false && repository.findByCorreo(correo) == null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public Usuario autenticar(String correo, String contrasena) {
         Usuario usuario = repository.findByCorreo(correo);
         return usuario != null && usuario.iniciarSesion(correo, contrasena)
@@ -51,6 +57,21 @@ public class UsuarioServiceImpl implements UsuarioService {
             return null;
         }
         return repository.save(usuario);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Usuario registrarCliente(Cliente cliente, String contraseña) {
+        if (cliente == null || cliente.getCorreo() == null || contraseña == null) {
+            return null;
+        }
+
+        Usuario usuario = new Usuario();
+        usuario.setCorreo(cliente.getCorreo());
+        usuario.setContrasena(contraseña);
+        usuario.setRol(Rol.CLIENTE);
+        
+        return registrar(usuario);
     }
 
     /** {@inheritDoc} */
