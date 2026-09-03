@@ -42,6 +42,12 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     /** {@inheritDoc} */
     @Override
+    public boolean validarContrasena(String contrasena){
+        return contrasena != null && contrasena.isBlank() == false;
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public Usuario autenticar(String correo, String contrasena) {
         Usuario usuario = repository.findByCorreo(correo);
         return usuario != null && usuario.iniciarSesion(correo, contrasena)

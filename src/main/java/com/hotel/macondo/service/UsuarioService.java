@@ -17,6 +17,9 @@ public interface UsuarioService {
     /** Valida que un correo se pueda usar. */
     boolean validarCorreo(String correo);
 
+    /** Valida que una contraseña se pueda usar. */
+    boolean validarContrasena(String contrasena);
+
     /** Valida las credenciales y retorna el usuario autenticado. */
     Usuario autenticar(String correo, String contrasena);
 
