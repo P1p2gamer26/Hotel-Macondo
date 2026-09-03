@@ -116,14 +116,29 @@ class AdminControllerTest {
 
     @Test
     void alternaDisponibilidadDeHabitacion() throws Exception {
-        Habitacion habitacion = habitacionService.buscarPorId(1);
-
+        // Se reconsulta despues de cada POST: si el servicio dejara de
+        // persistir el cambio, el test lo detecta.
         mockMvc.perform(post("/admin/habitaciones/{id}/estado", 1))
                 .andExpect(redirectedUrl("/admin/habitaciones"));
-        assertEquals("NO_DISPONIBLE", habitacion.getEstado());
+        assertEquals("NO_DISPONIBLE", habitacionService.buscarPorId(1).getEstado());
 
         mockMvc.perform(post("/admin/habitaciones/{id}/estado", 1));
-        assertEquals("DISPONIBLE", habitacion.getEstado());
+        assertEquals("DISPONIBLE", habitacionService.buscarPorId(1).getEstado());
+    }
+
+    @Test
+    void noGuardaHabitacionSinTipo() throws Exception {
+        int iniciales = habitacionService.buscarTodas().size();
+
+        mockMvc.perform(post("/admin/habitaciones/guardar")
+                .param("nombre", "Sin tipo")
+                .param("numero", "999")
+                .param("estado", "DISPONIBLE")
+                .param("piso", "9"))
+                .andExpect(redirectedUrl("/admin/habitaciones"))
+                .andExpect(flash().attributeExists("errorHabitacion"));
+
+        assertEquals(iniciales, habitacionService.buscarTodas().size());
     }
 
     @Test
