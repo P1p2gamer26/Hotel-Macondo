@@ -10,9 +10,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.hotel.macondo.entities.Cliente;
-import com.hotel.macondo.entities.Usuario;
 import com.hotel.macondo.service.ClienteService;
-import com.hotel.macondo.service.UsuarioService;
+import com.hotel.macondo.service.CuentaClienteService;
 
 /**
  * Gestiona el perfil del cliente indicado en la ruta privada.
@@ -25,7 +24,7 @@ public class PerfilController {
     private ClienteService clienteService;
 
     @Autowired
-    private UsuarioService usuarioService;
+    private CuentaClienteService cuentaClienteService;
 
     /** Renderiza el perfil del cliente solicitado. */
     @GetMapping("/perfil")
@@ -38,19 +37,8 @@ public class PerfilController {
     /** Actualiza solamente los datos personales editables del cliente. */
     @PostMapping("/perfil")
     public String actualizarPerfil(@PathVariable Integer id, Cliente cliente, Model model) {
-        Cliente existente = clienteService.buscarPorId(id); // Obtenemos el usuario asociado al cliente para modificarlo
-        String correPrevio = existente.getCorreo();
-        String correoNuevo = cliente.getCorreo();
-
-        if(!usuarioService.validarCorreo(correoNuevo)){
-            return "redirect:/cliente/" + id + "/perfil";
-        }
-
-        // Actualiza los datos del cliente
-        clienteService.actualizarInformacion(existente, cliente);
-
-        // Se cambia el correo de la cuenta asociada al cliente
-        usuarioService.actualizarCorreo(correPrevio, correoNuevo);
+        
+        cuentaClienteService.actualizarPerfil(id, cliente);
 
         return "redirect:/cliente/" + id + "/perfil";
     }
@@ -63,20 +51,9 @@ public class PerfilController {
             @RequestParam("confirmarContrasena") String confirmarContrasena,
             Model model) {
 
-        // Toma de datos
-        Cliente cliente = clienteService.buscarPorId(id);
-        Usuario usuario = usuarioService.buscarPorCorreo(cliente.getCorreo());
-
-        // Valida que la contraseña actual sea correcta, que la nueva contraseña sea valida y que coincida con la confirmacion
-        if (!usuario.iniciarSesion(cliente.getCorreo(), contrasenaActual) 
-            || !usuarioService.validarContrasena(nuevaContrasena) 
-            || !nuevaContrasena.equals(confirmarContrasena)) {
-            model.addAttribute("cliente", cliente);
-            return "cliente/perfil_cliente";
-        }
-
-        usuarioService.actualizarContrasena(cliente.getCorreo(), nuevaContrasena);
-        return "redirect:/cliente/" + id + "/perfil?password=true";
+        cuentaClienteService.actualizarContrasena(id, contrasenaActual, nuevaContrasena, confirmarContrasena);
+        
+        return "redirect:/cliente/" + id + "/perfil";
     }
 
 }

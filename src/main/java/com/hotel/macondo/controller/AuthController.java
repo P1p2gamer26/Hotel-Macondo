@@ -12,7 +12,7 @@ import com.hotel.macondo.entities.Rol;
 import com.hotel.macondo.entities.Usuario;
 import com.hotel.macondo.service.UsuarioService;
 import com.hotel.macondo.entities.Cliente;
-import com.hotel.macondo.service.ClienteService;
+import com.hotel.macondo.service.CuentaClienteService;
 
 @Controller
 public class AuthController {
@@ -20,7 +20,7 @@ public class AuthController {
     @Autowired
     private UsuarioService serviceUsuario;
     @Autowired
-    private ClienteService serviceCliente;
+    private CuentaClienteService cuentaClienteService;
 
     /**
      * Muestra el formulario de inicio de sesion.
@@ -54,10 +54,8 @@ public class AuthController {
     public String mostrarRegistro(Model model) {
         // Crea un cliente vacio que se llenara con la informacion del formulario
         Cliente cliente = new Cliente(null, "", "", "", "", "");
-
         // Le pasa el objeto cliente al model para que se pueda llenar con el formulario
         model.addAttribute("cliente", cliente);
-
         // Redirecciona a la pagina con el formulario
         return "registro";
     }
@@ -98,26 +96,8 @@ public class AuthController {
     @PostMapping("/registro")
     public String agregarCliente(@ModelAttribute("cliente") Cliente clienteNuevo, @RequestParam("contrasena") String contrasena, Model model){
 
-        // Validacion y estandarizacion del correo
-        String correo = clienteNuevo.getCorreo() != null
-        ? clienteNuevo.getCorreo().trim().toLowerCase() // Si no es null entonces se estandariza
-        : null; // Si es null entonces se deja como null
-
-        // Valida que el correo no este en uso
-        if(!serviceUsuario.validarCorreo(correo)){
-            return "registro";
-        }
-
-        // Guarda el cliente en el repository y crea una copia que tiene el id asignado
-        Cliente clienteGuardado = serviceCliente.guardar(clienteNuevo);
-
-        // Guarda al usuario en el repository
-        Usuario usuarioGuardado = serviceUsuario.registrarCliente(clienteGuardado, contrasena);
-
-        // Confirmacion de que la creacion del usuario
-        if (usuarioGuardado == null) {
-            serviceCliente.eliminar(clienteGuardado.getId());
-            return "registro";
+        if (!cuentaClienteService.crearCuenta(clienteNuevo, contrasena)) {
+            return "registro"; // Si la creacion de la cuenta falla, redirige al formulario de registro
         }
 
         // Cuando se termina de crear la cuenta del cliente se redirecciona a la pagina de su cuenta
