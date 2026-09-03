@@ -4,13 +4,18 @@ import java.util.Collection;
 
 import com.hotel.macondo.entities.Habitacion;
 import com.hotel.macondo.entities.TipoHabitacion;
+import com.hotel.macondo.exceptions.RecursoNoEncontradoException;
 
 public interface HabitacionService {
 
     /** Retorna todas las habitaciones disponibles en el catalogo. */
     Collection<Habitacion> buscarTodas();
 
-    /** Busca una habitacion por su identificador. */
+    /**
+     * Busca una habitacion por su identificador.
+     *
+     * @throws RecursoNoEncontradoException si no existe una habitacion con ese id
+     */
     Habitacion buscarPorId(Integer id);
 
     /** Busca una habitacion por su nombre comercial. */
