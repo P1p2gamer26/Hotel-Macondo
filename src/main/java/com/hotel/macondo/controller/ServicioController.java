@@ -29,7 +29,7 @@ public class ServicioController {
 
     /** Construye el detalle publico de un servicio activo. */
     @GetMapping("/{id}")
-    public String mostrarDetalle(@PathVariable Integer id, Model model) {
+    public String mostrarDetalle(@PathVariable Long id, Model model) {
         Servicio servicio = service.buscarPorId(id);
         // Un servicio inexistente o retirado del catalogo no tiene ficha publica.
         if (servicio == null || !servicio.isActivo()) {

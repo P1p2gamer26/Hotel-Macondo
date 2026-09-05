@@ -33,7 +33,7 @@ public class CuentaServiceImpl implements CuentaService {
 
     /** {@inheritDoc} */
     @Override
-    public Cuenta buscarPorId(Integer id) {
+    public Cuenta buscarPorId(Long id) {
         return repository.findById(id);
     }
 
@@ -45,20 +45,20 @@ public class CuentaServiceImpl implements CuentaService {
 
     /** {@inheritDoc} */
     @Override
-    public void eliminar(Integer id) {
+    public void eliminar(Long id) {
         repository.delete(id);
     }
 
     /** {@inheritDoc} */
     @Override
-    public DetalleCuenta agregarServicio(Integer cuentaId, Servicio servicio, int cantidad) {
+    public DetalleCuenta agregarServicio(Long cuentaId, Servicio servicio, int cantidad) {
         Cuenta cuenta = repository.findById(cuentaId);
         return cuenta == null ? null : cuenta.agregarItem(servicio, cantidad);
     }
 
     /** {@inheritDoc} */
     @Override
-    public Pago pagar(Integer cuentaId, BigDecimal monto, String metodoPago) {
+    public Pago pagar(Long cuentaId, BigDecimal monto, String metodoPago) {
         Cuenta cuenta = repository.findById(cuentaId);
         return cuenta == null ? null : cuenta.pagar(monto, metodoPago);
     }

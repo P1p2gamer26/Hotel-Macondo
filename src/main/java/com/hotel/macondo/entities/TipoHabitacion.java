@@ -1,39 +1,59 @@
 package com.hotel.macondo.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import java.math.BigDecimal;
-
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
-@Data
-@NoArgsConstructor
+@Getter
+@Setter
+@ToString(exclude = "habitaciones")
 @AllArgsConstructor
+@NoArgsConstructor
+@Entity
 public class TipoHabitacion {
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    private Integer id;
-    private String nombre;
-    private String descripcion;
-    private BigDecimal precioNoche;
-    private Integer capacidadPersonas;
+  @Column(nullable = false, unique = true, length = 50)
+  private String nombre;
 
-    /**
-     * Constructor auxiliar para crear instancias antes de asignar ID.
-     */
-    public TipoHabitacion(String nombre, String descripcion, BigDecimal precioNoche, Integer capacidadPersonas) {
-        this.nombre = nombre;
-        this.descripcion = descripcion;
-        this.precioNoche = precioNoche;
-        this.capacidadPersonas = capacidadPersonas;
-    }
+  @Column(nullable = false, length = 2000)
+  private String descripcion;
 
-    /**
-     * Calcula el costo total para una cantidad determinada de noches.
-     */
-    public BigDecimal calcularCosto(long noches) {
-        if (precioNoche == null || noches <= 0) {
-            return BigDecimal.ZERO;
-        }
-        return precioNoche.multiply(BigDecimal.valueOf(noches));
-    }
+  @Column(nullable = false, precision = 12, scale = 2)
+  private BigDecimal precioNoche;
+
+  @Column(nullable = false)
+  private Integer capacidadPersonas;
+
+  @JsonIgnore
+  @OneToMany(mappedBy = "tipoHabitacion")
+  private List<Habitacion> habitaciones = new ArrayList<>();
+
+  public TipoHabitacion(
+      String nombre, String descripcion, BigDecimal precioNoche, Integer capacidadPersonas) {
+    this.nombre = nombre;
+    this.descripcion = descripcion;
+    this.precioNoche = precioNoche;
+    this.capacidadPersonas = capacidadPersonas;
+  }
+
+  public BigDecimal calcularCosto(long noches) {
+    return precioNoche == null || noches <= 0
+        ? BigDecimal.ZERO
+        : precioNoche.multiply(BigDecimal.valueOf(noches));
+  }
 }

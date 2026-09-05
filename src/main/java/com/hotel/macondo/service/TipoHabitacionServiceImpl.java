@@ -27,7 +27,7 @@ public class TipoHabitacionServiceImpl implements TipoHabitacionService {
     }
 
     @Override
-    public TipoHabitacion buscarPorId(Integer id) {
+    public TipoHabitacion buscarPorId(Long id) {
         return repository.findById(id);
     }
 
@@ -39,7 +39,7 @@ public class TipoHabitacionServiceImpl implements TipoHabitacionService {
     }
 
     @Override
-    public boolean eliminar(Integer id) {
+    public boolean eliminar(Long id) {
         if (habitacionService.existeHabitacionConTipo(id)) {
             return false;
         }

@@ -12,14 +12,16 @@ import com.hotel.macondo.entities.Cuenta;
 @Repository
 public class CuentaRepository {
 
-    private final Map<Integer, Cuenta> data = new LinkedHashMap<>();
+    private final Map<Long, Cuenta> data = new LinkedHashMap<>();
     private int siguienteId = 2;
 
     /**
      * Carga una cuenta vacia para verificar el flujo temporal.
      */
     public CuentaRepository() {
-        data.put(1, new Cuenta(1, null));
+        Cuenta cuenta = new Cuenta();
+        cuenta.setId(1L);
+        data.put(1L, cuenta);
     }
 
     /**
@@ -32,7 +34,7 @@ public class CuentaRepository {
     /**
      * Busca una cuenta por identificador.
      */
-    public Cuenta findById(Integer id) {
+    public Cuenta findById(Long id) {
         return data.get(id);
     }
 
@@ -41,7 +43,7 @@ public class CuentaRepository {
      */
     public Cuenta save(Cuenta cuenta) {
         if (cuenta.getId() == null) {
-            cuenta.setId(siguienteId++);
+            cuenta.setId((long) siguienteId++);
         }
         data.put(cuenta.getId(), cuenta);
         return cuenta;
@@ -50,7 +52,7 @@ public class CuentaRepository {
     /**
      * Elimina una cuenta por identificador.
      */
-    public void delete(Integer id) {
+    public void delete(Long id) {
         data.remove(id);
     }
 }

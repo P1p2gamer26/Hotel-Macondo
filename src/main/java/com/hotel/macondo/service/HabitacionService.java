@@ -11,7 +11,7 @@ public interface HabitacionService {
     Collection<Habitacion> buscarTodas();
 
     /** Busca una habitacion por su identificador. */
-    Habitacion buscarPorId(Integer id);
+    Habitacion buscarPorId(Long id);
 
     /** Busca una habitacion por su nombre comercial. */
     Habitacion buscarPorNombre(String nombre);
@@ -30,13 +30,13 @@ public interface HabitacionService {
      * Toda habitacion debe tener un tipo valido: si el identificador es nulo
      * o no corresponde a ningun tipo, no se guarda nada y retorna null.
      */
-    Habitacion guardar(Habitacion habitacion, Integer idTipo);
+    Habitacion guardar(Habitacion habitacion, Long idTipo);
 
     /**
      * Invierte la disponibilidad de una habitacion: la pone en mantenimiento
      * o la devuelve al catalogo. Retorna null si la habitacion no existe.
      */
-    Habitacion cambiarEstado(Integer id);
+    Habitacion cambiarEstado(Long id);
 
     /**
      * Propaga los cambios de un tipo de habitacion a todas las habitaciones
@@ -47,8 +47,8 @@ public interface HabitacionService {
     /**
      * Indica si existe al menos una habitacion asignada al tipo indicado.
      */
-    boolean existeHabitacionConTipo(Integer idTipo);
+    boolean existeHabitacionConTipo(Long idTipo);
 
     /** Elimina una habitacion por identificador. */
-    void eliminar(Integer id);
+    void eliminar(Long id);
 }

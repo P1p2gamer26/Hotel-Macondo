@@ -8,7 +8,7 @@ public interface TipoHabitacionService {
 
     Collection<TipoHabitacion> buscarTodos();
 
-    TipoHabitacion buscarPorId(Integer id);
+    TipoHabitacion buscarPorId(Long id);
 
     TipoHabitacion guardar(TipoHabitacion tipo);
 
@@ -16,5 +16,5 @@ public interface TipoHabitacionService {
      * Elimina un tipo de habitacion solo si no hay habitaciones asignadas.
      * Devuelve {@code true} si se elimino y {@code false} en caso contrario.
      */
-    boolean eliminar(Integer id);
+    boolean eliminar(Long id);
 }

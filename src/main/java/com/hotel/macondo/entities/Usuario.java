@@ -1,46 +1,77 @@
 package com.hotel.macondo.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToOne;
 import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 
-@Data
+@Getter
+@Setter
+@ToString(exclude = {"contrasena", "cliente", "operador"})
 @AllArgsConstructor
 @NoArgsConstructor
+@Entity
 public class Usuario {
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    private Integer id;
-    private String correo;
+  @Column(nullable = false, unique = true, length = 255)
+  private String correo;
 
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
-    private String contrasena;
+  @Column(nullable = false, length = 255)
+  private String contrasena;
 
-    private Rol rol;
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false, length = 20)
+  private Rol rol;
 
-    /**
-     * Valida las credenciales usando los datos de este usuario.
-     */
-    public boolean iniciarSesion(String correo, String contrasena) {
-        return this.correo != null
-                && this.correo.equalsIgnoreCase(correo)
-                && this.contrasena != null
-                && this.contrasena.equals(contrasena);
-    }
+  @JsonIgnore
+  @OneToOne
+  private Cliente cliente;
 
-    /**
-     * Verifica si el usuario puede actuar con el rol solicitado.
-     */
-    public boolean tieneRol(Rol rolSolicitado) {
-        return rol != null && rol == rolSolicitado;
-    }
+  @JsonIgnore
+  @OneToOne(mappedBy = "usuario")
+  private Operador operador;
 
-    /**
-     * Actualiza el correo del usuario
-     */
-    public void actualizarCorreo(String correo){
-        this.correo = correo;
-    } 
+  public Usuario(String correo, String contrasena, Rol rol) {
+    this.correo = correo;
+    this.contrasena = contrasena;
+    this.rol = rol;
+  }
+
+  public void asignarCliente(Cliente cliente) {
+    this.cliente = cliente;
+    if (cliente != null && cliente.getUsuario() != this) cliente.asignarUsuario(this);
+  }
+
+  public void asignarOperador(Operador operador) {
+    this.operador = operador;
+    if (operador != null && operador.getUsuario() != this) operador.asignarUsuario(this);
+  }
+
+  public boolean iniciarSesion(String correo, String contrasena) {
+    return this.correo != null
+        && this.correo.equalsIgnoreCase(correo)
+        && this.contrasena != null
+        && this.contrasena.equals(contrasena);
+  }
+
+  public boolean tieneRol(Rol rolSolicitado) {
+    return rol != null && rol == rolSolicitado;
+  }
+
+  public void actualizarCorreo(String correo) {
+    this.correo = correo;
+  }
 }

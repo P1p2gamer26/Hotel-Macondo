@@ -12,7 +12,7 @@ public interface ClienteService {
     Collection<Cliente> buscarTodos();
 
     /** Busca un cliente por identificador. */
-    Cliente buscarPorId(Integer id);
+    Cliente buscarPorId(Long id);
 
     /** Busca un cliente por cedula. */
     Cliente buscarPorCedula(String cedula);
@@ -21,7 +21,7 @@ public interface ClienteService {
     Cliente guardar(Cliente cliente);
 
     /** Elimina un cliente por identificador. */
-    void eliminar(Integer id);
+    void eliminar(Long id);
 
     /** Actualiza toda la informacion del cliente */
     Cliente actualizarInformacion(Cliente cliente, Cliente informacion);

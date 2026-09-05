@@ -7,7 +7,8 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
+import java.time.LocalDateTime;
+import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,17 +66,29 @@ class MacondoApplicationTests {
     }
 
     @Test
-    void usuarioNoReferenciaPerfilesDeDominio() {
-        assertFalse(Arrays.stream(Usuario.class.getDeclaredFields())
-                .map(campo -> campo.getType())
-                .anyMatch(tipo -> tipo == Cliente.class || tipo == Operador.class));
+    void usuarioReferenciaSusPerfilesDeDominio() throws NoSuchFieldException {
+        assertEquals(Cliente.class,
+                Usuario.class.getDeclaredField("cliente").getType());
+        assertEquals(Operador.class,
+                Usuario.class.getDeclaredField("operador").getType());
     }
 
     @Test
     void cuentaCalculaYLiquidaSuSaldo() {
-        Servicio servicio = new Servicio(99, "Traslado", "Traslado local",
-                "Transporte", null, false, BigDecimal.valueOf(50000), true);
-        Cuenta cuenta = new Cuenta(99, null);
+        Servicio servicio = new Servicio(
+                "Traslado",
+                "Traslado local",
+                "Transporte",
+                null,
+                false,
+                BigDecimal.valueOf(50000),
+                true,
+                null,
+                null,
+                null,
+                List.of(),
+                List.of());
+        Cuenta cuenta = new Cuenta("ABIERTA", BigDecimal.ZERO, LocalDateTime.now());
 
         assertNotNull(cuenta.agregarItem(servicio, 2));
         assertEquals(0, BigDecimal.valueOf(100000).compareTo(cuenta.getTotal()));

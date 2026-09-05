@@ -41,7 +41,7 @@ public class CuentaClienteServiceImpl implements CuentaClienteService {
 
     /** {@inheritDoc} */
     @Override
-    public Boolean actualizarContrasena(Integer id, String contrasenaActual, String nuevaContrasena, String confirmarContrasena) {
+    public Boolean actualizarContrasena(Long id, String contrasenaActual, String nuevaContrasena, String confirmarContrasena) {
         Cliente cliente = clienteService.buscarPorId(id);
         if(cliente == null){
             return false;
@@ -63,7 +63,7 @@ public class CuentaClienteServiceImpl implements CuentaClienteService {
 
     /** {@inheritDoc} */
     @Override
-    public Boolean actualizarPerfil(Integer id, Cliente cliente) {
+    public Boolean actualizarPerfil(Long id, Cliente cliente) {
         Cliente existente = clienteService.buscarPorId(id); // Obtenemos el usuario asociado al cliente para modificarlo
         String correoPrevio = existente.getCorreo();
         String correoNuevo = cliente.getCorreo();
@@ -93,7 +93,7 @@ public class CuentaClienteServiceImpl implements CuentaClienteService {
 
     /** {@inheritDoc} */
     @Override
-    public Boolean eliminarCuenta(Integer id) {
+    public Boolean eliminarCuenta(Long id) {
         // Se busca el usuario asociado al cliente
         String correoUsuario = (clienteService.buscarPorId(id)).getCorreo();
 

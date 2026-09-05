@@ -29,7 +29,7 @@ public class OperadorServiceImpl implements OperadorService {
 
     /** {@inheritDoc} */
     @Override
-    public Operador buscarPorId(Integer id) {
+    public Operador buscarPorId(Long id) {
         return repository.findById(id);
     }
 
@@ -49,7 +49,7 @@ public class OperadorServiceImpl implements OperadorService {
 
     /** {@inheritDoc} */
     @Override
-    public Operador cambiarEstado(Integer id) {
+    public Operador cambiarEstado(Long id) {
         Operador operador = repository.findById(id);
         if (operador == null) {
             return null;
@@ -60,7 +60,7 @@ public class OperadorServiceImpl implements OperadorService {
 
     /** {@inheritDoc} */
     @Override
-    public void eliminar(Integer id) {
+    public void eliminar(Long id) {
         repository.delete(id);
     }
 }

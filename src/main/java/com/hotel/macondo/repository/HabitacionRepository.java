@@ -19,8 +19,8 @@ public class HabitacionRepository {
     // Base de datos falsa. Es LinkedHashMap y no HashMap porque el orden de
     // las habitaciones importa: en la landing deben salir de la mas economica
     // a la mas costosa, igual que en el diseño.
-    private final Map<Integer, Habitacion> data = new LinkedHashMap<>();
-    private int siguienteId = 5;
+    private final Map<Long, Habitacion> data = new LinkedHashMap<>();
+    private long siguienteId = 5L;
 
     /**
      * Carga las habitaciones de prueba del catalogo tomando los tipos del
@@ -29,25 +29,29 @@ public class HabitacionRepository {
      */
     @Autowired
     public HabitacionRepository(TipoHabitacionRepository tipoHabitacionRepository) {
-        sembrar(1, "ACOGEDORA", "/images/HabitacionNormal.avif",
-                tipoHabitacionRepository.findById(1));
-        sembrar(2, "POPULAR", "/images/HabitacionExecutive.avif",
-                tipoHabitacionRepository.findById(2));
-        sembrar(3, "EXCLUSIVA", "/images/HabitacionVIP.avif",
-                tipoHabitacionRepository.findById(3));
-        sembrar(4, "ÚNICO", "/images/HabitacionLuxury.avif",
-                tipoHabitacionRepository.findById(4));
+        sembrar(1L, "ACOGEDORA", "/images/HabitacionNormal.avif", tipoHabitacionRepository.findById(1L));
+        sembrar(2L, "POPULAR", "/images/HabitacionExecutive.avif", tipoHabitacionRepository.findById(2L));
+        sembrar(3L, "EXCLUSIVA", "/images/HabitacionVIP.avif", tipoHabitacionRepository.findById(3L));
+        sembrar(4L, "ÚNICO", "/images/HabitacionLuxury.avif", tipoHabitacionRepository.findById(4L));
     }
 
     /**
      * Registra una habitacion de prueba en el piso 1, disponible y con los
      * datos comerciales derivados de su tipo.
      */
-    private void sembrar(Integer id, String etiqueta, String imagen, TipoHabitacion tipo) {
-        Habitacion habitacion = new Habitacion(String.valueOf(id), "DISPONIBLE", 1, tipo);
+    private void sembrar(Long id, String etiqueta, String imagen, TipoHabitacion tipo) {
+        Habitacion habitacion = new Habitacion(
+                tipo.getNombre(),
+                etiqueta,
+                tipo.getDescripcion(),
+                tipo.getPrecioNoche(),
+                tipo.getCapacidadPersonas(),
+                imagen,
+                String.valueOf(id),
+                "DISPONIBLE",
+                1);
+        habitacion.aplicarTipo(tipo);
         habitacion.setId(id);
-        habitacion.setEtiqueta(etiqueta);
-        habitacion.setImagen(imagen);
         data.put(id, habitacion);
     }
 
@@ -57,7 +61,7 @@ public class HabitacionRepository {
     }
 
     /** Busca una habitacion por identificador. */
-    public Habitacion findById(Integer id) {
+    public Habitacion findById(Long id) {
         return data.get(id);
     }
 
@@ -96,7 +100,7 @@ public class HabitacionRepository {
     /**
      * Elimina una habitacion por identificador.
      */
-    public void delete(Integer id) {
+    public void delete(Long id) {
         data.remove(id);
     }
 

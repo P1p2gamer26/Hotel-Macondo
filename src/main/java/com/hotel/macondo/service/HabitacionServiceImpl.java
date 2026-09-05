@@ -35,7 +35,7 @@ public class HabitacionServiceImpl implements HabitacionService {
 
     /** {@inheritDoc} */
     @Override
-    public Habitacion buscarPorId(Integer id) {
+    public Habitacion buscarPorId(Long id) {
         return repository.findById(id);
     }
 
@@ -61,7 +61,7 @@ public class HabitacionServiceImpl implements HabitacionService {
 
     /** {@inheritDoc} */
     @Override
-    public Habitacion guardar(Habitacion habitacion, Integer idTipo) {
+    public Habitacion guardar(Habitacion habitacion, Long idTipo) {
         if (idTipo == null) {
             return null;
         }
@@ -75,7 +75,7 @@ public class HabitacionServiceImpl implements HabitacionService {
 
     /** {@inheritDoc} */
     @Override
-    public Habitacion cambiarEstado(Integer id) {
+    public Habitacion cambiarEstado(Long id) {
         Habitacion habitacion = repository.findById(id);
         if (habitacion == null) {
             return null;
@@ -105,7 +105,7 @@ public class HabitacionServiceImpl implements HabitacionService {
 
     /** {@inheritDoc} */
     @Override
-    public boolean existeHabitacionConTipo(Integer idTipo) {
+    public boolean existeHabitacionConTipo(Long idTipo) {
         if (idTipo == null) {
             return false;
         }
@@ -116,7 +116,7 @@ public class HabitacionServiceImpl implements HabitacionService {
 
     /** {@inheritDoc} */
     @Override
-    public void eliminar(Integer id) {
+    public void eliminar(Long id) {
         repository.delete(id);
     }
 }

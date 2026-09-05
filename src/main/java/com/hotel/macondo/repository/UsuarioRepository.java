@@ -20,14 +20,22 @@ public class UsuarioRepository {
      */
     public UsuarioRepository() {
         // --- ADMINISTRADORES (No tienen entidad propia, se manejan como Usuario) ---
-        save(new Usuario(99, "admin@macondo.com", "admin123", Rol.ADMINISTRADOR));
+        Usuario administrador = new Usuario("admin@macondo.com", "admin123", Rol.ADMINISTRADOR);
+        administrador.setId(99L);
+        save(administrador);
 
         // --- OPERADORES (Vinculado con Operador id: 1) ---
-        save(new Usuario(1, "operador@macondo.com", "operador123", Rol.OPERADOR));
+        Usuario operador = new Usuario("operador@macondo.com", "operador123", Rol.OPERADOR);
+        operador.setId(1L);
+        save(operador);
 
         // --- CLIENTES (Vinculados con los IDs reales de ClienteRepository) ---
-        save(new Usuario(1, "ana@macondo.com", "ana123", Rol.CLIENTE));
-        save(new Usuario(2, "luis@macondo.com", "luis123", Rol.CLIENTE));
+        Usuario ana = new Usuario("ana@macondo.com", "ana123", Rol.CLIENTE);
+        ana.setId(1L);
+        save(ana);
+        Usuario luis = new Usuario("luis@macondo.com", "luis123", Rol.CLIENTE);
+        luis.setId(2L);
+        save(luis);
     }
 
     public Collection<Usuario> findAll() {

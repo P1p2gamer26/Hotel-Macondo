@@ -66,7 +66,7 @@ public class OperadorController {
      */
 
     @GetMapping("/cuenta/{id}")
-    public String cuentaHabitacion(@PathVariable Integer id, Model model) {
+    public String cuentaHabitacion(@PathVariable Long id, Model model) {
         model.addAttribute("seccionActiva", "cuenta");
         return "operador/cuenta_habitacion";
     }

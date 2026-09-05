@@ -2,7 +2,6 @@ package com.hotel.macondo.repository;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -19,13 +18,13 @@ public class ReservaRepository {
     public ReservaRepository() {
         // Datos de prueba iniciales para simular la base de datos
         data.put("MHC-2025-001", new Reserva("MHC-2025-001", LocalDate.now(), LocalDate.now().plusDays(3), 2, "ACTIVA",
-                new BigDecimal("2850000"), new ArrayList<>()));
+                new BigDecimal("2850000")));
         data.put("MHC-2025-002", new Reserva("MHC-2025-002", LocalDate.now().plusDays(5), LocalDate.now().plusDays(8),
-                2, "CONFIRMADA", new BigDecimal("1740000"), new ArrayList<>()));
+                2, "CONFIRMADA", new BigDecimal("1740000")));
         data.put("MHC-2024-089", new Reserva("MHC-2024-089", LocalDate.now().minusDays(10),
-                LocalDate.now().minusDays(7), 1, "FINALIZADA", new BigDecimal("1050000"), new ArrayList<>()));
+                LocalDate.now().minusDays(7), 1, "FINALIZADA", new BigDecimal("1050000")));
         data.put("MHC-2023-211", new Reserva("MHC-2023-211", LocalDate.now().minusDays(30),
-                LocalDate.now().minusDays(25), 4, "CANCELADA", new BigDecimal("5700000"), new ArrayList<>()));
+                LocalDate.now().minusDays(25), 4, "CANCELADA", new BigDecimal("5700000")));
     }
 
     public Collection<Reserva> findAll() {

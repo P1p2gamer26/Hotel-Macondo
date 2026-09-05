@@ -12,7 +12,7 @@ public interface ServicioService {
     Collection<Servicio> buscarTodos();
 
     // Busca un servicio por identificador
-    Servicio buscarPorId(Integer id);
+    Servicio buscarPorId(Long id);
 
     // Retorna solo los servicios activos ordenados por ID para el catalogo publico
     List<Servicio> obtenerCatalogoActivo();
@@ -21,7 +21,7 @@ public interface ServicioService {
     List<String> obtenerCategoriasDisponibles();
 
     // Obtiene servicios recomendados/relacionados activos excluyendo el actual
-    List<Servicio> obtenerRelacionados(Integer servicioActualId, int limite);
+    List<Servicio> obtenerRelacionados(Long servicioActualId, int limite);
 
     List<Servicio> obtenerRecomendaciones(int limite);
 
@@ -32,11 +32,11 @@ public interface ServicioService {
      * Actualiza la informacion editable de un servicio y la persiste.
      * Retorna null si el servicio no existe.
      */
-    Servicio actualizarDatos(Integer id, String nombre, String categoria, BigDecimal precio);
+    Servicio actualizarDatos(Long id, String nombre, String categoria, BigDecimal precio);
 
     /**
      * Activa o desactiva un servicio del catalogo y persiste el cambio.
      * Retorna null si el servicio no existe.
      */
-    Servicio cambiarEstado(Integer id);
+    Servicio cambiarEstado(Long id);
 }

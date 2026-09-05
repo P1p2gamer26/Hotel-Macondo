@@ -13,20 +13,20 @@ import com.hotel.macondo.entities.TipoHabitacion;
 @Repository
 public class TipoHabitacionRepository {
 
-    private final Map<Integer, TipoHabitacion> data = new LinkedHashMap<>();
-    private int siguienteId = 5;
+    private final Map<Long, TipoHabitacion> data = new LinkedHashMap<>();
+    private long siguienteId = 5L;
 
     public TipoHabitacionRepository() {
-        data.put(1, new TipoHabitacion(1, "Normal",
+        data.put(1L, crearTipo(1L, "Normal",
                 "Refugio intimo con vista al jardin tropical, cama queen y aire acondicionado.",
                 BigDecimal.valueOf(350000), 2));
-        data.put(2, new TipoHabitacion(2, "Executive",
+        data.put(2L, crearTipo(2L, "Executive",
                 "Espacio amplio con sala de trabajo, banera de lujo y vista al mar Caribe.",
                 BigDecimal.valueOf(580000), 3));
-        data.put(3, new TipoHabitacion(3, "VIP",
+        data.put(3L, crearTipo(3L, "VIP",
                 "Suite boutique con terraza privada, jacuzzi exterior y servicio de mayordomo.",
                 BigDecimal.valueOf(950000), 4));
-        data.put(4, new TipoHabitacion(4, "Luxury",
+        data.put(4L, crearTipo(4L, "Luxury",
                 "Villa frente al mar con piscina privada y atencion personalizada 24 horas.",
                 BigDecimal.valueOf(1800000), 6));
     }
@@ -35,7 +35,7 @@ public class TipoHabitacionRepository {
         return List.copyOf(data.values());
     }
 
-    public TipoHabitacion findById(Integer id) {
+    public TipoHabitacion findById(Long id) {
         return data.get(id);
     }
 
@@ -47,7 +47,14 @@ public class TipoHabitacionRepository {
         return tipo;
     }
 
-    public void delete(Integer id) {
+    public void delete(Long id) {
         data.remove(id);
+    }
+
+    private TipoHabitacion crearTipo(Long id, String nombre, String descripcion,
+            BigDecimal precioNoche, Integer capacidadPersonas) {
+        TipoHabitacion tipo = new TipoHabitacion(nombre, descripcion, precioNoche, capacidadPersonas);
+        tipo.setId(id);
+        return tipo;
     }
 }

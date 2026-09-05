@@ -12,14 +12,16 @@ import com.hotel.macondo.entities.Operador;
 @Repository
 public class OperadorRepository {
 
-    private final Map<Integer, Operador> data = new LinkedHashMap<>();
+    private final Map<Long, Operador> data = new LinkedHashMap<>();
     private int siguienteId = 2;
 
     /**
      * Carga un operador de prueba para el almacenamiento temporal.
      */
     public OperadorRepository() {
-        data.put(1, new Operador(1, "Recepcion principal", true));
+        Operador operador = new Operador("Recepcion principal", true);
+        operador.setId(1L);
+        data.put(1L, operador);
     }
 
     /**
@@ -32,7 +34,7 @@ public class OperadorRepository {
     /**
      * Busca un operador por identificador.
      */
-    public Operador findById(Integer id) {
+    public Operador findById(Long id) {
         return data.get(id);
     }
 
@@ -41,7 +43,7 @@ public class OperadorRepository {
      */
     public Operador save(Operador operador) {
         if (operador.getId() == null) {
-            operador.setId(siguienteId++);
+            operador.setId((long) siguienteId++);
         }
         data.put(operador.getId(), operador);
         return operador;
@@ -50,7 +52,7 @@ public class OperadorRepository {
     /**
      * Elimina un operador por identificador.
      */
-    public void delete(Integer id) {
+    public void delete(Long id) {
         data.remove(id);
     }
 }

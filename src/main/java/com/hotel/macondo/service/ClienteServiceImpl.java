@@ -33,7 +33,7 @@ public class ClienteServiceImpl implements ClienteService {
 
     /** {@inheritDoc} */
     @Override
-    public Cliente buscarPorId(Integer id) {
+    public Cliente buscarPorId(Long id) {
         return repository.findById(id);
     }
 
@@ -51,7 +51,7 @@ public class ClienteServiceImpl implements ClienteService {
 
     /** {@inheritDoc} */
     @Override
-    public void eliminar(Integer id) {
+    public void eliminar(Long id) {
         repository.delete(id);
     }
 

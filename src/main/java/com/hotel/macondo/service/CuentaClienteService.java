@@ -6,9 +6,9 @@ public interface CuentaClienteService {
 
     Boolean crearCuenta(Cliente cliente, String contrasena);
 
-    Boolean actualizarContrasena(Integer id, String contrasenaActual, String nuevaContrasena, String confirmarContrasena);
+    Boolean actualizarContrasena(Long id, String contrasenaActual, String nuevaContrasena, String confirmarContrasena);
 
-    Boolean actualizarPerfil(Integer id, Cliente cliente);
+    Boolean actualizarPerfil(Long id, Cliente cliente);
 
-    Boolean eliminarCuenta(Integer id);
+    Boolean eliminarCuenta(Long id);
 }

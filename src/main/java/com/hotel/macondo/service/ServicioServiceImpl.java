@@ -27,7 +27,7 @@ public class ServicioServiceImpl implements ServicioService {
     }
 
     @Override
-    public Servicio buscarPorId(Integer id) {
+    public Servicio buscarPorId(Long id) {
         return repository.findById(id);
     }
 
@@ -48,7 +48,7 @@ public class ServicioServiceImpl implements ServicioService {
     }
 
     @Override
-    public List<Servicio> obtenerRelacionados(Integer servicioActualId, int limite) {
+    public List<Servicio> obtenerRelacionados(Long servicioActualId, int limite) {
         return obtenerCatalogoActivo().stream()
                 .filter(item -> !item.getId().equals(servicioActualId))
                 .limit(limite)
@@ -68,7 +68,7 @@ public class ServicioServiceImpl implements ServicioService {
     }
 
     @Override
-    public Servicio actualizarDatos(Integer id, String nombre, String categoria,
+    public Servicio actualizarDatos(Long id, String nombre, String categoria,
             BigDecimal precio) {
         Servicio servicio = repository.findById(id);
         if (servicio == null) {
@@ -79,7 +79,7 @@ public class ServicioServiceImpl implements ServicioService {
     }
 
     @Override
-    public Servicio cambiarEstado(Integer id) {
+    public Servicio cambiarEstado(Long id) {
         Servicio servicio = repository.findById(id);
         if (servicio == null) {
             return null;

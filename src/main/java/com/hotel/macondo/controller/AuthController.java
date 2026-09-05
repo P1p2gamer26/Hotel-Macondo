@@ -53,7 +53,7 @@ public class AuthController {
     @GetMapping("/registro")
     public String mostrarRegistro(Model model) {
         // Crea un cliente vacio que se llenara con la informacion del formulario
-        Cliente cliente = new Cliente(null, "", "", "", "", "");
+        Cliente cliente = new Cliente("", "", "", "", "");
         // Le pasa el objeto cliente al model para que se pueda llenar con el formulario
         model.addAttribute("cliente", cliente);
         // Redirecciona a la pagina con el formulario
