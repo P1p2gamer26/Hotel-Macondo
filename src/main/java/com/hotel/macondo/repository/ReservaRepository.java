@@ -1,46 +1,66 @@
 package com.hotel.macondo.repository;
 
-import java.math.BigDecimal;
+import com.hotel.macondo.entities.Cliente;
+import com.hotel.macondo.entities.Reserva;
 import java.time.LocalDate;
 import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
+import java.util.List;
+import java.util.Optional;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import com.hotel.macondo.entities.Reserva;
-
 @Repository
-public class ReservaRepository {
+public interface ReservaRepository extends JpaRepository<Reserva, Long> {
 
-    private final Map<String, Reserva> data = new LinkedHashMap<>();
+  List<Reserva> findAllByOrderByIdAsc();
 
-    public ReservaRepository() {
-        // Datos de prueba iniciales para simular la base de datos
-        data.put("MHC-2025-001", new Reserva("MHC-2025-001", LocalDate.now(), LocalDate.now().plusDays(3), 2, "ACTIVA",
-                new BigDecimal("2850000")));
-        data.put("MHC-2025-002", new Reserva("MHC-2025-002", LocalDate.now().plusDays(5), LocalDate.now().plusDays(8),
-                2, "CONFIRMADA", new BigDecimal("1740000")));
-        data.put("MHC-2024-089", new Reserva("MHC-2024-089", LocalDate.now().minusDays(10),
-                LocalDate.now().minusDays(7), 1, "FINALIZADA", new BigDecimal("1050000")));
-        data.put("MHC-2023-211", new Reserva("MHC-2023-211", LocalDate.now().minusDays(30),
-                LocalDate.now().minusDays(25), 4, "CANCELADA", new BigDecimal("5700000")));
-    }
+  Optional<Reserva> findByNumeroReserva(String numeroReserva);
 
-    public Collection<Reserva> findAll() {
-        return data.values();
-    }
+  List<Reserva> findByEstadoInOrderByIdAsc(Collection<String> estados);
 
-    public Reserva findById(String id) {
-        return data.get(id);
-    }
+  @Query(
+      """
+      SELECT r
+      FROM Reserva r
+      WHERE r.cliente = :cliente
+        AND UPPER(r.estado) <> 'CANCELADA'
+        AND r.fechaFin >= :fechaActual
+      ORDER BY r.fechaInicio
+      """)
+  List<Reserva> buscarVigentesPorCliente(
+      @Param("cliente") Cliente cliente, @Param("fechaActual") LocalDate fechaActual);
 
-    public Reserva save(Reserva reserva) {
-        data.put(reserva.getNumeroReserva(), reserva);
-        return reserva;
-    }
+  @Query(
+      """
+      SELECT r
+      FROM Reserva r
+      WHERE r.cliente = :cliente
+        AND (UPPER(r.estado) = 'CANCELADA' OR r.fechaFin < :fechaActual)
+      ORDER BY r.fechaInicio DESC
+      """)
+  List<Reserva> buscarHistoricasPorCliente(
+      @Param("cliente") Cliente cliente, @Param("fechaActual") LocalDate fechaActual);
 
-    public void delete(String id) {
-        data.remove(id);
-    }
+  @Query(
+      """
+      SELECT COUNT(r)
+      FROM Reserva r
+      WHERE r.cliente = :cliente
+        AND UPPER(r.estado) <> 'CANCELADA'
+        AND r.fechaFin >= :fechaActual
+      """)
+  long contarVigentesPorCliente(
+      @Param("cliente") Cliente cliente, @Param("fechaActual") LocalDate fechaActual);
+
+  @Query(
+      """
+      SELECT COUNT(r)
+      FROM Reserva r
+      WHERE r.cliente = :cliente
+        AND (UPPER(r.estado) = 'CANCELADA' OR r.fechaFin < :fechaActual)
+      """)
+  long contarHistoricasPorCliente(
+      @Param("cliente") Cliente cliente, @Param("fechaActual") LocalDate fechaActual);
 }

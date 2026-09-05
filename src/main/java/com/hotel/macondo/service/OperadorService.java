@@ -15,6 +15,9 @@ public interface OperadorService {
     /** Crea o actualiza un operador. */
     Operador guardar(Operador operador);
 
+    /** Cuenta todos los operadores registrados. */
+    long contarTodos();
+
     /** Cuenta los operadores que estan activos. */
     long contarActivos();
 

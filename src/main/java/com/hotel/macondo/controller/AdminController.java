@@ -45,13 +45,13 @@ public class AdminController {
      */
     @GetMapping
     public String inicio(Model model) {
-        model.addAttribute("totalOperadores", operadorService.buscarTodos().size());
+        model.addAttribute("totalOperadores", operadorService.contarTodos());
         model.addAttribute("operadoresActivos", operadorService.contarActivos());
 
-        model.addAttribute("totalServicios", servicioService.buscarTodos().size());
+        model.addAttribute("totalServicios", servicioService.contarTodos());
         model.addAttribute("serviciosActivos", servicioService.contarActivos());
 
-        model.addAttribute("totalHabitaciones", habitacionService.buscarTodas().size());
+        model.addAttribute("totalHabitaciones", habitacionService.contarTodas());
         model.addAttribute("habitacionesDisponibles", habitacionService.contarDisponibles());
 
         return "admin/index";
@@ -151,7 +151,7 @@ public class AdminController {
             RedirectAttributes redirectAttributes) {
         if (habitacionService.guardar(habitacion, tipoId) == null) {
             redirectAttributes.addFlashAttribute("errorHabitacion",
-                    "No se puede guardar: debes seleccionar un tipo de habitacion valido.");
+                    "No se puede guardar: selecciona un tipo valido y usa un nombre distinto al tipo.");
         }
         return "redirect:/admin/habitaciones";
     }
@@ -195,12 +195,16 @@ public class AdminController {
             @RequestParam BigDecimal precioNoche,
             @RequestParam Integer capacidadPersonas) {
 
-        TipoHabitacion tipo = new TipoHabitacion(
-                nombre,
-                descripcion,
-                precioNoche,
-                capacidadPersonas);
-        tipo.setId(id);
+        TipoHabitacion tipo = id == null
+                ? new TipoHabitacion(nombre, descripcion, precioNoche, capacidadPersonas)
+                : tipoHabitacionService.buscarPorId(id);
+        if (tipo == null) {
+            return "redirect:/admin/tipos_habitacion";
+        }
+        tipo.setNombre(nombre);
+        tipo.setDescripcion(descripcion);
+        tipo.setPrecioNoche(precioNoche);
+        tipo.setCapacidadPersonas(capacidadPersonas);
         tipoHabitacionService.guardar(tipo);
         return "redirect:/admin/tipos_habitacion";
     }

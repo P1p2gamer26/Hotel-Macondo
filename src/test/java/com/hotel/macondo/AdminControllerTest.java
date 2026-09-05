@@ -152,8 +152,8 @@ class AdminControllerTest {
                         org.hamcrest.Matchers.containsString("form-habitacion")));
 
         int iniciales = habitacionService.buscarTodas().size();
-        // La habitacion se guarda asignandole un tipo: descripcion, precio y
-        // capacidad se derivan del tipo, pero el nombre es independiente.
+        // La habitacion se guarda asignandole un tipo, del cual deriva sus
+        // datos comerciales, mientras conserva un nombre propio.
         mockMvc.perform(post("/admin/habitaciones/guardar")
                 .param("nombre", "Suite Familiar")
                 .param("etiqueta", "NUEVA")
@@ -169,7 +169,6 @@ class AdminControllerTest {
                 .filter(habitacion -> "501".equals(habitacion.getNumero()))
                 .findFirst().orElseThrow();
         assertEquals("501", nueva.getNumero());
-        // Nombre independiente del tipo.
         assertEquals("Suite Familiar", nueva.getNombre());
         // Datos derivados del tipo seleccionado.
         assertEquals(2L, nueva.getTipoHabitacion().getId());
@@ -189,9 +188,8 @@ class AdminControllerTest {
                 .andExpect(redirectedUrl("/admin/tipos_habitacion"));
 
         Habitacion habitacion = habitacionService.buscarPorId(1L);
-        // El nombre es independiente del tipo y no se sobrescribe.
-        assertEquals("Normal", habitacion.getNombre());
-        // Los datos comerciales del tipo si se propagan.
+        assertEquals("Jardín Tropical", habitacion.getNombre());
+        // Los datos comerciales del tipo se propagan.
         assertEquals("Espacio redisenado para familias", habitacion.getDescripcion());
         assertEquals(0, java.math.BigDecimal.valueOf(420000)
                 .compareTo(habitacion.getPrecio()));

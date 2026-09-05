@@ -1,94 +1,106 @@
 package com.hotel.macondo.service;
 
-import java.math.BigDecimal;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.hotel.macondo.entities.Servicio;
 import com.hotel.macondo.repository.ServicioRepository;
+import java.math.BigDecimal;
+import java.util.Collection;
+import java.util.List;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional
 public class ServicioServiceImpl implements ServicioService {
 
-    private final ServicioRepository repository;
+  private final ServicioRepository repository;
 
-    @Autowired
-    public ServicioServiceImpl(ServicioRepository repository) {
-        this.repository = repository;
-    }
+  public ServicioServiceImpl(ServicioRepository repository) {
+    this.repository = repository;
+  }
 
-    @Override
-    public Collection<Servicio> buscarTodos() {
-        return repository.findAll();
-    }
+  /** {@inheritDoc} */
+  @Override
+  public Collection<Servicio> buscarTodos() {
+    return repository.findAllByOrderByIdAsc();
+  }
 
-    @Override
-    public Servicio buscarPorId(Long id) {
-        return repository.findById(id);
-    }
+  /** {@inheritDoc} */
+  @Override
+  public Servicio buscarPorId(Long id) {
+    return repository.findById(id).orElse(null);
+  }
 
-    @Override
-    public List<Servicio> obtenerCatalogoActivo() {
-        return repository.findAll().stream()
-                .filter(Servicio::isActivo)
-                .sorted(Comparator.comparing(Servicio::getId))
-                .toList();
-    }
+  /** {@inheritDoc} */
+  @Override
+  public List<Servicio> obtenerCatalogoActivo() {
+    return repository.findByActivoTrueOrderByIdAsc();
+  }
 
-    @Override
-    public List<String> obtenerCategoriasDisponibles() {
-        return obtenerCatalogoActivo().stream()
-                .map(Servicio::getCategoria)
-                .distinct()
-                .toList();
-    }
+  /** {@inheritDoc} */
+  @Override
+  public List<String> obtenerCategoriasDisponibles() {
+    return obtenerCatalogoActivo().stream()
+        .map(Servicio::getCategoria)
+        .distinct()
+        .toList();
+  }
 
-    @Override
-    public List<Servicio> obtenerRelacionados(Long servicioActualId, int limite) {
-        return obtenerCatalogoActivo().stream()
-                .filter(item -> !item.getId().equals(servicioActualId))
-                .limit(limite)
-                .toList();
+  /** {@inheritDoc} */
+  @Override
+  public List<Servicio> obtenerRelacionados(Long servicioActualId, int limite) {
+    if (limite <= 0) {
+      return List.of();
     }
+    return repository.findByActivoTrueAndIdNotOrderByIdAsc(
+        servicioActualId, PageRequest.of(0, limite));
+  }
 
-    @Override
-    public List<Servicio> obtenerRecomendaciones(int limite) {
-        return obtenerCatalogoActivo().stream()
-                .limit(limite)
-                .toList();
+  /** {@inheritDoc} */
+  @Override
+  public List<Servicio> obtenerRecomendaciones(int limite) {
+    if (limite <= 0) {
+      return List.of();
     }
+    return repository.findByActivoTrueOrderByIdAsc(PageRequest.of(0, limite));
+  }
 
-    @Override
-    public long contarActivos() {
-        return obtenerCatalogoActivo().size();
-    }
+  /** {@inheritDoc} */
+  @Override
+  public long contarTodos() {
+    return repository.count();
+  }
 
-    @Override
-    public Servicio actualizarDatos(Long id, String nombre, String categoria,
-            BigDecimal precio) {
-        Servicio servicio = repository.findById(id);
-        if (servicio == null) {
-            return null;
-        }
-        servicio.actualizarDatos(nombre, categoria, precio);
-        return repository.save(servicio);
-    }
+  /** {@inheritDoc} */
+  @Override
+  public long contarActivos() {
+    return repository.countByActivoTrue();
+  }
 
-    @Override
-    public Servicio cambiarEstado(Long id) {
-        Servicio servicio = repository.findById(id);
-        if (servicio == null) {
-            return null;
-        }
-        if (servicio.isActivo()) {
-            servicio.desactivar();
-        } else {
-            servicio.activar();
-        }
-        return repository.save(servicio);
+  /** {@inheritDoc} */
+  @Override
+  public Servicio actualizarDatos(
+      Long id, String nombre, String categoria, BigDecimal precio) {
+    Servicio servicio = repository.findById(id).orElse(null);
+    if (servicio == null) {
+      return null;
     }
+    servicio.actualizarDatos(nombre, categoria, precio);
+    return repository.save(servicio);
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public Servicio cambiarEstado(Long id) {
+    Servicio servicio = repository.findById(id).orElse(null);
+    if (servicio == null) {
+      return null;
+    }
+    if (servicio.isActivo()) {
+      servicio.desactivar();
+    } else {
+      servicio.activar();
+    }
+    return repository.save(servicio);
+  }
 }

@@ -25,6 +25,9 @@ public interface ServicioService {
 
     List<Servicio> obtenerRecomendaciones(int limite);
 
+    // Cuenta todos los servicios registrados
+    long contarTodos();
+
     // Cuenta los servicios activos del catalogo, para el tablero del panel admin
     long contarActivos();
 

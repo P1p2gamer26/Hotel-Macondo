@@ -24,6 +24,9 @@ public interface HabitacionService {
     /** Filtra las habitaciones que admiten la cantidad de personas indicada. */
     Collection<Habitacion> buscarPorPersonas(int personas);
 
+    /** Cuenta todas las habitaciones registradas. */
+    long contarTodas();
+
     /** Cuenta las habitaciones que estan disponibles para reservar. */
     long contarDisponibles();
 

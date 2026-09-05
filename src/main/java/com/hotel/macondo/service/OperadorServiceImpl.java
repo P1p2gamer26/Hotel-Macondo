@@ -1,66 +1,65 @@
 package com.hotel.macondo.service;
 
-import java.util.Collection;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.hotel.macondo.entities.Operador;
 import com.hotel.macondo.repository.OperadorRepository;
+import java.util.Collection;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional
 public class OperadorServiceImpl implements OperadorService {
 
-    private final OperadorRepository repository;
+  private final OperadorRepository repository;
 
-    /**
-     * Crea el servicio con su repositorio de operadores.
-     */
-    @Autowired
-    public OperadorServiceImpl(OperadorRepository repository) {
-        this.repository = repository;
-    }
+  public OperadorServiceImpl(OperadorRepository repository) {
+    this.repository = repository;
+  }
 
-    /** {@inheritDoc} */
-    @Override
-    public Collection<Operador> buscarTodos() {
-        return repository.findAll();
-    }
+  /** {@inheritDoc} */
+  @Override
+  public Collection<Operador> buscarTodos() {
+    return repository.findAllByOrderByIdAsc();
+  }
 
-    /** {@inheritDoc} */
-    @Override
-    public Operador buscarPorId(Long id) {
-        return repository.findById(id);
-    }
+  /** {@inheritDoc} */
+  @Override
+  public Operador buscarPorId(Long id) {
+    return repository.findById(id).orElse(null);
+  }
 
-    /** {@inheritDoc} */
-    @Override
-    public Operador guardar(Operador operador) {
-        return repository.save(operador);
-    }
+  /** {@inheritDoc} */
+  @Override
+  public Operador guardar(Operador operador) {
+    return repository.save(operador);
+  }
 
-    /** {@inheritDoc} */
-    @Override
-    public long contarActivos() {
-        return repository.findAll().stream()
-                .filter(operador -> Boolean.TRUE.equals(operador.getActivo()))
-                .count();
-    }
+  /** {@inheritDoc} */
+  @Override
+  public long contarTodos() {
+    return repository.count();
+  }
 
-    /** {@inheritDoc} */
-    @Override
-    public Operador cambiarEstado(Long id) {
-        Operador operador = repository.findById(id);
-        if (operador == null) {
-            return null;
-        }
-        operador.setActivo(!Boolean.TRUE.equals(operador.getActivo()));
-        return repository.save(operador);
-    }
+  /** {@inheritDoc} */
+  @Override
+  public long contarActivos() {
+    return repository.countByActivoTrue();
+  }
 
-    /** {@inheritDoc} */
-    @Override
-    public void eliminar(Long id) {
-        repository.delete(id);
+  /** {@inheritDoc} */
+  @Override
+  public Operador cambiarEstado(Long id) {
+    Operador operador = repository.findById(id).orElse(null);
+    if (operador == null) {
+      return null;
     }
+    operador.setActivo(!Boolean.TRUE.equals(operador.getActivo()));
+    return repository.save(operador);
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public void eliminar(Long id) {
+    repository.deleteById(id);
+  }
 }
