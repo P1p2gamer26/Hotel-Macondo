@@ -38,7 +38,6 @@ public class Pago {
   @Column(nullable = false, length = 20)
   private String estado;
 
-  @JsonIgnore
   @ManyToOne
   private Cuenta cuenta;
 
@@ -51,7 +50,8 @@ public class Pago {
 
   public void asignarCuenta(Cuenta cuenta) {
     this.cuenta = cuenta;
-    if (cuenta != null && !cuenta.getPagos().contains(this)) cuenta.getPagos().add(this);
+    if (cuenta != null && !cuenta.getPagos().contains(this))
+      cuenta.getPagos().add(this);
   }
 
   public void confirmar() {

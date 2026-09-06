@@ -41,17 +41,8 @@ public class ClienteController {
     }
 
     /**
-     * Retorna los clientes guardados temporalmente.
+     * Muestra el dashboard del cliente identificado por la URL.
      */
-    @GetMapping
-    @ResponseBody
-    public Collection<Cliente> listar() {
-        return clienteService.buscarTodos();
-    }
-
-/**
-    * Muestra el dashboard del cliente identificado por la URL.
-    */
     @GetMapping("/{id}")
     public String mostrarDashboard(@PathVariable Long id, Model model) {
         Cliente cliente = clienteService.buscarPorId(id);
@@ -79,7 +70,7 @@ public class ClienteController {
         model.addAttribute("fechaActual", fechaActual);
 
         return "cliente/dashboard";
-        }
+    }
 
     /** Renderiza el perfil del cliente solicitado. */
     @GetMapping("{id}/perfil")
@@ -92,7 +83,7 @@ public class ClienteController {
     /** Actualiza solamente los datos personales editables del cliente. */
     @PostMapping("{id}/perfil")
     public String actualizarPerfil(@PathVariable Long id, Cliente cliente, Model model) {
-        
+
         cuentaClienteService.actualizarPerfil(id, cliente);
 
         return "redirect:/cliente/" + id + "/perfil";
@@ -107,7 +98,7 @@ public class ClienteController {
             Model model) {
 
         cuentaClienteService.actualizarContrasena(id, contrasenaActual, nuevaContrasena, confirmarContrasena);
-        
+
         return "redirect:/cliente/" + id + "/perfil";
     }
 
@@ -115,7 +106,7 @@ public class ClienteController {
      * Elimina la cuenta del cliente y su usuario relacionado
      */
     @GetMapping("/delete/{id}")
-    public String eliminarCuenta(@PathVariable Long id){
+    public String eliminarCuenta(@PathVariable Long id) {
 
         cuentaClienteService.eliminarCuenta(id);
 

@@ -21,7 +21,7 @@ import lombok.ToString;
 
 @Getter
 @Setter
-@ToString(exclude = {"reserva", "detalles", "pagos"})
+@ToString(exclude = { "reserva", "detalles", "pagos" })
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
@@ -42,11 +42,9 @@ public class Cuenta {
   @OneToOne
   private Reserva reserva;
 
-  @JsonIgnore
   @OneToMany(mappedBy = "cuenta")
   private List<DetalleCuenta> detalles = new ArrayList<>();
 
-  @JsonIgnore
   @OneToMany(mappedBy = "cuenta")
   private List<Pago> pagos = new ArrayList<>();
 
@@ -56,10 +54,10 @@ public class Cuenta {
     this.fechaApertura = fechaApertura;
   }
 
-
   public void asignarReserva(Reserva reserva) {
     this.reserva = reserva;
-    if (reserva != null && reserva.getCuenta() != this) reserva.asignarCuenta(this);
+    if (reserva != null && reserva.getCuenta() != this)
+      reserva.asignarCuenta(this);
   }
 
   public DetalleCuenta agregarItem(Servicio servicio, int cantidad) {
@@ -73,8 +71,7 @@ public class Cuenta {
         || cantidad <= 0
         || servicios.stream().anyMatch(s -> s == null || !s.isActivo() || s.getPrecio() == null))
       return null;
-    BigDecimal precio =
-        servicios.stream().map(Servicio::getPrecio).reduce(BigDecimal.ZERO, BigDecimal::add);
+    BigDecimal precio = servicios.stream().map(Servicio::getPrecio).reduce(BigDecimal.ZERO, BigDecimal::add);
     DetalleCuenta detalle = new DetalleCuenta(cantidad, precio, LocalDateTime.now());
     detalle.asignarServicios(servicios);
     detalle.asignarCuenta(this);
@@ -84,12 +81,14 @@ public class Cuenta {
 
   public boolean eliminarItem(Long detalleId) {
     boolean eliminado = detalles.removeIf(d -> Objects.equals(d.getId(), detalleId));
-    if (eliminado) recalcularTotal();
+    if (eliminado)
+      recalcularTotal();
     return eliminado;
   }
 
   public Pago pagar(BigDecimal monto, String metodoPago) {
-    if (!"ABIERTA".equals(estado) || monto == null || monto.compareTo(total) < 0) return null;
+    if (!"ABIERTA".equals(estado) || monto == null || monto.compareTo(total) < 0)
+      return null;
     Pago pago = new Pago(monto, metodoPago, LocalDateTime.now(), "PENDIENTE");
     pago.asignarCuenta(this);
     detalles.clear();
@@ -103,9 +102,8 @@ public class Cuenta {
   }
 
   private void recalcularTotal() {
-    total =
-        detalles.stream()
-            .map(DetalleCuenta::calcularSubtotal)
-            .reduce(BigDecimal.ZERO, BigDecimal::add);
+    total = detalles.stream()
+        .map(DetalleCuenta::calcularSubtotal)
+        .reduce(BigDecimal.ZERO, BigDecimal::add);
   }
 }

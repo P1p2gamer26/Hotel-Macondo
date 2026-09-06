@@ -39,7 +39,6 @@ public class TipoHabitacion {
   @Column(nullable = false)
   private Integer capacidadPersonas;
 
-  @JsonIgnore
   @OneToMany(mappedBy = "tipoHabitacion")
   private List<Habitacion> habitaciones = new ArrayList<>();
 

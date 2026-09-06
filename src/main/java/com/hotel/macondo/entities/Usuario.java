@@ -17,7 +17,7 @@ import lombok.ToString;
 
 @Getter
 @Setter
-@ToString(exclude = {"contrasena", "cliente", "operador"})
+@ToString(exclude = { "contrasena", "cliente", "operador" })
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
@@ -36,11 +36,9 @@ public class Usuario {
   @Column(nullable = false, length = 20)
   private Rol rol;
 
-  @JsonIgnore
   @OneToOne
   private Cliente cliente;
 
-  @JsonIgnore
   @OneToOne(mappedBy = "usuario")
   private Operador operador;
 
@@ -52,12 +50,14 @@ public class Usuario {
 
   public void asignarCliente(Cliente cliente) {
     this.cliente = cliente;
-    if (cliente != null && cliente.getUsuario() != this) cliente.asignarUsuario(this);
+    if (cliente != null && cliente.getUsuario() != this)
+      cliente.asignarUsuario(this);
   }
 
   public void asignarOperador(Operador operador) {
     this.operador = operador;
-    if (operador != null && operador.getUsuario() != this) operador.asignarUsuario(this);
+    if (operador != null && operador.getUsuario() != this)
+      operador.asignarUsuario(this);
   }
 
   public boolean iniciarSesion(String correo, String contrasena) {

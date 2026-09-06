@@ -20,7 +20,7 @@ import lombok.ToString;
 
 @Getter
 @Setter
-@ToString(exclude = {"tipoHabitacion", "reservas"})
+@ToString(exclude = { "tipoHabitacion", "reservas" })
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
@@ -57,7 +57,6 @@ public class Habitacion {
   @ManyToOne
   private TipoHabitacion tipoHabitacion;
 
-  @JsonIgnore
   @ManyToMany(mappedBy = "habitaciones")
   private List<Reserva> reservas = new ArrayList<>();
 
@@ -83,13 +82,16 @@ public class Habitacion {
   }
 
   public void aplicarTipo(TipoHabitacion tipo) {
-    if (tipo == null) return;
-    if (this.tipoHabitacion != null) this.tipoHabitacion.getHabitaciones().remove(this);
+    if (tipo == null)
+      return;
+    if (this.tipoHabitacion != null)
+      this.tipoHabitacion.getHabitaciones().remove(this);
     this.tipoHabitacion = tipo;
     this.descripcion = tipo.getDescripcion();
     this.precio = tipo.getPrecioNoche() == null ? BigDecimal.ZERO : tipo.getPrecioNoche();
     this.capacidad = tipo.getCapacidadPersonas() == null ? 0 : tipo.getCapacidadPersonas();
-    if (!tipo.getHabitaciones().contains(this)) tipo.getHabitaciones().add(this);
+    if (!tipo.getHabitaciones().contains(this))
+      tipo.getHabitaciones().add(this);
   }
 
   public void deshabilitar() {

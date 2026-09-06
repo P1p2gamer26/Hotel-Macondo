@@ -18,7 +18,7 @@ import lombok.ToString;
 
 @Getter
 @Setter
-@ToString(exclude = {"reservas", "usuario"})
+@ToString(exclude = { "reservas", "usuario" })
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
@@ -42,11 +42,9 @@ public class Cliente {
   @Column(nullable = false, unique = true, length = 255)
   private String correo;
 
-  @JsonIgnore
   @OneToMany(mappedBy = "cliente")
   private List<Reserva> reservas = new ArrayList<>();
 
-  @JsonIgnore
   @OneToOne(mappedBy = "cliente")
   private Usuario usuario;
 
@@ -75,7 +73,8 @@ public class Cliente {
 
   public void asignarUsuario(Usuario usuario) {
     this.usuario = usuario;
-    if (usuario != null && usuario.getCliente() != this) usuario.asignarCliente(this);
+    if (usuario != null && usuario.getCliente() != this)
+      usuario.asignarCliente(this);
   }
 
   public List<Reserva> verReservasActivas() {

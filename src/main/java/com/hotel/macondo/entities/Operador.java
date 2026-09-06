@@ -30,7 +30,6 @@ public class Operador {
   @Column(nullable = false)
   private Boolean activo;
 
-  @JsonIgnore
   @OneToOne
   private Usuario usuario;
 
@@ -39,10 +38,10 @@ public class Operador {
     this.activo = activo;
   }
 
-
   public void asignarUsuario(Usuario usuario) {
     this.usuario = usuario;
-    if (usuario != null && usuario.getOperador() != this) usuario.asignarOperador(this);
+    if (usuario != null && usuario.getOperador() != this)
+      usuario.asignarOperador(this);
   }
 
   public boolean cancelarReserva(Reserva reserva) {

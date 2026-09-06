@@ -64,7 +64,6 @@ public class Servicio {
   @ElementCollection
   private List<String> etiquetas = new ArrayList<>();
 
-  @JsonIgnore
   @ManyToMany(mappedBy = "servicios")
   private List<DetalleCuenta> detallesCuenta = new ArrayList<>();
 
@@ -94,7 +93,6 @@ public class Servicio {
     this.incluidos = incluidos == null ? new ArrayList<>() : new ArrayList<>(incluidos);
     this.etiquetas = etiquetas == null ? new ArrayList<>() : new ArrayList<>(etiquetas);
   }
-
 
   public void actualizarDatos(String nombre, String categoria, BigDecimal precio) {
     this.nombre = nombre;
