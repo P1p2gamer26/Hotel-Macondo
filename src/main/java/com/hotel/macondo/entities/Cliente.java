@@ -14,7 +14,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import lombok.Builder;
 
+@Builder
 @Getter
 @Setter
 @ToString(exclude = { "reservas", "usuario" })
@@ -53,6 +55,13 @@ public class Cliente {
     this.cedula = cedula;
     this.telefono = telefono;
     this.correo = correo;
+  }
+
+  public List<Reserva> getReservas() {
+    if (this.reservas == null) {
+      this.reservas = new ArrayList<>();
+    }
+    return this.reservas;
   }
 
   public void agregarReserva(Reserva reserva) {

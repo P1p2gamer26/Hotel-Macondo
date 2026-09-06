@@ -13,7 +13,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import lombok.Builder;
 
+@Builder
 @Getter
 @Setter
 @ToString(exclude = { "contrasena", "admin", "cliente", "operador" })
