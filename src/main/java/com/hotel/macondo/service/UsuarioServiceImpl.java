@@ -57,9 +57,12 @@ public class UsuarioServiceImpl implements UsuarioService {
     String correoNormalizado = normalizarCorreo(correo);
     Usuario usuario =
         repository.findByCorreoIgnoreCase(correoNormalizado).orElse(null);
-    return usuario != null && usuario.iniciarSesion(correoNormalizado, contrasena)
-        ? usuario
-        : null;
+    if (usuario == null
+        || usuario.getContrasena() == null
+        || !usuario.getContrasena().equals(contrasena)) {
+      return null;
+    }
+    return usuario;
   }
 
   /** {@inheritDoc} */
@@ -137,7 +140,7 @@ public class UsuarioServiceImpl implements UsuarioService {
   /** {@inheritDoc} */
   @Override
   public boolean autorizar(Usuario usuario, Rol rol) {
-    return usuario != null && usuario.tieneRol(rol);
+    return usuario != null && usuario.getRol() == rol;
   }
 
   /** {@inheritDoc} */

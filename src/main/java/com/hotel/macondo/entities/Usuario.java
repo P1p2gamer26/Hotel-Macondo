@@ -1,6 +1,5 @@
 package com.hotel.macondo.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -17,7 +16,7 @@ import lombok.ToString;
 
 @Getter
 @Setter
-@ToString(exclude = { "contrasena", "cliente", "operador" })
+@ToString(exclude = { "contrasena", "admin", "cliente", "operador" })
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
@@ -42,6 +41,9 @@ public class Usuario {
   @OneToOne(mappedBy = "usuario")
   private Operador operador;
 
+  @OneToOne(mappedBy = "usuario")
+  private Admin admin;
+
   public Usuario(String correo, String contrasena, Rol rol) {
     this.correo = correo;
     this.contrasena = contrasena;
@@ -50,28 +52,22 @@ public class Usuario {
 
   public void asignarCliente(Cliente cliente) {
     this.cliente = cliente;
-    if (cliente != null && cliente.getUsuario() != this)
+    if (cliente != null && cliente.getUsuario() != this) {
       cliente.asignarUsuario(this);
+    }
   }
 
   public void asignarOperador(Operador operador) {
     this.operador = operador;
-    if (operador != null && operador.getUsuario() != this)
+    if (operador != null && operador.getUsuario() != this) {
       operador.asignarUsuario(this);
+    }
   }
 
-  public boolean iniciarSesion(String correo, String contrasena) {
-    return this.correo != null
-        && this.correo.equalsIgnoreCase(correo)
-        && this.contrasena != null
-        && this.contrasena.equals(contrasena);
-  }
-
-  public boolean tieneRol(Rol rolSolicitado) {
-    return rol != null && rol == rolSolicitado;
-  }
-
-  public void actualizarCorreo(String correo) {
-    this.correo = correo;
+  public void asignarAdmin(Admin admin) {
+    this.admin = admin;
+    if (admin != null && admin.getUsuario() != this) {
+      admin.asignarUsuario(this);
+    }
   }
 }

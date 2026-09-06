@@ -1,5 +1,6 @@
 package com.hotel.macondo;
 
+import com.hotel.macondo.entities.Admin;
 import com.hotel.macondo.entities.Cliente;
 import com.hotel.macondo.entities.Cuenta;
 import com.hotel.macondo.entities.Habitacion;
@@ -10,6 +11,7 @@ import com.hotel.macondo.entities.Servicio;
 import com.hotel.macondo.entities.Testimonio;
 import com.hotel.macondo.entities.TipoHabitacion;
 import com.hotel.macondo.entities.Usuario;
+import com.hotel.macondo.repository.AdminRepository;
 import com.hotel.macondo.repository.ClienteRepository;
 import com.hotel.macondo.repository.CuentaRepository;
 import com.hotel.macondo.repository.HabitacionRepository;
@@ -31,6 +33,7 @@ import org.springframework.stereotype.Component;
 @Transactional
 public class DataLoader implements CommandLineRunner {
 
+  private final AdminRepository adminRepository;
   private final TipoHabitacionRepository tipoHabitacionRepository;
   private final HabitacionRepository habitacionRepository;
   private final ServicioRepository servicioRepository;
@@ -42,6 +45,7 @@ public class DataLoader implements CommandLineRunner {
   private final CuentaRepository cuentaRepository;
 
   public DataLoader(
+      AdminRepository adminRepository,
       TipoHabitacionRepository tipoHabitacionRepository,
       HabitacionRepository habitacionRepository,
       ServicioRepository servicioRepository,
@@ -51,6 +55,7 @@ public class DataLoader implements CommandLineRunner {
       OperadorRepository operadorRepository,
       ReservaRepository reservaRepository,
       CuentaRepository cuentaRepository) {
+    this.adminRepository = adminRepository;
     this.tipoHabitacionRepository = tipoHabitacionRepository;
     this.habitacionRepository = habitacionRepository;
     this.servicioRepository = servicioRepository;
@@ -70,7 +75,7 @@ public class DataLoader implements CommandLineRunner {
     cargarTestimonios();
 
     List<Cliente> clientes = cargarClientes();
-    cargarUsuariosYOperador(clientes);
+    cargarUsuariosYPerfiles(clientes);
     cargarReservasPrincipales();
     cargarReservasDeClientes(clientes, habitaciones);
     cargarCuenta();
@@ -339,9 +344,13 @@ public class DataLoader implements CommandLineRunner {
     return List.of(ana, luis);
   }
 
-  private void cargarUsuariosYOperador(List<Cliente> clientes) {
-    usuarioRepository.save(
-        new Usuario("admin@macondo.com", "admin123", Rol.ADMINISTRADOR));
+  private void cargarUsuariosYPerfiles(List<Cliente> clientes) {
+    Usuario usuarioAdmin =
+        usuarioRepository.save(
+            new Usuario("admin@macondo.com", "admin123", Rol.ADMINISTRADOR));
+    Admin admin = new Admin("Administrador principal");
+    admin.asignarUsuario(usuarioAdmin);
+    adminRepository.save(admin);
 
     Usuario usuarioOperador =
         usuarioRepository.save(

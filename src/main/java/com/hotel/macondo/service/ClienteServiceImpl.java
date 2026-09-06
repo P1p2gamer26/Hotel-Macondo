@@ -63,17 +63,6 @@ public class ClienteServiceImpl implements ClienteService {
 
   /** {@inheritDoc} */
   @Override
-  public Cliente actualizarInformacion(Cliente cliente, Cliente informacion) {
-    cliente.actualizarInformacion(
-        informacion.getNombre(),
-        informacion.getApellido(),
-        informacion.getTelefono(),
-        informacion.getCorreo());
-    return guardar(cliente);
-  }
-
-  /** {@inheritDoc} */
-  @Override
   public Reserva obtenerReservaActiva(Cliente cliente) {
     if (cliente == null) {
       return null;

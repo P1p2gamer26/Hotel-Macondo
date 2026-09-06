@@ -1,6 +1,5 @@
 package com.hotel.macondo.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -9,7 +8,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -82,38 +80,12 @@ public class Habitacion {
   }
 
   public void aplicarTipo(TipoHabitacion tipo) {
-    if (tipo == null)
-      return;
-    if (this.tipoHabitacion != null)
+    if (this.tipoHabitacion != null && this.tipoHabitacion != tipo) {
       this.tipoHabitacion.getHabitaciones().remove(this);
+    }
     this.tipoHabitacion = tipo;
-    this.descripcion = tipo.getDescripcion();
-    this.precio = tipo.getPrecioNoche() == null ? BigDecimal.ZERO : tipo.getPrecioNoche();
-    this.capacidad = tipo.getCapacidadPersonas() == null ? 0 : tipo.getCapacidadPersonas();
-    if (!tipo.getHabitaciones().contains(this))
+    if (tipo != null && !tipo.getHabitaciones().contains(this)) {
       tipo.getHabitaciones().add(this);
-  }
-
-  public void deshabilitar() {
-    estado = "NO_DISPONIBLE";
-  }
-
-  public void habilitar() {
-    estado = "DISPONIBLE";
-  }
-
-  public boolean estaHabilitada() {
-    return "DISPONIBLE".equals(estado);
-  }
-
-  public BigDecimal calcularCosto(long noches) {
-    return tipoHabitacion == null ? BigDecimal.ZERO : tipoHabitacion.calcularCosto(noches);
-  }
-
-  public boolean estaDisponible(LocalDate fechaInicio, LocalDate fechaFin) {
-    return estaHabilitada()
-        && fechaInicio != null
-        && fechaFin != null
-        && fechaInicio.isBefore(fechaFin);
+    }
   }
 }

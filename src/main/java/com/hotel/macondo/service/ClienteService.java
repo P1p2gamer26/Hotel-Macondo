@@ -23,9 +23,6 @@ public interface ClienteService {
     /** Elimina un cliente por identificador. */
     void eliminar(Long id);
 
-    /** Actualiza toda la informacion del cliente */
-    Cliente actualizarInformacion(Cliente cliente, Cliente informacion);
-
     Reserva obtenerReservaActiva(Cliente cliente);
 
     Habitacion obtenerHabitacionActiva(Reserva reserva);

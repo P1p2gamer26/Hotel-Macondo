@@ -1,6 +1,5 @@
 package com.hotel.macondo.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -48,11 +47,5 @@ public class TipoHabitacion {
     this.descripcion = descripcion;
     this.precioNoche = precioNoche;
     this.capacidadPersonas = capacidadPersonas;
-  }
-
-  public BigDecimal calcularCosto(long noches) {
-    return precioNoche == null || noches <= 0
-        ? BigDecimal.ZERO
-        : precioNoche.multiply(BigDecimal.valueOf(noches));
   }
 }

@@ -2,7 +2,6 @@ package com.hotel.macondo.service;
 
 import com.hotel.macondo.entities.Servicio;
 import com.hotel.macondo.repository.ServicioRepository;
-import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.List;
 import org.springframework.data.domain.PageRequest;
@@ -29,6 +28,12 @@ public class ServicioServiceImpl implements ServicioService {
   @Override
   public Servicio buscarPorId(Long id) {
     return repository.findById(id).orElse(null);
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public Servicio guardar(Servicio servicio) {
+    return repository.save(servicio);
   }
 
   /** {@inheritDoc} */
@@ -79,28 +84,12 @@ public class ServicioServiceImpl implements ServicioService {
 
   /** {@inheritDoc} */
   @Override
-  public Servicio actualizarDatos(
-      Long id, String nombre, String categoria, BigDecimal precio) {
-    Servicio servicio = repository.findById(id).orElse(null);
-    if (servicio == null) {
-      return null;
-    }
-    servicio.actualizarDatos(nombre, categoria, precio);
-    return repository.save(servicio);
-  }
-
-  /** {@inheritDoc} */
-  @Override
   public Servicio cambiarEstado(Long id) {
     Servicio servicio = repository.findById(id).orElse(null);
     if (servicio == null) {
       return null;
     }
-    if (servicio.isActivo()) {
-      servicio.desactivar();
-    } else {
-      servicio.activar();
-    }
+    servicio.setActivo(!servicio.isActivo());
     return repository.save(servicio);
   }
 }

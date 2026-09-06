@@ -1,12 +1,11 @@
 package com.hotel.macondo.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
@@ -17,7 +16,7 @@ import lombok.ToString;
 
 @Getter
 @Setter
-@ToString(exclude = "cuenta")
+@ToString
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
@@ -38,7 +37,7 @@ public class Pago {
   @Column(nullable = false, length = 20)
   private String estado;
 
-  @ManyToOne
+  @OneToOne
   private Cuenta cuenta;
 
   public Pago(BigDecimal monto, String metodoPago, LocalDateTime fechaPago, String estado) {
@@ -46,19 +45,5 @@ public class Pago {
     this.metodoPago = metodoPago;
     this.fechaPago = fechaPago;
     this.estado = estado;
-  }
-
-  public void asignarCuenta(Cuenta cuenta) {
-    this.cuenta = cuenta;
-    if (cuenta != null && !cuenta.getPagos().contains(this))
-      cuenta.getPagos().add(this);
-  }
-
-  public void confirmar() {
-    estado = "CONFIRMADO";
-  }
-
-  public void rechazar() {
-    estado = "RECHAZADO";
   }
 }

@@ -15,6 +15,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.hotel.macondo.entities.Habitacion;
 import com.hotel.macondo.entities.Operador;
+import com.hotel.macondo.entities.Servicio;
 import com.hotel.macondo.entities.TipoHabitacion;
 import com.hotel.macondo.service.HabitacionService;
 import com.hotel.macondo.service.OperadorService;
@@ -114,7 +115,13 @@ public class AdminController {
             @RequestParam String nombre,
             @RequestParam String categoria,
             @RequestParam BigDecimal precio) {
-        servicioService.actualizarDatos(id, nombre, categoria, precio);
+        Servicio servicio = servicioService.buscarPorId(id);
+        if (servicio != null) {
+            servicio.setNombre(nombre);
+            servicio.setCategoria(categoria);
+            servicio.setPrecio(precio);
+            servicioService.guardar(servicio);
+        }
         return "redirect:/admin/servicios";
     }
 

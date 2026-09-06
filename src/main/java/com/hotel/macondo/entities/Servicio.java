@@ -1,13 +1,11 @@
 package com.hotel.macondo.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToMany;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +17,7 @@ import lombok.ToString;
 
 @Getter
 @Setter
-@ToString(exclude = "detallesCuenta")
+@ToString
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
@@ -64,9 +62,6 @@ public class Servicio {
   @ElementCollection
   private List<String> etiquetas = new ArrayList<>();
 
-  @ManyToMany(mappedBy = "servicios")
-  private List<DetalleCuenta> detallesCuenta = new ArrayList<>();
-
   public Servicio(
       String nombre,
       String descripcion,
@@ -94,17 +89,4 @@ public class Servicio {
     this.etiquetas = etiquetas == null ? new ArrayList<>() : new ArrayList<>(etiquetas);
   }
 
-  public void actualizarDatos(String nombre, String categoria, BigDecimal precio) {
-    this.nombre = nombre;
-    this.categoria = categoria;
-    this.precio = precio;
-  }
-
-  public void desactivar() {
-    activo = false;
-  }
-
-  public void activar() {
-    activo = true;
-  }
 }

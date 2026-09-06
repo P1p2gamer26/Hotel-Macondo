@@ -1,6 +1,5 @@
 package com.hotel.macondo.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -56,14 +55,6 @@ public class Cliente {
     this.correo = correo;
   }
 
-  public void actualizarInformacion(
-      String nombre, String apellido, String telefono, String correo) {
-    this.nombre = nombre;
-    this.apellido = apellido;
-    this.telefono = telefono;
-    this.correo = correo;
-  }
-
   public void agregarReserva(Reserva reserva) {
     if (reserva != null && !reservas.contains(reserva)) {
       reservas.add(reserva);
@@ -73,15 +64,8 @@ public class Cliente {
 
   public void asignarUsuario(Usuario usuario) {
     this.usuario = usuario;
-    if (usuario != null && usuario.getCliente() != this)
+    if (usuario != null && usuario.getCliente() != this) {
       usuario.asignarCliente(this);
-  }
-
-  public List<Reserva> verReservasActivas() {
-    return reservas.stream().filter(Reserva::estaVigente).toList();
-  }
-
-  public List<Reserva> verHistorialReservas() {
-    return reservas.stream().filter(Reserva::esHistorica).toList();
+    }
   }
 }

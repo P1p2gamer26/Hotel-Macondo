@@ -8,7 +8,10 @@ import com.hotel.macondo.repository.CuentaRepository;
 import com.hotel.macondo.repository.DetalleCuentaRepository;
 import com.hotel.macondo.repository.PagoRepository;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -58,36 +61,87 @@ public class CuentaServiceImpl implements CuentaService {
   public DetalleCuenta agregarServicio(
       Long cuentaId, Servicio servicio, int cantidad) {
     Cuenta cuenta = repository.findById(cuentaId).orElse(null);
-    if (cuenta == null) {
+    if (cuenta == null
+        || !"ABIERTA".equals(cuenta.getEstado())
+        || servicio == null
+        || !servicio.isActivo()
+        || servicio.getPrecio() == null
+        || cantidad <= 0) {
       return null;
     }
 
-    DetalleCuenta detalle = cuenta.agregarItem(servicio, cantidad);
-    if (detalle == null) {
-      return null;
-    }
+    DetalleCuenta detalle =
+        new DetalleCuenta(cantidad, servicio.getPrecio(), LocalDateTime.now());
+    detalle.setServicio(servicio);
+    cuenta.agregarDetalle(detalle);
 
     detalleCuentaRepository.save(detalle);
+    cuenta.setTotal(calcularTotal(cuenta.getDetalles()));
     repository.save(cuenta);
     return detalle;
   }
 
   /** {@inheritDoc} */
   @Override
+  public boolean eliminarDetalle(Long cuentaId, Long detalleId) {
+    Cuenta cuenta = repository.findById(cuentaId).orElse(null);
+    if (cuenta == null || !"ABIERTA".equals(cuenta.getEstado())) {
+      return false;
+    }
+
+    DetalleCuenta detalle =
+        detalleCuentaRepository.findByIdAndCuentaId(detalleId, cuentaId).orElse(null);
+    if (detalle == null) {
+      return false;
+    }
+
+    cuenta.getDetalles().removeIf(item -> Objects.equals(item.getId(), detalleId));
+    detalleCuentaRepository.delete(detalle);
+    cuenta.setTotal(calcularTotal(cuenta.getDetalles()));
+    repository.save(cuenta);
+    return true;
+  }
+
+  /** {@inheritDoc} */
+  @Override
   public Pago pagar(Long cuentaId, BigDecimal monto, String metodoPago) {
     Cuenta cuenta = repository.findById(cuentaId).orElse(null);
-    if (cuenta == null) {
+    if (cuenta == null
+        || !"ABIERTA".equals(cuenta.getEstado())
+        || cuenta.getTotal() == null
+        || cuenta.getTotal().compareTo(BigDecimal.ZERO) <= 0
+        || monto == null
+        || monto.compareTo(cuenta.getTotal()) != 0
+        || metodoPago == null
+        || metodoPago.isBlank()) {
       return null;
     }
 
-    Pago pago = cuenta.pagar(monto, metodoPago);
-    if (pago == null) {
-      return null;
-    }
+    Pago pago = new Pago(monto, metodoPago, LocalDateTime.now(), "CONFIRMADO");
+    pago.setCuenta(cuenta);
 
     detalleCuentaRepository.deleteAllByCuentaId(cuentaId);
+    cuenta.getDetalles().clear();
+    cuenta.setTotal(BigDecimal.ZERO);
+    cuenta.setEstado("PAGADA");
     pagoRepository.save(pago);
     repository.save(cuenta);
     return pago;
+  }
+
+  private BigDecimal calcularTotal(List<DetalleCuenta> detalles) {
+    return detalles.stream()
+        .map(this::calcularSubtotal)
+        .reduce(BigDecimal.ZERO, BigDecimal::add);
+  }
+
+  private BigDecimal calcularSubtotal(DetalleCuenta detalle) {
+    if (detalle == null
+        || detalle.getPrecio() == null
+        || detalle.getCantidad() == null
+        || detalle.getCantidad() <= 0) {
+      return BigDecimal.ZERO;
+    }
+    return detalle.getPrecio().multiply(BigDecimal.valueOf(detalle.getCantidad()));
   }
 }

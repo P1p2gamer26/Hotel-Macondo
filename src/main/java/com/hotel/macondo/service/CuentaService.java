@@ -25,6 +25,9 @@ public interface CuentaService {
     /** Agrega un servicio a una cuenta existente. */
     DetalleCuenta agregarServicio(Long cuentaId, Servicio servicio, int cantidad);
 
+    /** Elimina un consumo de una cuenta abierta. */
+    boolean eliminarDetalle(Long cuentaId, Long detalleId);
+
     /** Registra el pago total de una cuenta. */
     Pago pagar(Long cuentaId, BigDecimal monto, String metodoPago);
 }

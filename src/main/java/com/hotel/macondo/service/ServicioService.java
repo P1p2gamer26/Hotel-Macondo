@@ -1,6 +1,5 @@
 package com.hotel.macondo.service;
 
-import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.List;
 
@@ -13,6 +12,9 @@ public interface ServicioService {
 
     // Busca un servicio por identificador
     Servicio buscarPorId(Long id);
+
+    // Crea o actualiza un servicio
+    Servicio guardar(Servicio servicio);
 
     // Retorna solo los servicios activos ordenados por ID para el catalogo publico
     List<Servicio> obtenerCatalogoActivo();
@@ -30,12 +32,6 @@ public interface ServicioService {
 
     // Cuenta los servicios activos del catalogo, para el tablero del panel admin
     long contarActivos();
-
-    /**
-     * Actualiza la informacion editable de un servicio y la persiste.
-     * Retorna null si el servicio no existe.
-     */
-    Servicio actualizarDatos(Long id, String nombre, String categoria, BigDecimal precio);
 
     /**
      * Activa o desactiva un servicio del catalogo y persiste el cambio.

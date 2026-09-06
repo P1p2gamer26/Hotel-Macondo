@@ -79,7 +79,7 @@ public class HabitacionServiceImpl implements HabitacionService {
         || habitacion.getNombre().equalsIgnoreCase(tipo.getNombre())) {
       return null;
     }
-    habitacion.aplicarTipo(tipo);
+    aplicarDatosDelTipo(habitacion, tipo);
     return repository.save(habitacion);
   }
 
@@ -90,11 +90,11 @@ public class HabitacionServiceImpl implements HabitacionService {
     if (habitacion == null) {
       return null;
     }
-    if (habitacion.estaHabilitada()) {
-      habitacion.deshabilitar();
-    } else {
-      habitacion.habilitar();
-    }
+    String nuevoEstado =
+        "DISPONIBLE".equals(habitacion.getEstado())
+            ? "NO_DISPONIBLE"
+            : "DISPONIBLE";
+    habitacion.setEstado(nuevoEstado);
     return repository.save(habitacion);
   }
 
@@ -105,7 +105,7 @@ public class HabitacionServiceImpl implements HabitacionService {
       return;
     }
     for (Habitacion habitacion : repository.findByTipoHabitacionId(tipo.getId())) {
-      habitacion.aplicarTipo(tipo);
+      aplicarDatosDelTipo(habitacion, tipo);
       repository.save(habitacion);
     }
   }
@@ -120,5 +120,12 @@ public class HabitacionServiceImpl implements HabitacionService {
   @Override
   public void eliminar(Long id) {
     repository.deleteById(id);
+  }
+
+  private void aplicarDatosDelTipo(Habitacion habitacion, TipoHabitacion tipo) {
+    habitacion.aplicarTipo(tipo);
+    habitacion.setDescripcion(tipo.getDescripcion());
+    habitacion.setPrecio(tipo.getPrecioNoche());
+    habitacion.setCapacidad(tipo.getCapacidadPersonas());
   }
 }

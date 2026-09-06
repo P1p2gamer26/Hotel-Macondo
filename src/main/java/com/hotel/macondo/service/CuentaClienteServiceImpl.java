@@ -54,7 +54,7 @@ public class CuentaClienteServiceImpl implements CuentaClienteService {
       return false;
     }
 
-    if (!usuario.iniciarSesion(cliente.getCorreo(), contrasenaActual)
+    if (usuarioService.autenticar(cliente.getCorreo(), contrasenaActual) == null
         || !usuarioService.validarContrasena(nuevaContrasena)
         || !nuevaContrasena.equals(confirmarContrasena)) {
       return false;
@@ -82,10 +82,17 @@ public class CuentaClienteServiceImpl implements CuentaClienteService {
       return false;
     }
 
-    if (clienteService.actualizarInformacion(existente, cliente) == null) {
+    Usuario usuarioActualizado =
+        usuarioService.actualizarCorreo(correoPrevio, correoNuevo);
+    if (usuarioActualizado == null) {
       return false;
     }
-    return usuarioService.actualizarCorreo(correoPrevio, correoNuevo) != null;
+
+    existente.setNombre(cliente.getNombre());
+    existente.setApellido(cliente.getApellido());
+    existente.setTelefono(cliente.getTelefono());
+    existente.setCorreo(correoNuevo);
+    return clienteService.guardar(existente) != null;
   }
 
   /** {@inheritDoc} */
