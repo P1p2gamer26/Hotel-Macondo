@@ -17,10 +17,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import lombok.Builder;
 
+@Builder
 @Getter
 @Setter
-@ToString(exclude = {"cliente", "habitaciones", "cuenta"})
+@ToString(exclude = { "cliente", "habitaciones", "cuenta" })
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity

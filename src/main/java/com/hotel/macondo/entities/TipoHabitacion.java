@@ -14,7 +14,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import lombok.Builder;
 
+@Builder
 @Getter
 @Setter
 @ToString(exclude = "habitaciones")
@@ -47,5 +49,12 @@ public class TipoHabitacion {
     this.descripcion = descripcion;
     this.precioNoche = precioNoche;
     this.capacidadPersonas = capacidadPersonas;
+  }
+
+  public List<Habitacion> getHabitaciones() {
+    if (this.habitaciones == null) {
+      this.habitaciones = new ArrayList<>();
+    }
+    return this.habitaciones;
   }
 }

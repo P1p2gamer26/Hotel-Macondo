@@ -1,5 +1,15 @@
 package com.hotel.macondo;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.stereotype.Component;
+
 import com.hotel.macondo.entities.Admin;
 import com.hotel.macondo.entities.Cliente;
 import com.hotel.macondo.entities.Cuenta;
@@ -21,436 +31,499 @@ import com.hotel.macondo.repository.ServicioRepository;
 import com.hotel.macondo.repository.TestimonioRepository;
 import com.hotel.macondo.repository.TipoHabitacionRepository;
 import com.hotel.macondo.repository.UsuarioRepository;
+
 import jakarta.transaction.Transactional;
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.List;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.stereotype.Component;
 
 @Component
 @Transactional
 public class DataLoader implements CommandLineRunner {
 
-  private final AdminRepository adminRepository;
-  private final TipoHabitacionRepository tipoHabitacionRepository;
-  private final HabitacionRepository habitacionRepository;
-  private final ServicioRepository servicioRepository;
-  private final TestimonioRepository testimonioRepository;
-  private final ClienteRepository clienteRepository;
-  private final UsuarioRepository usuarioRepository;
-  private final OperadorRepository operadorRepository;
-  private final ReservaRepository reservaRepository;
-  private final CuentaRepository cuentaRepository;
+        @Autowired
+        private AdminRepository adminRepository;
 
-  public DataLoader(
-      AdminRepository adminRepository,
-      TipoHabitacionRepository tipoHabitacionRepository,
-      HabitacionRepository habitacionRepository,
-      ServicioRepository servicioRepository,
-      TestimonioRepository testimonioRepository,
-      ClienteRepository clienteRepository,
-      UsuarioRepository usuarioRepository,
-      OperadorRepository operadorRepository,
-      ReservaRepository reservaRepository,
-      CuentaRepository cuentaRepository) {
-    this.adminRepository = adminRepository;
-    this.tipoHabitacionRepository = tipoHabitacionRepository;
-    this.habitacionRepository = habitacionRepository;
-    this.servicioRepository = servicioRepository;
-    this.testimonioRepository = testimonioRepository;
-    this.clienteRepository = clienteRepository;
-    this.usuarioRepository = usuarioRepository;
-    this.operadorRepository = operadorRepository;
-    this.reservaRepository = reservaRepository;
-    this.cuentaRepository = cuentaRepository;
-  }
+        @Autowired
+        private TipoHabitacionRepository tipoHabitacionRepository;
 
-  @Override
-  public void run(String... args) {
-    List<TipoHabitacion> tipos = cargarTiposHabitacion();
-    List<Habitacion> habitaciones = cargarHabitaciones(tipos);
-    cargarServicios();
-    cargarTestimonios();
+        @Autowired
+        private HabitacionRepository habitacionRepository;
 
-    List<Cliente> clientes = cargarClientes();
-    cargarUsuariosYPerfiles(clientes);
-    cargarReservasPrincipales();
-    cargarReservasDeClientes(clientes, habitaciones);
-    cargarCuenta();
-  }
+        @Autowired
+        private ServicioRepository servicioRepository;
 
-  private List<TipoHabitacion> cargarTiposHabitacion() {
-    TipoHabitacion normal =
-        tipoHabitacionRepository.save(
-            new TipoHabitacion(
-                "Normal",
-                "Refugio intimo con vista al jardin tropical, cama queen y aire acondicionado.",
-                BigDecimal.valueOf(350000),
-                2));
+        @Autowired
+        private TestimonioRepository testimonioRepository;
 
-    TipoHabitacion executive =
-        tipoHabitacionRepository.save(
-            new TipoHabitacion(
-                "Executive",
-                "Espacio amplio con sala de trabajo, banera de lujo y vista al mar Caribe.",
-                BigDecimal.valueOf(580000),
-                3));
+        @Autowired
+        private ClienteRepository clienteRepository;
 
-    TipoHabitacion vip =
-        tipoHabitacionRepository.save(
-            new TipoHabitacion(
-                "VIP",
-                "Suite boutique con terraza privada, jacuzzi exterior y servicio de mayordomo.",
-                BigDecimal.valueOf(950000),
-                4));
+        @Autowired
+        private UsuarioRepository usuarioRepository;
 
-    TipoHabitacion luxury =
-        tipoHabitacionRepository.save(
-            new TipoHabitacion(
-                "Luxury",
-                "Villa frente al mar con piscina privada y atencion personalizada 24 horas.",
-                BigDecimal.valueOf(1800000),
-                6));
+        @Autowired
+        private OperadorRepository operadorRepository;
 
-    return List.of(normal, executive, vip, luxury);
-  }
+        @Autowired
+        private ReservaRepository reservaRepository;
 
-  private List<Habitacion> cargarHabitaciones(List<TipoHabitacion> tipos) {
-    Habitacion normal =
-        crearHabitacion(
-            "Jardín Tropical",
-            "ACOGEDORA",
-            "/images/HabitacionNormal.avif",
-            "1",
-            tipos.get(0));
-    Habitacion executive =
-        crearHabitacion(
-            "Horizonte Caribe",
-            "POPULAR",
-            "/images/HabitacionExecutive.avif",
-            "2",
-            tipos.get(1));
-    Habitacion vip =
-        crearHabitacion(
-            "Terraza Macondo",
-            "EXCLUSIVA",
-            "/images/HabitacionVIP.avif",
-            "3",
-            tipos.get(2));
-    Habitacion luxury =
-        crearHabitacion(
-            "Villa del Mar",
-            "ÚNICO",
-            "/images/HabitacionLuxury.avif",
-            "4",
-            tipos.get(3));
+        @Autowired
+        private CuentaRepository cuentaRepository;
 
-    return List.of(normal, executive, vip, luxury);
-  }
+        @Override
+        public void run(String... args) {
+                List<TipoHabitacion> tipos = cargarTiposHabitacion();
+                List<Habitacion> habitaciones = cargarHabitaciones(tipos);
+                cargarServicios();
+                cargarTestimonios();
 
-  private Habitacion crearHabitacion(
-      String nombre,
-      String etiqueta,
-      String imagen,
-      String numero,
-      TipoHabitacion tipo) {
-    Habitacion habitacion =
-        new Habitacion(
-            nombre,
-            etiqueta,
-            tipo.getDescripcion(),
-            tipo.getPrecioNoche(),
-            tipo.getCapacidadPersonas(),
-            imagen,
-            numero,
-            "DISPONIBLE",
-            1);
-    habitacion.aplicarTipo(tipo);
-    return habitacionRepository.save(habitacion);
-  }
+                List<Cliente> clientes = cargarClientes();
+                cargarUsuariosYPerfiles(clientes);
+                cargarReservasPrincipales();
+                cargarReservasDeClientes(clientes, habitaciones);
+                cargarCuenta();
+        }
 
-  private void cargarServicios() {
-    servicioRepository.save(
-        crearServicio(
-            "Spa & Bienestar",
-            "Bienestar",
-            "60-90 min",
-            "Sumérgete en una experiencia sensorial de relajación profunda con masajes terapéuticos, aromaterapia caribeña y tratamientos faciales con ingredientes de la región.",
-            "Nuestro spa combina técnicas milenarias de bienestar con ingredientes naturales del Caribe: aceite de coco, flores de cayena, sales del mar y hierbas aromáticas de la Sierra Nevada. Cada sesión está diseñada para despertar los sentidos y restaurar el equilibrio del cuerpo y la mente. Disfruta de masajes relajantes, tratamientos de hidroterapia, envolturas de arcilla caribeña y aromaterapia en cabinas privadas con vista al jardín tropical.",
-            "/images/Spa.avif",
-            true,
-            120000,
-            "Lunes a domingo: 8:00 a.m. - 8:00 p.m.",
-            List.of(
-                "Masaje de 60 min",
-                "Aromaterapia incluida",
-                "Baño de vapor",
-                "Infusión de hierbas",
-                "Cabina privada",
-                "Toallas de lujo"),
-            List.of("Masajes", "Hidroterapia", "Aromaterapia", "Tratamientos faciales")));
+        private List<TipoHabitacion> cargarTiposHabitacion() {
+                List<TipoHabitacion> tipos = new ArrayList<>();
 
-    servicioRepository.save(
-        crearServicio(
-            "Restaurante Gourmet",
-            "Gastronomía",
-            "Almuerzo & cena",
-            "La cocina caribeña elevada a su máxima expresión. Platos elaborados con productos locales y técnicas contemporáneas, con vista panorámica al mar.",
-            "Una experiencia culinaria donde los sabores del Caribe se encuentran con técnicas contemporáneas. Nuestro menú celebra los productos locales, la pesca del día y las recetas que han pasado de generación en generación.",
-            "/images/Restaurante.avif",
-            false,
-            85000,
-            "Todos los días: 12:00 m. - 10:30 p.m.",
-            List.of(
-                "Menú degustación",
-                "Maridaje de vinos",
-                "Vista al mar",
-                "Reserva garantizada",
-                "Opción Vegana",
-                "Menú infantil"),
-            List.of("Cocina caribeña", "Maridaje", "Cena", "Productos locales")));
+                tipos.add(tipoHabitacionRepository.save(
+                                TipoHabitacion.builder()
+                                                .nombre("Castaño Fundacional")
+                                                .descripcion("Refugio íntimo con vista al gran patio de Macondo, cama queen y brisa fresca.")
+                                                .precioNoche(BigDecimal.valueOf(280000))
+                                                .capacidadPersonas(2)
+                                                .build()));
 
-    servicioRepository.save(
-        crearServicio(
-            "Piscina Infinity",
-            "Bienestar",
-            "Acceso diario",
-            "Nada hacia el horizonte infinito del Caribe desde nuestra piscina de borde abierto frente al mar.",
-            "Una piscina serena frente al Caribe, con camastros, bebidas frescas y atención durante todo el día.",
-            "/images/Piscina.avif",
-            false,
-            70000,
-            "Lunes a domingo: 7:00 a.m. - 9:00 p.m.",
-            List.of("Camastro reservado", "Toallas", "Bebida de bienvenida", "Servicio junto a la piscina"),
-            List.of("Piscina", "Descanso", "Vista al mar")));
+                tipos.add(tipoHabitacionRepository.save(
+                                TipoHabitacion.builder()
+                                                .nombre("Orfebrería Buendía")
+                                                .descripcion("Espacio distinguido con detalles artesanales en oro, balcón y sala de lectura.")
+                                                .precioNoche(BigDecimal.valueOf(450000))
+                                                .capacidadPersonas(3)
+                                                .build()));
 
-    servicioRepository.save(
-        crearServicio(
-            "Playa Privada",
-            "Bienestar",
-            "Acceso diario",
-            "Arena blanca, sombra natural y el Caribe a pocos pasos de tu habitación.",
-            "Disfruta de un sector reservado de playa con servicio personalizado, zonas de descanso y actividades tranquilas frente al mar.",
-            "/images/PlayaPriv.avif",
-            false,
-            60000,
-            "Lunes a domingo: 7:00 a.m. - 6:00 p.m.",
-            List.of("Sombrilla", "Camastro", "Toalla", "Bebida de bienvenida"),
-            List.of("Playa", "Descanso", "Caribe")));
+                tipos.add(tipoHabitacionRepository.save(
+                                TipoHabitacion.builder()
+                                                .nombre("Mariposas Amarillas")
+                                                .descripcion(
+                                                                "Suite boutique luminosa decorada con motivos botánicos, cama king size y terraza caribeña.")
+                                                .precioNoche(BigDecimal.valueOf(650000))
+                                                .capacidadPersonas(4)
+                                                .build()));
 
-    servicioRepository.save(
-        crearServicio(
-            "Tours Guiados",
-            "Aventura",
-            "Medio día / Día completo",
-            "Descubre los rincones más mágicos de la costa caribeña con nuestros guías expertos. Cartagena histórica, islas del Rosario, manglares y más.",
-            "Recorre Cartagena y sus alrededores con anfitriones locales que conocen cada historia, sabor y paisaje de la región.",
-            "/images/Guiado.avif",
-            false,
-            95000,
-            "Salidas programadas todos los días.",
-            List.of("Guía bilingüe", "Transporte incluido", "Snacks y agua", "Seguro de viaje"),
-            List.of("Cartagena", "Islas", "Manglares", "Historia")));
+                tipos.add(tipoHabitacionRepository.save(
+                                TipoHabitacion.builder()
+                                                .nombre("Cuarto de Melquíades")
+                                                .descripcion(
+                                                                "Suite ejecutiva con estudio privado, selección de libros clásicos y vista al río.")
+                                                .precioNoche(BigDecimal.valueOf(980000))
+                                                .capacidadPersonas(2)
+                                                .build()));
 
-    servicioRepository.save(
-        crearServicio(
-            "Eventos Especiales",
-            "Exclusivo",
-            "A medida",
-            "Celebra los momentos más importantes de tu vida en el escenario perfecto. Bodas, aniversarios, reuniones corporativas con decoración y catering de lujo.",
-            "Creamos celebraciones a medida frente al mar, desde encuentros privados hasta bodas y eventos corporativos completos.",
-            "/images/Eventos.avif",
-            false,
-            3500000,
-            "Programación personalizada.",
-            List.of(
-                "Coordinador de eventos",
-                "Decoración temática",
-                "Catering gourmet",
-                "Fotografía profesional"),
-            List.of("Bodas", "Celebraciones", "Eventos corporativos")));
-  }
+                tipos.add(tipoHabitacionRepository.save(
+                                TipoHabitacion.builder()
+                                                .nombre("Cien Años Presidencial")
+                                                .descripcion(
+                                                                "Villa exclusiva frente al mar con piscina privada y atención personalizada 24 horas.")
+                                                .precioNoche(BigDecimal.valueOf(1900000))
+                                                .capacidadPersonas(6)
+                                                .build()));
 
-  private Servicio crearServicio(
-      String nombre,
-      String categoria,
-      String duracion,
-      String descripcion,
-      String descripcionDetalle,
-      String imagen,
-      boolean destacado,
-      long precio,
-      String horario,
-      List<String> incluidos,
-      List<String> etiquetas) {
-    return new Servicio(
-        nombre,
-        descripcion,
-        categoria,
-        imagen,
-        destacado,
-        BigDecimal.valueOf(precio),
-        true,
-        duracion,
-        descripcionDetalle,
-        horario,
-        incluidos,
-        etiquetas);
-  }
+                return tipos;
+        }
 
-  private void cargarTestimonios() {
-    testimonioRepository.save(
-        new Testimonio(
-            "Hotel Macondo es un sueño hecho realidad. La combinación de lujo, naturaleza y la magia del Caribe colombiano me dejó sin palabras. Regresaré sin duda.",
-            "Valentina Ospina",
-            "Bogotá, Colombia",
-            5,
-            "/images/IconoP1.avif"));
-    testimonioRepository.save(
-        new Testimonio(
-            "Nunca imaginé que un hotel pudiera transmitir tanta poesía. El restaurante es excepcional y el servicio es de otro planeta. Una experiencia completamente transformadora.",
-            "Martín Delgado",
-            "Ciudad de México, México",
-            5,
-            "/images/IconoP2.avif"));
-    testimonioRepository.save(
-        new Testimonio(
-            "Vine buscando descanso y encontré magia pura. La suite VIP con terraza frente al mar y el spa con rituales caribeños fueron absolutamente perfectos.",
-            "Sofía Benítez",
-            "Madrid, España",
-            5,
-            "/images/IconoP3.avif"));
-  }
+        private List<Habitacion> cargarHabitaciones(List<TipoHabitacion> tipos) {
+                List<Habitacion> habitaciones = new ArrayList<>();
 
-  private List<Cliente> cargarClientes() {
-    Cliente ana =
-        clienteRepository.save(
-            new Cliente(
-                "Ana",
-                "Torres",
-                "1001001",
-                "3001112233",
-                "ana@macondo.com"));
-    Cliente luis =
-        clienteRepository.save(
-            new Cliente(
-                "Luis",
-                "Mora",
-                "1001002",
-                "3004445566",
-                "luis@macondo.com"));
-    return List.of(ana, luis);
-  }
+                // matriz de nombres tematicos (5 pisos x 10 nombres inspirados en la obra)
+                String[][] nombresPorPiso = {
+                                { // piso 1: castano fundacional
+                                                "Sombra del Castaño", "Río de Piedras", "Sendero del Galeón",
+                                                "Trocha de la Ciénaga",
+                                                "Brisa del Río", "Tierra Colorada", "Remanso de la Ceiba",
+                                                "Platanal Dorado",
+                                                "Canto de Chicharras", "Rocío Matinal"
+                                },
+                                { // piso 2: orfebreria buendia
+                                                "Pescaíto de Oro", "Taller de Orfebrería", "Yunque y Fuego",
+                                                "Fragua Colonial",
+                                                "Muralla y Sol", "Reloj de Arena", "Sala de Tertulia", "Alcandora Real",
+                                                "Baúl de Recuerdos", "Crisol del Mar"
+                                },
+                                { // piso 3: mariposas amarillas
+                                                "Nube de Mariposas", "Patio de Begonias", "Remanso de Remedios",
+                                                "Balcón de la Ciénaga",
+                                                "Jardín Encantado", "Susurro del Alba", "Mirador de Amaranta",
+                                                "Llovizna de Flores",
+                                                "Sueño de Guayaba", "Azahares del Viento"
+                                },
+                                { // piso 4: cuarto de melquiades
+                                                "Cuarto del Hielo", "Taller de Alquimia", "Espejo de Agua",
+                                                "Salón de Imanes",
+                                                "Astrolabio Mayor", "Gabinete Gitano", "Prisma del Sol",
+                                                "Brújula Antigua",
+                                                "Viento del Trópico", "Atalaya Secreta"
+                                },
+                                { // piso 5: cien anos presidencial
+                                                "Galeón Perdido", "Ciudad de los Espejos", "Horizonte Caribe",
+                                                "Refugio del Patriarca",
+                                                "Cúpula Macondo", "Terraza del Olvido", "Mirador del Océano",
+                                                "Brisa de Ultramar",
+                                                "Palacio de Palmeras", "Cumbre Solitaria"
+                                }
+                };
 
-  private void cargarUsuariosYPerfiles(List<Cliente> clientes) {
-    Usuario usuarioAdmin =
-        usuarioRepository.save(
-            new Usuario("admin@macondo.com", "admin123", Rol.ADMINISTRADOR));
-    Admin admin = new Admin("Administrador principal");
-    admin.asignarUsuario(usuarioAdmin);
-    adminRepository.save(admin);
+                String[] imagenesPorTipo = {
+                                "/images/HabitacionNormal.avif",
+                                "/images/HabitacionExecutive.avif",
+                                "/images/HabitacionVIP.avif",
+                                "/images/HabitacionExecutive.avif",
+                                "/images/HabitacionLuxury.avif"
+                };
 
-    Usuario usuarioOperador =
-        usuarioRepository.save(
-            new Usuario("operador@macondo.com", "operador123", Rol.OPERADOR));
-    Operador operador = new Operador("Recepcion principal", true);
-    operador.asignarUsuario(usuarioOperador);
-    operadorRepository.save(operador);
+                String[] etiquetas = { "ACOGEDORA", "POPULAR", "EXCLUSIVA", "HISTÓRICA", "ÚNICA" };
 
-    Usuario usuarioAna = new Usuario("ana@macondo.com", "ana123", Rol.CLIENTE);
-    usuarioAna.asignarCliente(clientes.get(0));
-    usuarioRepository.save(usuarioAna);
+                // generacion sistematica de las 50 habitaciones fisicas
+                for (int piso = 1; piso <= 5; piso++) {
+                        TipoHabitacion tipo = tipos.get(piso - 1);
+                        String etiqueta = etiquetas[piso - 1];
+                        String imagen = imagenesPorTipo[piso - 1];
 
-    Usuario usuarioLuis = new Usuario("luis@macondo.com", "luis123", Rol.CLIENTE);
-    usuarioLuis.asignarCliente(clientes.get(1));
-    usuarioRepository.save(usuarioLuis);
-  }
+                        for (int hab = 1; hab <= 10; hab++) {
+                                String numero = String.format("%d%02d", piso, hab);
+                                String nombre = nombresPorPiso[piso - 1][hab - 1] + " " + numero;
 
-  private void cargarReservasPrincipales() {
-    reservaRepository.save(
-        new Reserva(
-            "MHC-2025-001",
-            LocalDate.now(),
-            LocalDate.now().plusDays(3),
-            2,
-            "ACTIVA",
-            new BigDecimal("2850000")));
-    reservaRepository.save(
-        new Reserva(
-            "MHC-2025-002",
-            LocalDate.now().plusDays(5),
-            LocalDate.now().plusDays(8),
-            2,
-            "CONFIRMADA",
-            new BigDecimal("1740000")));
-    reservaRepository.save(
-        new Reserva(
-            "MHC-2024-089",
-            LocalDate.now().minusDays(10),
-            LocalDate.now().minusDays(7),
-            1,
-            "FINALIZADA",
-            new BigDecimal("1050000")));
-    reservaRepository.save(
-        new Reserva(
-            "MHC-2023-211",
-            LocalDate.now().minusDays(30),
-            LocalDate.now().minusDays(25),
-            4,
-            "CANCELADA",
-            new BigDecimal("5700000")));
-  }
+                                Habitacion h = Habitacion.builder()
+                                                .nombre(nombre)
+                                                .etiqueta(etiqueta)
+                                                .descripcion(tipo.getDescripcion())
+                                                .precio(tipo.getPrecioNoche())
+                                                .capacidad(tipo.getCapacidadPersonas())
+                                                .imagen(imagen)
+                                                .numero(numero)
+                                                .estado("DISPONIBLE")
+                                                .piso(piso)
+                                                .build();
 
-  private void cargarReservasDeClientes(
-      List<Cliente> clientes, List<Habitacion> habitaciones) {
-    LocalDate entradaAna = LocalDate.now().plusDays(22);
-    guardarReservaDeCliente(
-        new Reserva(
-            "MCD-2026-0915",
-            entradaAna,
-            entradaAna.plusDays(3),
-            habitaciones.get(2).getCapacidad(),
-            "ACTIVA",
-            BigDecimal.ZERO),
-        clientes.get(0),
-        habitaciones.get(2));
+                                h.aplicarTipo(tipo);
+                                habitaciones.add(habitacionRepository.save(h));
+                        }
+                }
 
-    LocalDate salidaAna = LocalDate.now().minusDays(20);
-    guardarReservaDeCliente(
-        new Reserva(
-            "MCD-2026-0801",
-            salidaAna.minusDays(2),
-            salidaAna,
-            habitaciones.get(1).getCapacidad(),
-            "FINALIZADA",
-            BigDecimal.ZERO),
-        clientes.get(0),
-        habitaciones.get(1));
+                return habitaciones;
+        }
 
-    LocalDate entradaLuis = LocalDate.now().plusDays(35);
-    guardarReservaDeCliente(
-        new Reserva(
-            "MCD-2026-0928",
-            entradaLuis,
-            entradaLuis.plusDays(2),
-            habitaciones.get(0).getCapacidad(),
-            "ACTIVA",
-            BigDecimal.ZERO),
-        clientes.get(1),
-        habitaciones.get(0));
-  }
+        private List<Cliente> cargarClientes() {
+                List<Cliente> clientes = new ArrayList<>();
 
-  private void guardarReservaDeCliente(
-      Reserva reserva, Cliente cliente, Habitacion habitacion) {
-    reserva.asignarCliente(cliente);
-    reserva.agregarHabitacion(habitacion);
-    reservaRepository.save(reserva);
-  }
+                // 10 clientes con identificadores cortos y correos con formato
+                // nombre@macondo.com
+                String[][] datos = {
+                                { "Úrsula", "Iguarán", "101", "300101", "ursula@macondo.com" },
+                                { "José Arcadio", "Buendía", "102", "300102", "josearcadio@macondo.com" },
+                                { "Aureliano", "Buendía", "103", "300103", "aureliano@macondo.com" },
+                                { "Amaranta", "Buendía", "104", "300104", "amaranta@macondo.com" },
+                                { "Rebeca", "Montiel", "105", "300105", "rebeca@macondo.com" },
+                                { "Pietro", "Crespi", "106", "300106", "pietro@macondo.com" },
+                                { "Gerineldo", "Márquez", "107", "300107", "gerineldo@macondo.com" },
+                                { "Petra", "Cotes", "108", "300108", "petra@macondo.com" },
+                                { "Mauricio", "Babilonia", "109", "300109", "mauricio@macondo.com" },
+                                { "Meme", "Buendía", "110", "300110", "meme@macondo.com" }
+                };
 
-  private void cargarCuenta() {
-    cuentaRepository.save(
-        new Cuenta("ABIERTA", BigDecimal.ZERO, LocalDateTime.now()));
-  }
+                for (String[] d : datos) {
+                        clientes.add(clienteRepository.save(
+                                        Cliente.builder()
+                                                        .nombre(d[0])
+                                                        .apellido(d[1])
+                                                        .cedula(d[2])
+                                                        .telefono(d[3])
+                                                        .correo(d[4])
+                                                        .build()));
+                }
+
+                return clientes;
+        }
+
+        private void cargarUsuariosYPerfiles(List<Cliente> clientes) {
+                // administrador general
+                Usuario userAdmin = usuarioRepository.save(
+                                Usuario.builder()
+                                                .correo("admin@macondo.com")
+                                                .contrasena("admin")
+                                                .rol(Rol.ADMINISTRADOR)
+                                                .build());
+                Admin admin = new Admin("Administrador Principal");
+                admin.asignarUsuario(userAdmin);
+                adminRepository.save(admin);
+
+                // operador de recepcion
+                Usuario userOperador = usuarioRepository.save(
+                                Usuario.builder()
+                                                .correo("operador@macondo.com")
+                                                .contrasena("ope")
+                                                .rol(Rol.OPERADOR)
+                                                .build());
+                Operador operador = new Operador("Recepción Principal", true);
+                operador.asignarUsuario(userOperador);
+                operadorRepository.save(operador);
+
+                // usuarios asociados a cada cliente con contrasena 123
+                for (Cliente c : clientes) {
+                        Usuario u = Usuario.builder()
+                                        .correo(c.getCorreo())
+                                        .contrasena("123")
+                                        .rol(Rol.CLIENTE)
+                                        .build();
+                        u.asignarCliente(c);
+                        usuarioRepository.save(u);
+                }
+        }
+
+        private void cargarServicios() {
+                // 1. spa y bienestar
+                servicioRepository.save(
+                                crearServicio(
+                                                "Spa & Bienestar",
+                                                "Bienestar",
+                                                "60-90 min",
+                                                "Sumérgete en una experiencia sensorial de relajación profunda con masajes terapéuticos, aromaterapia caribeña y tratamientos faciales con ingredientes de la región.",
+                                                "Nuestro spa combina técnicas milenarias de bienestar con ingredientes naturales del Caribe: aceite de coco, flores de cayena, sales del mar y hierbas aromáticas de la Sierra Nevada. Cada sesión está diseñada para despertar los sentidos y restaurar el equilibrio del cuerpo y la mente. Disfruta de masajes relajantes, tratamientos de hidroterapia, envolturas de arcilla caribeña y aromaterapia en cabinas privadas con vista al jardín tropical.",
+                                                "/images/Spa.avif",
+                                                true,
+                                                120000,
+                                                "Lunes a domingo: 8:00 a.m. - 8:00 p.m.",
+                                                List.of(
+                                                                "Masaje de 60 min",
+                                                                "Aromaterapia incluida",
+                                                                "Baño de vapor",
+                                                                "Infusión de hierbas",
+                                                                "Cabina privada",
+                                                                "Toallas de lujo"),
+                                                List.of("Masajes", "Hidroterapia", "Aromaterapia",
+                                                                "Tratamientos faciales")));
+
+                // 2. restaurante gourmet
+                servicioRepository.save(
+                                crearServicio(
+                                                "Restaurante Gourmet",
+                                                "Gastronomía",
+                                                "Almuerzo & cena",
+                                                "La cocina caribeña elevada a su máxima expresión. Platos elaborados con productos locales y técnicas contemporáneas, con vista panorámica al mar.",
+                                                "Una experiencia culinaria donde los sabores del Caribe se encuentran con técnicas contemporáneas. Nuestro menú celebra los productos locales, la pesca del día y las recetas que han pasado de generación en generación.",
+                                                "/images/Restaurante.avif",
+                                                false,
+                                                85000,
+                                                "Todos los días: 12:00 m. - 10:30 p.m.",
+                                                List.of(
+                                                                "Menú degustación",
+                                                                "Maridaje de vinos",
+                                                                "Vista al mar",
+                                                                "Reserva garantizada",
+                                                                "Opción Vegana",
+                                                                "Menú infantil"),
+                                                List.of("Cocina caribeña", "Maridaje", "Cena", "Productos locales")));
+
+                // 3. piscina infinity
+                servicioRepository.save(
+                                crearServicio(
+                                                "Piscina Infinity",
+                                                "Bienestar",
+                                                "Acceso diario",
+                                                "Nada hacia el horizonte infinito del Caribe desde nuestra piscina de borde abierto frente al mar.",
+                                                "Una piscina serena frente al Caribe, con camastros, bebidas frescas y atención durante todo el día.",
+                                                "/images/Piscina.avif",
+                                                false,
+                                                70000,
+                                                "Lunes a domingo: 7:00 a.m. - 9:00 p.m.",
+                                                List.of("Camastro reservado", "Toallas", "Bebida de bienvenida",
+                                                                "Servicio junto a la piscina"),
+                                                List.of("Piscina", "Descanso", "Vista al mar")));
+
+                // 4. playa privada
+                servicioRepository.save(
+                                crearServicio(
+                                                "Playa Privada",
+                                                "Bienestar",
+                                                "Acceso diario",
+                                                "Arena blanca, sombra natural y el Caribe a pocos pasos de tu habitación.",
+                                                "Disfruta de un sector reservado de playa con servicio personalizado, zonas de descanso y actividades tranquilas frente al mar.",
+                                                "/images/PlayaPriv.avif",
+                                                false,
+                                                60000,
+                                                "Lunes a domingo: 7:00 a.m. - 6:00 p.m.",
+                                                List.of("Sombrilla", "Camastro", "Toalla", "Bebida de bienvenida"),
+                                                List.of("Playa", "Descanso", "Caribe")));
+
+                // 5. tours guiados
+                servicioRepository.save(
+                                crearServicio(
+                                                "Tours Guiados",
+                                                "Aventura",
+                                                "Medio día / Día completo",
+                                                "Descubre los rincones más mágicos de la costa caribeña con nuestros guías expertos. Cartagena histórica, islas del Rosario, manglares y más.",
+                                                "Recorre Cartagena y sus alrededores con anfitriones locales que conocen cada historia, sabor y paisaje de la región.",
+                                                "/images/Guiado.avif",
+                                                false,
+                                                95000,
+                                                "Salidas programadas todos los días.",
+                                                List.of("Guía bilingüe", "Transporte incluido", "Snacks y agua",
+                                                                "Seguro de viaje"),
+                                                List.of("Cartagena", "Islas", "Manglares", "Historia")));
+
+                // 6. eventos especiales
+                servicioRepository.save(
+                                crearServicio(
+                                                "Eventos Especiales",
+                                                "Exclusivo",
+                                                "A medida",
+                                                "Celebra los momentos más importantes de tu vida en el escenario perfecto. Bodas, aniversarios, reuniones corporativas con decoración y catering de lujo.",
+                                                "Creamos celebraciones a medida frente al mar, desde encuentros privados hasta bodas y eventos corporativos completos.",
+                                                "/images/Eventos.avif",
+                                                false,
+                                                3500000,
+                                                "Programación personalizada.",
+                                                List.of(
+                                                                "Coordinador de eventos",
+                                                                "Decoración temática",
+                                                                "Catering gourmet",
+                                                                "Fotografía profesional"),
+                                                List.of("Bodas", "Celebraciones", "Eventos corporativos")));
+        }
+
+        private Servicio crearServicio(
+                        String nombre,
+                        String categoria,
+                        String duracion,
+                        String descripcion,
+                        String descripcionDetalle,
+                        String imagen,
+                        boolean destacado,
+                        long precio,
+                        String horario,
+                        List<String> incluidos,
+                        List<String> etiquetas) {
+                return new Servicio(
+                                nombre,
+                                descripcion,
+                                categoria,
+                                imagen,
+                                destacado,
+                                BigDecimal.valueOf(precio),
+                                true,
+                                duracion,
+                                descripcionDetalle,
+                                horario,
+                                incluidos,
+                                etiquetas);
+        }
+
+        private void cargarTestimonios() {
+                testimonioRepository.save(
+                                new Testimonio(
+                                                "Hotel Macondo es un sueño hecho realidad. La combinación de lujo, naturaleza y la magia del Caribe colombiano me dejó sin palabras. Regresaré sin duda.",
+                                                "Valentina Ospina",
+                                                "Bogotá, Colombia",
+                                                5,
+                                                "/images/IconoP1.avif"));
+                testimonioRepository.save(
+                                new Testimonio(
+                                                "Nunca imaginé que un hotel pudiera transmitir tanta poesía. El restaurante es excepcional y el servicio es de otro planeta. Una experiencia completamente transformadora.",
+                                                "Martín Delgado",
+                                                "Ciudad de México, México",
+                                                5,
+                                                "/images/IconoP2.avif"));
+                testimonioRepository.save(
+                                new Testimonio(
+                                                "Vine buscando descanso y encontré magia pura. La suite VIP con terraza frente al mar y el spa con rituales caribeños fueron absolutamente perfectos.",
+                                                "Sofía Benítez",
+                                                "Madrid, España",
+                                                5,
+                                                "/images/IconoP3.avif"));
+        }
+
+        private void cargarReservasPrincipales() {
+                reservaRepository.save(
+                                new Reserva(
+                                                "MHC-2025-001",
+                                                LocalDate.now(),
+                                                LocalDate.now().plusDays(3),
+                                                2,
+                                                "ACTIVA",
+                                                new BigDecimal("2850000")));
+                reservaRepository.save(
+                                new Reserva(
+                                                "MHC-2025-002",
+                                                LocalDate.now().plusDays(5),
+                                                LocalDate.now().plusDays(8),
+                                                2,
+                                                "CONFIRMADA",
+                                                new BigDecimal("1740000")));
+                reservaRepository.save(
+                                new Reserva(
+                                                "MHC-2024-089",
+                                                LocalDate.now().minusDays(10),
+                                                LocalDate.now().minusDays(7),
+                                                1,
+                                                "FINALIZADA",
+                                                new BigDecimal("1050000")));
+                reservaRepository.save(
+                                new Reserva(
+                                                "MHC-2023-211",
+                                                LocalDate.now().minusDays(30),
+                                                LocalDate.now().minusDays(25),
+                                                4,
+                                                "CANCELADA",
+                                                new BigDecimal("5700000")));
+        }
+
+        private void cargarReservasDeClientes(
+                        List<Cliente> clientes, List<Habitacion> habitaciones) {
+                LocalDate entradaUrsula = LocalDate.now().plusDays(10);
+                guardarReservaDeCliente(
+                                new Reserva(
+                                                "MCD-2026-0915",
+                                                entradaUrsula,
+                                                entradaUrsula.plusDays(3),
+                                                habitaciones.get(0).getCapacidad(),
+                                                "ACTIVA",
+                                                BigDecimal.ZERO),
+                                clientes.get(0),
+                                habitaciones.get(0));
+
+                LocalDate salidaUrsula = LocalDate.now().minusDays(15);
+                guardarReservaDeCliente(
+                                new Reserva(
+                                                "MCD-2026-0801",
+                                                salidaUrsula.minusDays(2),
+                                                salidaUrsula,
+                                                habitaciones.get(10).getCapacidad(),
+                                                "FINALIZADA",
+                                                BigDecimal.ZERO),
+                                clientes.get(0),
+                                habitaciones.get(10));
+
+                LocalDate entradaJoseArcadio = LocalDate.now().plusDays(20);
+                guardarReservaDeCliente(
+                                new Reserva(
+                                                "MCD-2026-0928",
+                                                entradaJoseArcadio,
+                                                entradaJoseArcadio.plusDays(4),
+                                                habitaciones.get(20).getCapacidad(),
+                                                "ACTIVA",
+                                                BigDecimal.ZERO),
+                                clientes.get(1),
+                                habitaciones.get(20));
+        }
+
+        private void guardarReservaDeCliente(
+                        Reserva reserva, Cliente cliente, Habitacion habitacion) {
+                reserva.asignarCliente(cliente);
+                reserva.agregarHabitacion(habitacion);
+                reservaRepository.save(reserva);
+        }
+
+        private void cargarCuenta() {
+                cuentaRepository.save(
+                                new Cuenta("ABIERTA", BigDecimal.ZERO, LocalDateTime.now()));
+        }
 }
