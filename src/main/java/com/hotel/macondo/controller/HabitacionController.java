@@ -45,7 +45,7 @@ public class HabitacionController {
      * Muestra el detalle de una habitacion o vuelve al listado si no existe.
      */
     @GetMapping("/{id}")
-    public String mostrarHabitacion(@PathVariable("id") Integer id, Model model) {
+    public String mostrarHabitacion(@PathVariable("id") Long id, Model model) {
         try {
             Habitacion habitacion = service.buscarPorId(id);
             model.addAttribute("habitacion", habitacion);

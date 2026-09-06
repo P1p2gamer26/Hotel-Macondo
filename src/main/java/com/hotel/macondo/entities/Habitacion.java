@@ -1,104 +1,91 @@
 package com.hotel.macondo.entities;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
 import java.math.BigDecimal;
-import java.time.LocalDate;
-
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
-// lombok: getters, setters, toString, equals
-@Data
-@NoArgsConstructor
+@Getter
+@Setter
+@ToString(exclude = { "tipoHabitacion", "reservas" })
 @AllArgsConstructor
+@NoArgsConstructor
+@Entity
 public class Habitacion {
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    private Integer id;
-    private String nombre;
-    private String etiqueta;
-    private String descripcion;
-    private long precio;
-    private int capacidad;
-    private String imagen;
-    private String numero;
-    private String estado;
-    private Integer piso;
-    private TipoHabitacion tipoHabitacion;
+  @Column(nullable = false, length = 100)
+  private String nombre;
 
-    /**
-     * Crea una habitacion a partir de los atributos definidos por el dominio.
-     */
-    public Habitacion(String numero, String estado, Integer piso,
-            TipoHabitacion tipoHabitacion) {
-        this.numero = numero;
-        this.estado = estado;
-        this.piso = piso;
-        this.tipoHabitacion = tipoHabitacion;
-        this.nombre = tipoHabitacion.getNombre();
-        this.descripcion = tipoHabitacion.getDescripcion();
-        this.precio = tipoHabitacion.getPrecioNoche().longValue();
-        this.capacidad = tipoHabitacion.getCapacidadPersonas();
+  @Column(length = 100)
+  private String etiqueta;
+
+  @Column(length = 2000)
+  private String descripcion;
+
+  @Column(nullable = false, precision = 12, scale = 2)
+  private BigDecimal precio = BigDecimal.ZERO;
+
+  @Column(nullable = false)
+  private int capacidad;
+
+  @Column(length = 255)
+  private String imagen;
+
+  @Column(nullable = false, unique = true, length = 10)
+  private String numero;
+
+  @Column(nullable = false, length = 20)
+  private String estado;
+
+  private Integer piso;
+  @ManyToOne
+  private TipoHabitacion tipoHabitacion;
+
+  @ManyToMany(mappedBy = "habitaciones")
+  private List<Reserva> reservas = new ArrayList<>();
+
+  public Habitacion(
+      String nombre,
+      String etiqueta,
+      String descripcion,
+      BigDecimal precio,
+      int capacidad,
+      String imagen,
+      String numero,
+      String estado,
+      Integer piso) {
+    this.nombre = nombre;
+    this.etiqueta = etiqueta;
+    this.descripcion = descripcion;
+    this.precio = precio;
+    this.capacidad = capacidad;
+    this.imagen = imagen;
+    this.numero = numero;
+    this.estado = estado;
+    this.piso = piso;
+  }
+
+  public void aplicarTipo(TipoHabitacion tipo) {
+    if (this.tipoHabitacion != null && this.tipoHabitacion != tipo) {
+      this.tipoHabitacion.getHabitaciones().remove(this);
     }
-
-    /**
-     * Aplica un tipo de habitacion a esta habitacion: guarda la referencia y
-     * deriva la descripcion, el precio y la capacidad directamente del tipo.
-     * El nombre NO se sobrescribe: es un dato comercial independiente que el
-     * administrador edita por separado (dos conceptos distintos).
-     */
-    public void aplicarTipo(TipoHabitacion tipo) {
-        if (tipo == null) {
-            return;
-        }
-        this.tipoHabitacion = tipo;
-        this.descripcion = tipo.getDescripcion();
-        this.precio = tipo.getPrecioNoche() == null ? 0L
-                : tipo.getPrecioNoche().longValue();
-        this.capacidad = tipo.getCapacidadPersonas() == null ? 0
-                : tipo.getCapacidadPersonas();
+    this.tipoHabitacion = tipo;
+    if (tipo != null && !tipo.getHabitaciones().contains(this)) {
+      tipo.getHabitaciones().add(this);
     }
-
-    /**
-     * Deshabilita temporalmente la habitacion.
-     */
-    public void deshabilitar() {
-        estado = "NO_DISPONIBLE";
-    }
-
-    /**
-     * Habilita la habitacion para recibir nuevas reservas.
-     */
-    public void habilitar() {
-        estado = "DISPONIBLE";
-    }
-
-    /**
-     * Indica si la habitacion esta habilitada para recibir reservas. El
-     * significado del estado vive aqui y no en las capas que lo consultan.
-     */
-    public boolean estaHabilitada() {
-        return "DISPONIBLE".equals(estado);
-    }
-
-    /**
-     * Calcula el costo de la habitacion para una cantidad de noches.
-     */
-    public BigDecimal calcularCosto(long noches) {
-        return tipoHabitacion == null ? BigDecimal.ZERO : tipoHabitacion.calcularCosto(noches);
-    }
-
-    /**
-     * Indica si la habitacion esta habilitada para el periodo solicitado.
-     *
-     * La validacion de cruces entre reservas pertenece al servicio de reservas:
-     * la habitacion no mantiene una referencia inversa a ellas.
-     */
-    public boolean estaDisponible(LocalDate fechaInicio, LocalDate fechaFin) {
-        if (!estaHabilitada() || fechaInicio == null || fechaFin == null
-                || !fechaInicio.isBefore(fechaFin)) {
-            return false;
-        }
-
-        return true;
-    }
+  }
 }

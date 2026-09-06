@@ -28,7 +28,7 @@ public class ReservaController {
 
     /** Muestra las reservas activas y futuras que pertenecen al cliente. */
     @GetMapping("/reservas")
-    public String reservasActivas(@PathVariable Integer id, Model model) {
+    public String reservasActivas(@PathVariable Long id, Model model) {
         Cliente cliente = obtenerCliente(id);
         model.addAttribute("cliente", cliente);
         model.addAttribute("reservas", reservaService.buscarActivasDeCliente(cliente));
@@ -37,7 +37,7 @@ public class ReservaController {
 
     /** Muestra las reservas finalizadas o canceladas del cliente. */
     @GetMapping("/historial")
-    public String historialReservas(@PathVariable Integer id, Model model) {
+    public String historialReservas(@PathVariable Long id, Model model) {
         Cliente cliente = obtenerCliente(id);
         model.addAttribute("cliente", cliente);
         model.addAttribute("historial", reservaService.buscarHistorialDeCliente(cliente));
@@ -45,7 +45,7 @@ public class ReservaController {
     }
 
     /** Evita renderizar vistas privadas para identificadores inexistentes. */
-    private Cliente obtenerCliente(Integer id) {
+    private Cliente obtenerCliente(Long id) {
         Cliente cliente = clienteService.buscarPorId(id);
         if (cliente == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Cliente no encontrado");

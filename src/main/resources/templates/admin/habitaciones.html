@@ -76,7 +76,6 @@
                   <option
                     th:each="tipo : ${tiposHabitacion}"
                     th:value="${tipo.id}"
-                    th:data-nombre="${tipo.nombre}"
                     th:data-descripcion="${tipo.descripcion}"
                     th:data-precio="${tipo.precioNoche}"
                     th:data-capacidad="${tipo.capacidadPersonas}"
@@ -96,7 +95,7 @@
                   type="text"
                   id="campo-nombre"
                   name="nombre"
-                  placeholder="VIP"
+                  placeholder="Jardín Tropical"
                   required
                 />
               </div>
@@ -427,11 +426,6 @@
         document.getElementById("campo-precio").value = opcion.dataset.precio || "";
         document.getElementById("campo-capacidad").value =
           opcion.dataset.capacidad || "";
-
-        var campoNombre = document.getElementById("campo-nombre");
-        if (campoNombre.value === "") {
-          campoNombre.value = opcion.dataset.nombre || "";
-        }
       }
 
       function editarHabitacion(boton) {

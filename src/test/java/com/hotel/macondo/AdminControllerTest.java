@@ -86,7 +86,7 @@ class AdminControllerTest {
 
         assertEquals(iniciales + 1, operadorService.buscarTodos().size());
 
-        Integer nuevoId = operadorService.buscarTodos().stream()
+        Long nuevoId = operadorService.buscarTodos().stream()
                 .filter(operador -> "Turno noche".equals(operador.getNombre()))
                 .findFirst().orElseThrow().getId();
         assertNotNull(nuevoId);
@@ -106,12 +106,12 @@ class AdminControllerTest {
                 .param("precio", "250000"))
                 .andExpect(redirectedUrl("/admin/servicios"));
 
-        assertEquals("Spa renovado", servicioService.buscarPorId(1).getNombre());
+        assertEquals("Spa renovado", servicioService.buscarPorId(1L).getNombre());
         assertEquals(0, java.math.BigDecimal.valueOf(250000)
-                .compareTo(servicioService.buscarPorId(1).getPrecio()));
+                .compareTo(servicioService.buscarPorId(1L).getPrecio()));
 
         mockMvc.perform(post("/admin/servicios/{id}/estado", 1));
-        assertFalse(servicioService.buscarPorId(1).isActivo());
+        assertFalse(servicioService.buscarPorId(1L).isActivo());
     }
 
     @Test
@@ -120,10 +120,10 @@ class AdminControllerTest {
         // persistir el cambio, el test lo detecta.
         mockMvc.perform(post("/admin/habitaciones/{id}/estado", 1))
                 .andExpect(redirectedUrl("/admin/habitaciones"));
-        assertEquals("NO_DISPONIBLE", habitacionService.buscarPorId(1).getEstado());
+        assertEquals("NO_DISPONIBLE", habitacionService.buscarPorId(1L).getEstado());
 
         mockMvc.perform(post("/admin/habitaciones/{id}/estado", 1));
-        assertEquals("DISPONIBLE", habitacionService.buscarPorId(1).getEstado());
+        assertEquals("DISPONIBLE", habitacionService.buscarPorId(1L).getEstado());
     }
 
     @Test
@@ -152,8 +152,8 @@ class AdminControllerTest {
                         org.hamcrest.Matchers.containsString("form-habitacion")));
 
         int iniciales = habitacionService.buscarTodas().size();
-        // La habitacion se guarda asignandole un tipo: descripcion, precio y
-        // capacidad se derivan del tipo, pero el nombre es independiente.
+        // La habitacion se guarda asignandole un tipo, del cual deriva sus
+        // datos comerciales, mientras conserva un nombre propio.
         mockMvc.perform(post("/admin/habitaciones/guardar")
                 .param("nombre", "Suite Familiar")
                 .param("etiqueta", "NUEVA")
@@ -169,11 +169,11 @@ class AdminControllerTest {
                 .filter(habitacion -> "501".equals(habitacion.getNumero()))
                 .findFirst().orElseThrow();
         assertEquals("501", nueva.getNumero());
-        // Nombre independiente del tipo.
         assertEquals("Suite Familiar", nueva.getNombre());
         // Datos derivados del tipo seleccionado.
-        assertEquals(2, nueva.getTipoHabitacion().getId());
-        assertEquals(580000, nueva.getPrecio());
+        assertEquals(2L, nueva.getTipoHabitacion().getId());
+        assertEquals(0, java.math.BigDecimal.valueOf(580000)
+                .compareTo(nueva.getPrecio()));
         assertEquals(3, nueva.getCapacidad());
     }
 
@@ -187,12 +187,12 @@ class AdminControllerTest {
                 .param("capacidadPersonas", "4"))
                 .andExpect(redirectedUrl("/admin/tipos_habitacion"));
 
-        Habitacion habitacion = habitacionService.buscarPorId(1);
-        // El nombre es independiente del tipo y no se sobrescribe.
-        assertEquals("Normal", habitacion.getNombre());
-        // Los datos comerciales del tipo si se propagan.
+        Habitacion habitacion = habitacionService.buscarPorId(1L);
+        assertEquals("Jardín Tropical", habitacion.getNombre());
+        // Los datos comerciales del tipo se propagan.
         assertEquals("Espacio redisenado para familias", habitacion.getDescripcion());
-        assertEquals(420000, habitacion.getPrecio());
+        assertEquals(0, java.math.BigDecimal.valueOf(420000)
+                .compareTo(habitacion.getPrecio()));
         assertEquals(4, habitacion.getCapacidad());
         assertEquals("Familiar", habitacion.getTipoHabitacion().getNombre());
     }
@@ -207,7 +207,7 @@ class AdminControllerTest {
                 .andExpect(flash().attributeExists("errorTipo"));
 
         assertEquals(tipos, tipoHabitacionService.buscarTodos().size());
-        assertNotNull(tipoHabitacionService.buscarPorId(1));
+        assertNotNull(tipoHabitacionService.buscarPorId(1L));
     }
 
     @Test
@@ -221,7 +221,7 @@ class AdminControllerTest {
                 .param("capacidadPersonas", "2"))
                 .andExpect(redirectedUrl("/admin/tipos_habitacion"));
 
-        Integer nuevoId = tipoHabitacionService.buscarTodos().stream()
+        Long nuevoId = tipoHabitacionService.buscarTodos().stream()
                 .filter(tipo -> "Loft".equals(tipo.getNombre()))
                 .findFirst().orElseThrow().getId();
 

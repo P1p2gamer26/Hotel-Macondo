@@ -10,10 +10,13 @@ public interface OperadorService {
     Collection<Operador> buscarTodos();
 
     /** Busca un operador por identificador. */
-    Operador buscarPorId(Integer id);
+    Operador buscarPorId(Long id);
 
     /** Crea o actualiza un operador. */
     Operador guardar(Operador operador);
+
+    /** Cuenta todos los operadores registrados. */
+    long contarTodos();
 
     /** Cuenta los operadores que estan activos. */
     long contarActivos();
@@ -22,8 +25,8 @@ public interface OperadorService {
      * Invierte el estado (activo/inactivo) de un operador. Retorna null si el
      * operador no existe.
      */
-    Operador cambiarEstado(Integer id);
+    Operador cambiarEstado(Long id);
 
     /** Elimina un operador por identificador. */
-    void eliminar(Integer id);
+    void eliminar(Long id);
 }

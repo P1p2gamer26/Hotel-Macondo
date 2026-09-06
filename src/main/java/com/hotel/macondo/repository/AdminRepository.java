@@ -1,12 +1,12 @@
 package com.hotel.macondo.repository;
 
-import com.hotel.macondo.entities.Cuenta;
+import com.hotel.macondo.entities.Admin;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface CuentaRepository extends JpaRepository<Cuenta, Long> {
+public interface AdminRepository extends JpaRepository<Admin, Long> {
 
-  List<Cuenta> findAllByOrderByIdAsc();
+  List<Admin> findAllByOrderByIdAsc();
 }

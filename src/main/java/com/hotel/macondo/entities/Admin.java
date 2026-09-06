@@ -18,7 +18,7 @@ import lombok.ToString;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class Operador {
+public class Admin {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
@@ -26,21 +26,17 @@ public class Operador {
   @Column(nullable = false, length = 100)
   private String nombre;
 
-  @Column(nullable = false)
-  private Boolean activo;
-
   @OneToOne
   private Usuario usuario;
 
-  public Operador(String nombre, Boolean activo) {
+  public Admin(String nombre) {
     this.nombre = nombre;
-    this.activo = activo;
   }
 
   public void asignarUsuario(Usuario usuario) {
     this.usuario = usuario;
-    if (usuario != null && usuario.getOperador() != this) {
-      usuario.asignarOperador(this);
+    if (usuario != null && usuario.getAdmin() != this) {
+      usuario.asignarAdmin(this);
     }
   }
 }

@@ -14,17 +14,20 @@ public interface CuentaService {
     Collection<Cuenta> buscarTodas();
 
     /** Busca una cuenta por identificador. */
-    Cuenta buscarPorId(Integer id);
+    Cuenta buscarPorId(Long id);
 
     /** Crea o actualiza una cuenta. */
     Cuenta guardar(Cuenta cuenta);
 
     /** Elimina una cuenta por identificador. */
-    void eliminar(Integer id);
+    void eliminar(Long id);
 
     /** Agrega un servicio a una cuenta existente. */
-    DetalleCuenta agregarServicio(Integer cuentaId, Servicio servicio, int cantidad);
+    DetalleCuenta agregarServicio(Long cuentaId, Servicio servicio, int cantidad);
+
+    /** Elimina un consumo de una cuenta abierta. */
+    boolean eliminarDetalle(Long cuentaId, Long detalleId);
 
     /** Registra el pago total de una cuenta. */
-    Pago pagar(Integer cuentaId, BigDecimal monto, String metodoPago);
+    Pago pagar(Long cuentaId, BigDecimal monto, String metodoPago);
 }

@@ -15,6 +15,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.hotel.macondo.entities.Habitacion;
 import com.hotel.macondo.entities.Operador;
+import com.hotel.macondo.entities.Servicio;
 import com.hotel.macondo.entities.TipoHabitacion;
 import com.hotel.macondo.service.HabitacionService;
 import com.hotel.macondo.service.OperadorService;
@@ -45,13 +46,13 @@ public class AdminController {
      */
     @GetMapping
     public String inicio(Model model) {
-        model.addAttribute("totalOperadores", operadorService.buscarTodos().size());
+        model.addAttribute("totalOperadores", operadorService.contarTodos());
         model.addAttribute("operadoresActivos", operadorService.contarActivos());
 
-        model.addAttribute("totalServicios", servicioService.buscarTodos().size());
+        model.addAttribute("totalServicios", servicioService.contarTodos());
         model.addAttribute("serviciosActivos", servicioService.contarActivos());
 
-        model.addAttribute("totalHabitaciones", habitacionService.buscarTodas().size());
+        model.addAttribute("totalHabitaciones", habitacionService.contarTodas());
         model.addAttribute("habitacionesDisponibles", habitacionService.contarDisponibles());
 
         return "admin/index";
@@ -73,7 +74,7 @@ public class AdminController {
      */
     @PostMapping("/operadores")
     public String crearOperador(@RequestParam String nombre) {
-        operadorService.guardar(new Operador(null, nombre, true));
+        operadorService.guardar(new Operador(nombre, true));
         return "redirect:/admin/operadores";
     }
 
@@ -81,7 +82,7 @@ public class AdminController {
      * Invierte el estado (activo/inactivo) de un operador.
      */
     @PostMapping("/operadores/{id}/estado")
-    public String cambiarEstadoOperador(@PathVariable Integer id) {
+    public String cambiarEstadoOperador(@PathVariable Long id) {
         operadorService.cambiarEstado(id);
         return "redirect:/admin/operadores";
     }
@@ -90,7 +91,7 @@ public class AdminController {
      * Elimina un operador del listado.
      */
     @PostMapping("/operadores/{id}/eliminar")
-    public String eliminarOperador(@PathVariable Integer id) {
+    public String eliminarOperador(@PathVariable Long id) {
         operadorService.eliminar(id);
         return "redirect:/admin/operadores";
     }
@@ -110,11 +111,17 @@ public class AdminController {
      * Actualiza nombre, categoria y precio de un servicio.
      */
     @PostMapping("/servicios/{id}")
-    public String editarServicio(@PathVariable Integer id,
+    public String editarServicio(@PathVariable Long id,
             @RequestParam String nombre,
             @RequestParam String categoria,
             @RequestParam BigDecimal precio) {
-        servicioService.actualizarDatos(id, nombre, categoria, precio);
+        Servicio servicio = servicioService.buscarPorId(id);
+        if (servicio != null) {
+            servicio.setNombre(nombre);
+            servicio.setCategoria(categoria);
+            servicio.setPrecio(precio);
+            servicioService.guardar(servicio);
+        }
         return "redirect:/admin/servicios";
     }
 
@@ -122,7 +129,7 @@ public class AdminController {
      * Activa o desactiva un servicio del catalogo.
      */
     @PostMapping("/servicios/{id}/estado")
-    public String cambiarEstadoServicio(@PathVariable Integer id) {
+    public String cambiarEstadoServicio(@PathVariable Long id) {
         servicioService.cambiarEstado(id);
         return "redirect:/admin/servicios";
     }
@@ -147,11 +154,11 @@ public class AdminController {
      */
     @PostMapping("/habitaciones/guardar")
     public String guardarHabitacion(@ModelAttribute("habitacion") Habitacion habitacion,
-            @RequestParam(required = false) Integer tipoId,
+            @RequestParam(required = false) Long tipoId,
             RedirectAttributes redirectAttributes) {
         if (habitacionService.guardar(habitacion, tipoId) == null) {
             redirectAttributes.addFlashAttribute("errorHabitacion",
-                    "No se puede guardar: debes seleccionar un tipo de habitacion valido.");
+                    "No se puede guardar: selecciona un tipo valido y usa un nombre distinto al tipo.");
         }
         return "redirect:/admin/habitaciones";
     }
@@ -160,7 +167,7 @@ public class AdminController {
      * Pone la habitacion en mantenimiento o la devuelve a disponible.
      */
     @PostMapping("/habitaciones/{id}/estado")
-    public String cambiarEstadoHabitacion(@PathVariable Integer id) {
+    public String cambiarEstadoHabitacion(@PathVariable Long id) {
         habitacionService.cambiarEstado(id);
         return "redirect:/admin/habitaciones";
     }
@@ -169,7 +176,7 @@ public class AdminController {
      * Elimina una habitacion del inventario.
      */
     @PostMapping("/habitaciones/{id}/eliminar")
-    public String eliminarHabitacion(@PathVariable Integer id) {
+    public String eliminarHabitacion(@PathVariable Long id) {
         habitacionService.eliminar(id);
         return "redirect:/admin/habitaciones";
     }
@@ -189,13 +196,22 @@ public class AdminController {
      * Guarda o actualiza un tipo de habitacion.
      */
     @PostMapping("/tipos_habitacion")
-    public String guardarTipoHabitacion(@RequestParam(required = false) Integer id,
+    public String guardarTipoHabitacion(@RequestParam(required = false) Long id,
             @RequestParam String nombre,
             @RequestParam String descripcion,
             @RequestParam BigDecimal precioNoche,
             @RequestParam Integer capacidadPersonas) {
 
-        TipoHabitacion tipo = new TipoHabitacion(id, nombre, descripcion, precioNoche, capacidadPersonas);
+        TipoHabitacion tipo = id == null
+                ? new TipoHabitacion(nombre, descripcion, precioNoche, capacidadPersonas)
+                : tipoHabitacionService.buscarPorId(id);
+        if (tipo == null) {
+            return "redirect:/admin/tipos_habitacion";
+        }
+        tipo.setNombre(nombre);
+        tipo.setDescripcion(descripcion);
+        tipo.setPrecioNoche(precioNoche);
+        tipo.setCapacidadPersonas(capacidadPersonas);
         tipoHabitacionService.guardar(tipo);
         return "redirect:/admin/tipos_habitacion";
     }
@@ -205,7 +221,7 @@ public class AdminController {
      * habitaciones asignadas a ese tipo.
      */
     @PostMapping("/tipos_habitacion/{id}/eliminar")
-    public String eliminarTipoHabitacion(@PathVariable Integer id,
+    public String eliminarTipoHabitacion(@PathVariable Long id,
             RedirectAttributes redirectAttributes) {
         if (!tipoHabitacionService.eliminar(id)) {
             redirectAttributes.addFlashAttribute("errorTipo",

@@ -53,7 +53,7 @@ public class AuthController {
     @GetMapping("/registro")
     public String mostrarRegistro(Model model) {
         // Crea un cliente vacio que se llenara con la informacion del formulario
-        Cliente cliente = new Cliente(null, "", "", "", "", "");
+        Cliente cliente = new Cliente("", "", "", "", "");
         // Le pasa el objeto cliente al model para que se pueda llenar con el formulario
         model.addAttribute("cliente", cliente);
         // Redirecciona a la pagina con el formulario
@@ -61,8 +61,7 @@ public class AuthController {
     }
 
     /**
-     * Procesa las credenciales y redirige dinamicamente usando el ID del usuario
-     * autenticado.
+     * Procesa las credenciales y redirige al perfil relacionado con el usuario.
      */
     @PostMapping("/login")
     public String iniciarSesion(@RequestParam(name = "username") String correo,
@@ -72,6 +71,7 @@ public class AuthController {
         Usuario usuario = serviceUsuario.autenticar(correo, contrasena);
 
         if (usuario == null) {
+            model.addAttribute("error", "Correo o contraseña incorrectos.");
             return "login";
         }
 
@@ -81,8 +81,12 @@ public class AuthController {
         } else if (usuario.getRol() == Rol.OPERADOR) {
             return "redirect:/operador";
         } else if (usuario.getRol() == Rol.CLIENTE) {
-            // Redirige al dashboard del cliente con su ID correspondiente
-            return "redirect:/cliente/" + usuario.getId();
+            Cliente cliente = usuario.getCliente();
+            if (cliente == null || cliente.getId() == null) {
+                model.addAttribute("error", "El usuario no tiene un cliente asociado.");
+                return "login";
+            }
+            return "redirect:/cliente/" + cliente.getId();
         }
 
         return "redirect:/";

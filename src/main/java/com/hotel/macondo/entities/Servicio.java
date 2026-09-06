@@ -1,73 +1,92 @@
 package com.hotel.macondo.entities;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-
-import lombok.Data;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
-@Data
+@Getter
+@Setter
+@ToString
+@AllArgsConstructor
 @NoArgsConstructor
+@Entity
 public class Servicio {
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    private Integer id;
-    private String nombre;
-    private String descripcion;
-    private String categoria;
-    private String imagen;
-    private boolean destacado;
-    private BigDecimal precio;
-    private boolean activo;
-    private String duracion;
-    private String descripcionDetalle;
-    private String horario;
-    private List<String> incluidos = new ArrayList<>();
-    private List<String> etiquetas = new ArrayList<>();
+  @Column(nullable = false, length = 100)
+  private String nombre;
 
-    /**
-     * Conserva el constructor usado por la pagina principal actual.
-     */
-    public Servicio(Integer id, String nombre, String descripcion, String categoria,
-            String imagen, boolean destacado) {
-        this(id, nombre, descripcion, categoria, imagen, destacado, BigDecimal.ZERO, true);
-    }
+  @Column(nullable = false, length = 2000)
+  private String descripcion;
 
-    /**
-     * Crea un servicio con sus datos comerciales completos.
-     */
-    public Servicio(Integer id, String nombre, String descripcion, String categoria,
-            String imagen, boolean destacado, BigDecimal precio, boolean activo) {
-        this.id = id;
-        this.nombre = nombre;
-        this.descripcion = descripcion;
-        this.categoria = categoria;
-        this.imagen = imagen;
-        this.destacado = destacado;
-        this.precio = precio;
-        this.activo = activo;
-    }
+  @Column(nullable = false, length = 100)
+  private String categoria;
 
-    /**
-     * Actualiza la informacion editable del servicio.
-     */
-    public void actualizarDatos(String nombre, String categoria, BigDecimal precio) {
-        this.nombre = nombre;
-        this.categoria = categoria;
-        this.precio = precio;
-    }
+  @Column(length = 255)
+  private String imagen;
 
-    /**
-     * Impide que el servicio sea agregado a nuevas cuentas.
-     */
-    public void desactivar() {
-        activo = false;
-    }
+  @Column(nullable = false)
+  private boolean destacado;
 
-    /**
-     * Devuelve el servicio al catalogo publico.
-     */
-    public void activar() {
-        activo = true;
-    }
+  @Column(nullable = false, precision = 12, scale = 2)
+  private BigDecimal precio;
+
+  @Column(nullable = false)
+  private boolean activo;
+
+  @Column(length = 100)
+  private String duracion;
+
+  @Column(length = 2000)
+  private String descripcionDetalle;
+
+  @Column(length = 100)
+  private String horario;
+
+  @ElementCollection
+  private List<String> incluidos = new ArrayList<>();
+
+  @ElementCollection
+  private List<String> etiquetas = new ArrayList<>();
+
+  public Servicio(
+      String nombre,
+      String descripcion,
+      String categoria,
+      String imagen,
+      boolean destacado,
+      BigDecimal precio,
+      boolean activo,
+      String duracion,
+      String descripcionDetalle,
+      String horario,
+      List<String> incluidos,
+      List<String> etiquetas) {
+    this.nombre = nombre;
+    this.descripcion = descripcion;
+    this.categoria = categoria;
+    this.imagen = imagen;
+    this.destacado = destacado;
+    this.precio = precio;
+    this.activo = activo;
+    this.duracion = duracion;
+    this.descripcionDetalle = descripcionDetalle;
+    this.horario = horario;
+    this.incluidos = incluidos == null ? new ArrayList<>() : new ArrayList<>(incluidos);
+    this.etiquetas = etiquetas == null ? new ArrayList<>() : new ArrayList<>(etiquetas);
+  }
+
 }

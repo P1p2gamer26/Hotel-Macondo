@@ -1,127 +1,157 @@
 package com.hotel.macondo.service;
 
-import java.util.Collection;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.hotel.macondo.entities.Cliente;
 import com.hotel.macondo.entities.Rol;
 import com.hotel.macondo.entities.Usuario;
 import com.hotel.macondo.repository.UsuarioRepository;
+import java.util.Collection;
+import java.util.Locale;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional
 public class UsuarioServiceImpl implements UsuarioService {
 
-    private final UsuarioRepository repository;
-    /**
-     * Crea el servicio con su repositorio de usuarios.
-     */
-    @Autowired
-    public UsuarioServiceImpl(UsuarioRepository repository) {
-        this.repository = repository;
+  private final UsuarioRepository repository;
+
+  public UsuarioServiceImpl(UsuarioRepository repository) {
+    this.repository = repository;
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public Collection<Usuario> buscarTodos() {
+    return repository.findAllByOrderByIdAsc();
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public Usuario buscarPorCorreo(String correo) {
+    if (correo == null) {
+      return null;
+    }
+    return repository.findByCorreoIgnoreCase(normalizarCorreo(correo)).orElse(null);
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public boolean validarCorreo(String correo) {
+    return correo != null
+        && !correo.isBlank()
+        && !repository.existsByCorreoIgnoreCase(normalizarCorreo(correo));
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public boolean validarContrasena(String contrasena) {
+    return contrasena != null && !contrasena.isBlank();
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public Usuario autenticar(String correo, String contrasena) {
+    if (correo == null) {
+      return null;
+    }
+    String correoNormalizado = normalizarCorreo(correo);
+    Usuario usuario =
+        repository.findByCorreoIgnoreCase(correoNormalizado).orElse(null);
+    if (usuario == null
+        || usuario.getContrasena() == null
+        || !usuario.getContrasena().equals(contrasena)) {
+      return null;
+    }
+    return usuario;
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public Usuario registrar(Usuario usuario) {
+    if (usuario == null || usuario.getCorreo() == null) {
+      return null;
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public Collection<Usuario> buscarTodos(){
-        return repository.findAll();
+    String correoNormalizado = normalizarCorreo(usuario.getCorreo());
+    if (repository.existsByCorreoIgnoreCase(correoNormalizado)) {
+      return null;
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public Usuario buscarPorCorreo(String correo) {
-        return repository.findByCorreo(correo);
+    usuario.setCorreo(correoNormalizado);
+    return repository.save(usuario);
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public Usuario registrarCliente(Cliente cliente, String contrasena) {
+    if (cliente == null || cliente.getCorreo() == null || contrasena == null) {
+      return null;
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public boolean validarCorreo(String correo){
-        return correo != null && correo.trim().isBlank() == false && repository.findByCorreo(correo) == null;
+    String correoNormalizado = normalizarCorreo(cliente.getCorreo());
+    if (repository.existsByCorreoIgnoreCase(correoNormalizado)) {
+      return null;
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public boolean validarContrasena(String contrasena){
-        return contrasena != null && contrasena.isBlank() == false;
+    Usuario usuario =
+        new Usuario(correoNormalizado, contrasena, Rol.CLIENTE);
+    usuario.asignarCliente(cliente);
+    return repository.save(usuario);
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public Usuario actualizarContrasena(String correo, String nuevaContrasena) {
+    if (correo == null || nuevaContrasena == null || nuevaContrasena.isBlank()) {
+      return null;
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public Usuario autenticar(String correo, String contrasena) {
-        Usuario usuario = repository.findByCorreo(correo);
-        return usuario != null && usuario.iniciarSesion(correo, contrasena)
-                ? usuario
-                : null;
+    Usuario usuario =
+        repository
+            .findByCorreoIgnoreCase(normalizarCorreo(correo))
+            .orElse(null);
+    if (usuario == null) {
+      return null;
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public Usuario registrar(Usuario usuario) {
-        if (usuario == null || usuario.getCorreo() == null
-                || repository.findByCorreo(usuario.getCorreo()) != null) {
-            return null;
-        }
-        return repository.save(usuario);
+    usuario.setContrasena(nuevaContrasena);
+    return repository.save(usuario);
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public Usuario actualizarCorreo(String correoPrevio, String correoNuevo) {
+    if (correoPrevio == null || correoNuevo == null) {
+      return null;
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public Usuario registrarCliente(Cliente cliente, String contraseña) {
-        if (cliente == null || cliente.getCorreo() == null || contraseña == null) {
-            return null;
-        }
-
-        Usuario usuario = new Usuario();
-        usuario.setCorreo(cliente.getCorreo());
-        usuario.setContrasena(contraseña);
-        usuario.setRol(Rol.CLIENTE);
-        
-        return registrar(usuario);
+    Usuario usuario =
+        repository
+            .findByCorreoIgnoreCase(normalizarCorreo(correoPrevio))
+            .orElse(null);
+    if (usuario == null) {
+      return null;
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public Usuario actualizarContrasena(String correo, String nuevaContrasena) {
-        if (correo == null || nuevaContrasena == null || nuevaContrasena.isBlank()) {
-            return null;
-        }
+    usuario.setCorreo(normalizarCorreo(correoNuevo));
+    return repository.save(usuario);
+  }
 
-        Usuario usuario = repository.findByCorreo(correo);
-        if (usuario == null) {
-            return null;
-        }
+  /** {@inheritDoc} */
+  @Override
+  public boolean autorizar(Usuario usuario, Rol rol) {
+    return usuario != null && usuario.getRol() == rol;
+  }
 
-        usuario.setContrasena(nuevaContrasena);
-        return repository.save(usuario);
+  /** {@inheritDoc} */
+  @Override
+  public void eliminar(String correo) {
+    if (correo != null) {
+      repository.deleteByCorreoIgnoreCase(normalizarCorreo(correo));
     }
+  }
 
-    /** {@inheritDoc} */
-    @Override
-    public Usuario actualizarCorreo(String correoPrevio, String correoNuevo){
-        if(correoNuevo == null || correoPrevio == null){
-            return null;
-        }
-
-        Usuario usuario = repository.findByCorreo(correoPrevio);
-        if(usuario == null) return null;
-
-        usuario.setCorreo(correoNuevo);
-        // Se elimina el usuario previo ya que como el correo es la key del map si solo lo 
-        // actualizamos entonces duplicaremos la informacion
-        repository.delete(correoPrevio);
-        return repository.save(usuario);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean autorizar(Usuario usuario, Rol rol) {
-        return usuario != null && usuario.tieneRol(rol);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void eliminar(String correo){
-        repository.delete(correo);
-    }
+  private String normalizarCorreo(String correo) {
+    return correo.trim().toLowerCase(Locale.ROOT);
+  }
 }
