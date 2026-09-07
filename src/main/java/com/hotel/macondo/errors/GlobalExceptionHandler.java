@@ -1,0 +1,17 @@
+package com.hotel.macondo.errors;
+
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+
+public class GlobalExceptionHandler {
+
+    @ExceptionHandler(RecursoNoEncontradoException.class)
+    public String handleRecursoNoEncontradoException(
+        RecursoNoEncontradoException ex,
+        Model model
+    ) {
+        model.addAttribute("mensaje",ex.getMessage());
+        return "error";
+    }
+    
+}
