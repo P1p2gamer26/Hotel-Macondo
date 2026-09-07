@@ -2,7 +2,7 @@ package com.hotel.macondo.service;
 
 import com.hotel.macondo.entities.Habitacion;
 import com.hotel.macondo.entities.TipoHabitacion;
-import com.hotel.macondo.exceptions.RecursoNoEncontradoException;
+import com.hotel.macondo.errors.RecursoNoEncontradoException;
 import com.hotel.macondo.repository.HabitacionRepository;
 import com.hotel.macondo.repository.TipoHabitacionRepository;
 import java.util.Collection;
