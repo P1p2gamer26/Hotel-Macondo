@@ -11,6 +11,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Getter
 @Setter
@@ -29,7 +31,9 @@ public class Operador {
   @Column(nullable = false)
   private Boolean activo;
 
+  // El perfil de operador muere con su usuario.
   @OneToOne
+  @OnDelete(action = OnDeleteAction.CASCADE)
   private Usuario usuario;
 
   public Operador(String nombre, Boolean activo) {

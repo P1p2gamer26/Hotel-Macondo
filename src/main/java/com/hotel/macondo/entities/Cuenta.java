@@ -16,10 +16,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Getter
 @Setter
-@ToString(exclude = { "reserva", "detalles" })
+@ToString(exclude = { "reserva", "detalles", "pagos" })
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
@@ -37,11 +39,19 @@ public class Cuenta {
   @Column(nullable = false)
   private LocalDateTime fechaApertura = LocalDateTime.now();
 
+  // La cuenta no existe sin su reserva: al borrar la reserva se borra la cuenta.
   @OneToOne
+  @OnDelete(action = OnDeleteAction.CASCADE)
   private Reserva reserva;
 
   @OneToMany(mappedBy = "cuenta")
+  @OnDelete(action = OnDeleteAction.CASCADE)
   private List<DetalleCuenta> detalles = new ArrayList<>();
+
+  // Lado inverso de Pago.cuenta: sin el, borrar una cuenta dejaba pagos huerfanos.
+  @OneToMany(mappedBy = "cuenta")
+  @OnDelete(action = OnDeleteAction.CASCADE)
+  private List<Pago> pagos = new ArrayList<>();
 
   public Cuenta(String estado, BigDecimal total, LocalDateTime fechaApertura) {
     this.estado = estado;

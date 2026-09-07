@@ -15,6 +15,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.Builder;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Builder
 @Getter
@@ -43,7 +45,9 @@ public class Cliente {
   @Column(nullable = false, unique = true, length = 255)
   private String correo;
 
+  // Al borrar el cliente se borran sus reservas (ON DELETE CASCADE sobre la FK).
   @OneToMany(mappedBy = "cliente")
+  @OnDelete(action = OnDeleteAction.CASCADE)
   private List<Reserva> reservas = new ArrayList<>();
 
   @OneToOne(mappedBy = "cliente")

@@ -103,7 +103,8 @@ public class CuentaClienteServiceImpl implements CuentaClienteService {
       return false;
     }
 
-    usuarioService.eliminar(cliente.getCorreo());
+    // Borrar el usuario ya es parte de eliminar el cliente: la cascada vive en
+    // ClienteService y aqui solo se orquesta.
     clienteService.eliminar(id);
     return true;
   }

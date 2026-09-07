@@ -1,6 +1,7 @@
 package com.hotel.macondo.service;
 
 import com.hotel.macondo.entities.Habitacion;
+import com.hotel.macondo.entities.Reserva;
 import com.hotel.macondo.entities.TipoHabitacion;
 import com.hotel.macondo.exceptions.RecursoNoEncontradoException;
 import com.hotel.macondo.repository.HabitacionRepository;
@@ -119,7 +120,19 @@ public class HabitacionServiceImpl implements HabitacionService {
   /** {@inheritDoc} */
   @Override
   public void eliminar(Long id) {
-    repository.deleteById(id);
+    Habitacion habitacion = repository.findById(id).orElse(null);
+    if (habitacion == null) {
+      return;
+    }
+
+    // Borrar la habitacion NO puede arrastrar las reservas: solo se desliga de
+    // ellas quitando las filas de la tabla intermedia.
+    for (Reserva reserva : habitacion.getReservas()) {
+      reserva.getHabitaciones().remove(habitacion);
+    }
+    habitacion.getReservas().clear();
+
+    repository.delete(habitacion);
   }
 
   private void aplicarDatosDelTipo(Habitacion habitacion, TipoHabitacion tipo) {
