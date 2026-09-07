@@ -63,4 +63,20 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
       """)
   long contarHistoricasPorCliente(
       @Param("cliente") Cliente cliente, @Param("fechaActual") LocalDate fechaActual);
+
+  /**
+   * Reservas que usan la habitacion indicada. Trae el cliente en la misma
+   * consulta porque el aviso de borrado se pinta despues del redirect, cuando
+   * las entidades ya estan desligadas de la sesion.
+   */
+  @Query(
+      """
+      SELECT r
+      FROM Reserva r
+      JOIN r.habitaciones h
+      LEFT JOIN FETCH r.cliente
+      WHERE h.id = :idHabitacion
+      ORDER BY r.fechaInicio
+      """)
+  List<Reserva> buscarPorHabitacion(@Param("idHabitacion") Long idHabitacion);
 }

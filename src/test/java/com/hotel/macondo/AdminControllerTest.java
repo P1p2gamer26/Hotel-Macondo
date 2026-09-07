@@ -64,7 +64,7 @@ class AdminControllerTest {
         mockMvc.perform(get("/admin/operadores"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(
-                        org.hamcrest.Matchers.containsString("Recepcion principal")));
+                        org.hamcrest.Matchers.containsString("Recepción Principal")));
 
         mockMvc.perform(get("/admin/servicios"))
                 .andExpect(status().isOk())
@@ -158,21 +158,21 @@ class AdminControllerTest {
                 .param("nombre", "Suite Familiar")
                 .param("etiqueta", "NUEVA")
                 .param("imagen", "/images/HabitacionLuxury.avif")
-                .param("numero", "501")
+                .param("numero", "601")
                 .param("estado", "DISPONIBLE")
-                .param("piso", "5")
+                .param("piso", "6")
                 .param("tipoId", "2"))
                 .andExpect(redirectedUrl("/admin/habitaciones"));
 
         assertEquals(iniciales + 1, habitacionService.buscarTodas().size());
         Habitacion nueva = habitacionService.buscarTodas().stream()
-                .filter(habitacion -> "501".equals(habitacion.getNumero()))
+                .filter(habitacion -> "601".equals(habitacion.getNumero()))
                 .findFirst().orElseThrow();
-        assertEquals("501", nueva.getNumero());
+        assertEquals("601", nueva.getNumero());
         assertEquals("Suite Familiar", nueva.getNombre());
         // Datos derivados del tipo seleccionado.
         assertEquals(2L, nueva.getTipoHabitacion().getId());
-        assertEquals(0, java.math.BigDecimal.valueOf(580000)
+        assertEquals(0, java.math.BigDecimal.valueOf(450000)
                 .compareTo(nueva.getPrecio()));
         assertEquals(3, nueva.getCapacidad());
     }
@@ -188,7 +188,8 @@ class AdminControllerTest {
                 .andExpect(redirectedUrl("/admin/tipos_habitacion"));
 
         Habitacion habitacion = habitacionService.buscarPorId(1L);
-        assertEquals("Jardín Tropical", habitacion.getNombre());
+        // El nombre comercial es propio de la habitacion y no lo pisa el tipo.
+        assertEquals("Sombra del Castaño 101", habitacion.getNombre());
         // Los datos comerciales del tipo se propagan.
         assertEquals("Espacio redisenado para familias", habitacion.getDescripcion());
         assertEquals(0, java.math.BigDecimal.valueOf(420000)

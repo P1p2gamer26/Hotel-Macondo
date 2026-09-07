@@ -88,11 +88,11 @@ class EliminacionCascadaTest {
     }
 
     /**
-     * Borrar una habitacion la desliga de sus reservas sin borrarlas: el
-     * ManyToMany solo pierde las filas de la tabla intermedia.
+     * Una habitacion con reservas no se borra: la reserva quedaria sin
+     * habitacion y cascadearla borraria reservas ajenas.
      */
     @Test
-    void borrarHabitacionNoBorraSusReservas() {
+    void noSePuedeBorrarUnaHabitacionConReservas() {
         Habitacion habitacion = habitacionRepository.findAllByOrderByIdAsc().stream()
                 .filter(h -> !h.getReservas().isEmpty())
                 .findFirst()
@@ -100,14 +100,31 @@ class EliminacionCascadaTest {
         Long habitacionId = habitacion.getId();
         List<Long> reservaIds = habitacion.getReservas().stream().map(Reserva::getId).toList();
 
-        habitacionService.eliminar(habitacionId);
+        assertFalse(habitacionService.eliminar(habitacionId),
+                "borrar una habitacion reservada debe rechazarse");
         recargarDesdeLaBase();
 
-        assertTrue(habitacionRepository.findById(habitacionId).isEmpty(), "la habitacion sigue viva");
+        assertTrue(habitacionRepository.findById(habitacionId).isPresent(),
+                "la habitacion no debia borrarse");
         for (Long reservaId : reservaIds) {
             assertTrue(reservaRepository.findById(reservaId).isPresent(),
-                    "la reserva " + reservaId + " no debia borrarse con la habitacion");
+                    "la reserva " + reservaId + " debia seguir intacta");
         }
+    }
+
+    /** Una habitacion libre si se puede borrar. */
+    @Test
+    void siSePuedeBorrarUnaHabitacionLibre() {
+        Habitacion libre = habitacionRepository.findAllByOrderByIdAsc().stream()
+                .filter(h -> h.getReservas().isEmpty())
+                .findFirst()
+                .orElseThrow();
+        Long libreId = libre.getId();
+
+        assertTrue(habitacionService.eliminar(libreId));
+        recargarDesdeLaBase();
+
+        assertTrue(habitacionRepository.findById(libreId).isEmpty());
     }
 
     /**
@@ -117,6 +134,38 @@ class EliminacionCascadaTest {
     private void recargarDesdeLaBase() {
         entityManager.flush();
         entityManager.clear();
+    }
+
+    /**
+     * Al rechazar el borrado hay que poder decir quien ocupa la habitacion,
+     * con nombre de cliente y numero de reserva.
+     */
+    @Test
+    void informaQuienOcupaLaHabitacion() {
+        Habitacion habitacion = habitacionRepository.findAllByOrderByIdAsc().stream()
+                .filter(h -> !h.getReservas().isEmpty())
+                .findFirst()
+                .orElseThrow();
+
+        List<Reserva> asociadas = habitacionService.reservasAsociadas(habitacion.getId());
+
+        assertFalse(asociadas.isEmpty(), "debe listar las reservas que la ocupan");
+        for (Reserva reserva : asociadas) {
+            assertNotNull(reserva.getNumeroReserva());
+            assertNotNull(reserva.getCliente(), "el cliente debe venir cargado");
+            assertNotNull(reserva.getCliente().getNombre());
+        }
+    }
+
+    /** Una habitacion libre no reporta ninguna reserva. */
+    @Test
+    void habitacionSinReservasNoReportaNada() {
+        Habitacion libre = habitacionRepository.findAllByOrderByIdAsc().stream()
+                .filter(h -> h.getReservas().isEmpty())
+                .findFirst()
+                .orElseThrow();
+
+        assertTrue(habitacionService.reservasAsociadas(libre.getId()).isEmpty());
     }
 
     /** Un tipo con habitaciones asociadas no se puede borrar: se bloquea, no se cascadea. */

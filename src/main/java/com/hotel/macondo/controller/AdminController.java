@@ -1,6 +1,7 @@
 package com.hotel.macondo.controller;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -15,6 +16,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.hotel.macondo.entities.Habitacion;
 import com.hotel.macondo.entities.Operador;
+import com.hotel.macondo.entities.Reserva;
 import com.hotel.macondo.entities.Servicio;
 import com.hotel.macondo.entities.TipoHabitacion;
 import com.hotel.macondo.service.HabitacionService;
@@ -173,11 +175,19 @@ public class AdminController {
     }
 
     /**
-     * Elimina una habitacion del inventario.
+     * Elimina una habitacion del inventario. No la elimina si todavia tiene
+     * reservas asociadas: en ese caso se listan para que el administrador
+     * sepa a quien reubicar antes de volver a intentarlo.
      */
     @PostMapping("/habitaciones/{id}/eliminar")
-    public String eliminarHabitacion(@PathVariable Long id) {
-        habitacionService.eliminar(id);
+    public String eliminarHabitacion(@PathVariable Long id,
+            RedirectAttributes redirectAttributes) {
+        List<Reserva> asociadas = habitacionService.reservasAsociadas(id);
+        if (!habitacionService.eliminar(id)) {
+            redirectAttributes.addFlashAttribute("errorHabitacion",
+                    "No se puede eliminar: la habitacion tiene reservas asociadas.");
+            redirectAttributes.addFlashAttribute("reservasAsociadas", asociadas);
+        }
         return "redirect:/admin/habitaciones";
     }
 

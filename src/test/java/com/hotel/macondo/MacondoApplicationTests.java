@@ -46,21 +46,22 @@ class MacondoApplicationTests {
 
     @Test
     void contextLoads() {
-        assertEquals(4, habitacionService.buscarTodas().size());
+        assertEquals(50, habitacionService.buscarTodas().size());
         assertEquals(6, servicioService.buscarTodos().size());
         assertEquals(3, testimonioService.buscarTodos().size());
     }
 
     @Test
     void habitacionesPorCapacidad() {
-        assertEquals(1, habitacionService.buscarPorPersonas(6).size());
-        assertEquals(4, habitacionService.buscarPorPersonas(1).size());
+        // Solo el piso 5 ("Cien Años Presidencial") admite 6 personas.
+        assertEquals(10, habitacionService.buscarPorPersonas(6).size());
+        assertEquals(50, habitacionService.buscarPorPersonas(1).size());
     }
 
     @Test
     void autenticaYAutorizaConRol() {
         Usuario usuario = usuarioService.autenticar(
-                "operador@macondo.com", "operador123");
+                "operador@macondo.com", "ope");
 
         assertNotNull(usuario);
         assertTrue(usuarioService.autorizar(usuario, Rol.OPERADOR));
@@ -80,7 +81,7 @@ class MacondoApplicationTests {
 
         Usuario usuarioAdmin = usuarioService.buscarPorCorreo("admin@macondo.com");
         assertNotNull(usuarioAdmin.getAdmin());
-        assertEquals("Administrador principal", usuarioAdmin.getAdmin().getNombre());
+        assertEquals("Administrador Principal", usuarioAdmin.getAdmin().getNombre());
     }
 
     @Test
