@@ -262,6 +262,36 @@
           th:text="${errorHabitacion}"
         ></div>
 
+        <!--
+          Detalle del rechazo: que reservas bloquean el borrado y de quien son,
+          para que el administrador sepa a quien reubicar primero.
+        -->
+        <div
+          class="mb-4 rounded-lg border border-red-200 bg-red-50 px-5 py-4 text-red-700"
+          th:if="${reservasAsociadas != null and !#lists.isEmpty(reservasAsociadas)}"
+        >
+          <p class="text-sm font-bold">
+            Reserva(s) que la ocupan
+            (<span th:text="${#lists.size(reservasAsociadas)}"></span>):
+          </p>
+          <ul class="mt-2 list-disc pl-5 text-sm">
+            <li th:each="r : ${reservasAsociadas}">
+              <strong
+                th:text="${r.cliente != null}
+                  ? ${r.cliente.nombre + ' ' + r.cliente.apellido}
+                  : 'Sin cliente'"
+              ></strong>
+              —
+              <span th:text="${r.numeroReserva}"></span>,
+              <span
+                th:text="${#temporals.format(r.fechaInicio, 'dd MMM yyyy')
+                  + ' → ' + #temporals.format(r.fechaFin, 'dd MMM yyyy')}"
+              ></span>
+              (<span th:text="${r.estado}"></span>)
+            </li>
+          </ul>
+        </div>
+
         <!-- Tabla de habitaciones -->
         <div class="bg-white rounded-2xl shadow-sm overflow-x-auto">
           <table class="w-full text-left min-w-[960px]">

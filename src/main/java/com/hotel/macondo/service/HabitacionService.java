@@ -1,8 +1,10 @@
 package com.hotel.macondo.service;
 
 import java.util.Collection;
+import java.util.List;
 
 import com.hotel.macondo.entities.Habitacion;
+import com.hotel.macondo.entities.Reserva;
 import com.hotel.macondo.entities.TipoHabitacion;
 import com.hotel.macondo.errors.RecursoNoEncontradoException;
 
@@ -57,6 +59,17 @@ public interface HabitacionService {
      */
     boolean existeHabitacionConTipo(Long idTipo);
 
-    /** Elimina una habitacion por identificador. */
-    void eliminar(Long id);
+    /**
+     * Reservas que usan esta habitacion. Si la lista no esta vacia la
+     * habitacion no se puede eliminar; sirve para decirle al administrador
+     * a quien tendria que reubicar primero.
+     */
+    List<Reserva> reservasAsociadas(Long id);
+
+    /**
+     * Elimina una habitacion por identificador. No la elimina si todavia
+     * tiene reservas asociadas, porque esas reservas quedarian sin
+     * habitacion. Retorna false cuando el borrado se rechaza.
+     */
+    boolean eliminar(Long id);
 }

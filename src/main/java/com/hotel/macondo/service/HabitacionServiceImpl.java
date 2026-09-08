@@ -1,11 +1,14 @@
 package com.hotel.macondo.service;
 
 import com.hotel.macondo.entities.Habitacion;
+import com.hotel.macondo.entities.Reserva;
 import com.hotel.macondo.entities.TipoHabitacion;
 import com.hotel.macondo.errors.RecursoNoEncontradoException;
 import com.hotel.macondo.repository.HabitacionRepository;
+import com.hotel.macondo.repository.ReservaRepository;
 import com.hotel.macondo.repository.TipoHabitacionRepository;
 import java.util.Collection;
+import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,12 +18,15 @@ public class HabitacionServiceImpl implements HabitacionService {
 
   private final HabitacionRepository repository;
   private final TipoHabitacionRepository tipoHabitacionRepository;
+  private final ReservaRepository reservaRepository;
 
   public HabitacionServiceImpl(
       HabitacionRepository repository,
-      TipoHabitacionRepository tipoHabitacionRepository) {
+      TipoHabitacionRepository tipoHabitacionRepository,
+      ReservaRepository reservaRepository) {
     this.repository = repository;
     this.tipoHabitacionRepository = tipoHabitacionRepository;
+    this.reservaRepository = reservaRepository;
   }
 
   /** {@inheritDoc} */
@@ -118,8 +124,27 @@ public class HabitacionServiceImpl implements HabitacionService {
 
   /** {@inheritDoc} */
   @Override
-  public void eliminar(Long id) {
-    repository.deleteById(id);
+  @Transactional(readOnly = true)
+  public List<Reserva> reservasAsociadas(Long id) {
+    return reservaRepository.buscarPorHabitacion(id);
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public boolean eliminar(Long id) {
+    Habitacion habitacion = repository.findById(id).orElse(null);
+    if (habitacion == null) {
+      return false;
+    }
+
+    // Una reserva sin habitacion no tiene sentido, y la cascada tampoco es
+    // opcion porque borraria reservas ajenas a esta habitacion. Se rechaza.
+    if (!habitacion.getReservas().isEmpty()) {
+      return false;
+    }
+
+    repository.delete(habitacion);
+    return true;
   }
 
   private void aplicarDatosDelTipo(Habitacion habitacion, TipoHabitacion tipo) {

@@ -3,8 +3,10 @@ package com.hotel.macondo.service;
 import com.hotel.macondo.entities.Cliente;
 import com.hotel.macondo.entities.Habitacion;
 import com.hotel.macondo.entities.Reserva;
+import com.hotel.macondo.entities.Usuario;
 import com.hotel.macondo.repository.ClienteRepository;
 import com.hotel.macondo.repository.ReservaRepository;
+import com.hotel.macondo.repository.UsuarioRepository;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
@@ -24,11 +26,15 @@ public class ClienteServiceImpl implements ClienteService {
 
   private final ClienteRepository repository;
   private final ReservaRepository reservaRepository;
+  private final UsuarioRepository usuarioRepository;
 
   public ClienteServiceImpl(
-      ClienteRepository repository, ReservaRepository reservaRepository) {
+      ClienteRepository repository,
+      ReservaRepository reservaRepository,
+      UsuarioRepository usuarioRepository) {
     this.repository = repository;
     this.reservaRepository = reservaRepository;
+    this.usuarioRepository = usuarioRepository;
   }
 
   /** {@inheritDoc} */
@@ -58,7 +64,27 @@ public class ClienteServiceImpl implements ClienteService {
   /** {@inheritDoc} */
   @Override
   public void eliminar(Long id) {
-    repository.deleteById(id);
+    Cliente cliente = repository.findById(id).orElse(null);
+    if (cliente == null) {
+      return;
+    }
+
+    // El ON DELETE CASCADE de la base cubre la integridad, pero Hibernate no se
+    // entera: si quedan hijos en la sesion apuntando al cliente borrado, el
+    // flush falla. Por eso se sueltan y se borran aqui, de arriba hacia abajo.
+    for (Reserva reserva : cliente.getReservas()) {
+      reserva.getHabitaciones().clear();
+      reservaRepository.delete(reserva);
+    }
+    cliente.getReservas().clear();
+
+    Usuario usuario = cliente.getUsuario();
+    if (usuario != null) {
+      cliente.setUsuario(null);
+      usuarioRepository.delete(usuario);
+    }
+
+    repository.delete(cliente);
   }
 
   /** {@inheritDoc} */

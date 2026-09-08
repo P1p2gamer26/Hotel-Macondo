@@ -11,6 +11,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Getter
 @Setter
@@ -26,7 +28,9 @@ public class Admin {
   @Column(nullable = false, length = 100)
   private String nombre;
 
+  // El perfil de admin muere con su usuario.
   @OneToOne
+  @OnDelete(action = OnDeleteAction.CASCADE)
   private Usuario usuario;
 
   public Admin(String nombre) {
