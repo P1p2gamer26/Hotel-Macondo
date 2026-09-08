@@ -6,7 +6,7 @@ import java.util.List;
 import com.hotel.macondo.entities.Habitacion;
 import com.hotel.macondo.entities.Reserva;
 import com.hotel.macondo.entities.TipoHabitacion;
-import com.hotel.macondo.exceptions.RecursoNoEncontradoException;
+import com.hotel.macondo.errors.RecursoNoEncontradoException;
 
 public interface HabitacionService {
 
