@@ -1,4 +1,4 @@
-package com.hotel.macondo.exceptions;
+package com.hotel.macondo.errors;
 
 public class RecursoNoEncontradoException extends RuntimeException {
 

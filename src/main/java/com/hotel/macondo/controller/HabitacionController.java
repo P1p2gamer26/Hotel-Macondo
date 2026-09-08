@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.hotel.macondo.entities.Habitacion;
-import com.hotel.macondo.exceptions.RecursoNoEncontradoException;
+import com.hotel.macondo.errors.RecursoNoEncontradoException;
 import com.hotel.macondo.service.HabitacionService;
 
 @RequestMapping("/habitaciones")
@@ -46,12 +46,9 @@ public class HabitacionController {
      */
     @GetMapping("/{id}")
     public String mostrarHabitacion(@PathVariable("id") Long id, Model model) {
-        try {
-            Habitacion habitacion = service.buscarPorId(id);
-            model.addAttribute("habitacion", habitacion);
-            return "habitacion/detalle_habitacion";
-        } catch (RecursoNoEncontradoException e) {
-            return "redirect:/habitaciones";
-        }
+        Habitacion habitacion = service.buscarPorId(id);
+        model.addAttribute("habitacion", habitacion);
+        return "habitacion/detalle_habitacion";
+        
     }
 }
