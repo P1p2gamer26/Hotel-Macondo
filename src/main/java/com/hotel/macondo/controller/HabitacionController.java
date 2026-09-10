@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.hotel.macondo.entities.Habitacion;
-import com.hotel.macondo.errors.RecursoNoEncontradoException;
 import com.hotel.macondo.service.HabitacionService;
 
 @RequestMapping("/habitaciones")

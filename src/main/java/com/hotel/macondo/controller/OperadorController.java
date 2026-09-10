@@ -1,7 +1,5 @@
 package com.hotel.macondo.controller;
 
-import java.util.Collection;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -9,9 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.hotel.macondo.entities.Operador;
 import com.hotel.macondo.service.OperadorService;
 
 /**
@@ -22,6 +18,8 @@ import com.hotel.macondo.service.OperadorService;
 @RequestMapping("/operador")
 public class OperadorController {
 
+    // Como no esta implementada ninguna funcionalidad entonces todavia no se utiliza
+    // Pero este se utilizara en un futuro, asi que por eso se mantiene la inyeccion de dependencias
     @Autowired
     private OperadorService service;
 

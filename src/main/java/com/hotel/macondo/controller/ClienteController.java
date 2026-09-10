@@ -1,6 +1,5 @@
 package com.hotel.macondo.controller;
 
-import java.util.Collection;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
@@ -10,7 +9,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -33,12 +31,6 @@ public class ClienteController {
     private CuentaClienteService cuentaClienteService;
     @Autowired
     private ServicioService servicioService;
-
-    private final AdminController adminController;
-
-    ClienteController(AdminController adminController) {
-        this.adminController = adminController;
-    }
 
     /**
      * Muestra el dashboard del cliente identificado por la URL.
