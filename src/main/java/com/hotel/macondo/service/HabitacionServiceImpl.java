@@ -1,16 +1,20 @@
 package com.hotel.macondo.service;
 
+import java.util.Collection;
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.hotel.macondo.entities.Habitacion;
 import com.hotel.macondo.entities.Reserva;
 import com.hotel.macondo.entities.TipoHabitacion;
-import com.hotel.macondo.errors.RecursoNoEncontradoException;
 import com.hotel.macondo.repository.HabitacionRepository;
 import com.hotel.macondo.repository.ReservaRepository;
 import com.hotel.macondo.repository.TipoHabitacionRepository;
-import java.util.Collection;
-import java.util.List;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import com.hotel.macondo.errors.RecursoNoEncontradoException;
+import com.hotel.macondo.errors.FormularioErroneoException;
+import com.hotel.macondo.errors.PeticionImposible;
 
 @Service
 @Transactional
@@ -74,16 +78,16 @@ public class HabitacionServiceImpl implements HabitacionService {
   @Override
   public Habitacion guardar(Habitacion habitacion, Long idTipo) {
     if (idTipo == null) {
-      return null;
+      throw new FormularioErroneoException("El tipo de habitación es obligatorio.");
     }
     TipoHabitacion tipo = tipoHabitacionRepository.findById(idTipo).orElse(null);
     if (tipo == null) {
-      return null;
+      throw new FormularioErroneoException("El tipo de habitación no existe.");
     }
     if (habitacion.getNombre() == null
         || habitacion.getNombre().isBlank()
         || habitacion.getNombre().equalsIgnoreCase(tipo.getNombre())) {
-      return null;
+      throw new FormularioErroneoException("El nombre de la habitación es inválido.");
     }
     aplicarDatosDelTipo(habitacion, tipo);
     return repository.save(habitacion);
@@ -131,20 +135,21 @@ public class HabitacionServiceImpl implements HabitacionService {
 
   /** {@inheritDoc} */
   @Override
-  public boolean eliminar(Long id) {
+  public void eliminar(Long id) {
     Habitacion habitacion = repository.findById(id).orElse(null);
     if (habitacion == null) {
-      return false;
+      throw new RecursoNoEncontradoException(
+          "No se encontro habitacion con id " + id);
     }
 
     // Una reserva sin habitacion no tiene sentido, y la cascada tampoco es
     // opcion porque borraria reservas ajenas a esta habitacion. Se rechaza.
     if (!habitacion.getReservas().isEmpty()) {
-      return false;
+      throw new PeticionImposible(
+          "No se puede eliminar: la habitacion tiene reservas asociadas.");
     }
 
     repository.delete(habitacion);
-    return true;
   }
 
   private void aplicarDatosDelTipo(Habitacion habitacion, TipoHabitacion tipo) {

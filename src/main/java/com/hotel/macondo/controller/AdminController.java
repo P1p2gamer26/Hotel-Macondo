@@ -158,9 +158,13 @@ public class AdminController {
     public String guardarHabitacion(@ModelAttribute("habitacion") Habitacion habitacion,
             @RequestParam(required = false) Long tipoId,
             RedirectAttributes redirectAttributes) {
-        if (habitacionService.guardar(habitacion, tipoId) == null) {
-            redirectAttributes.addFlashAttribute("errorHabitacion",
-                    "No se puede guardar: selecciona un tipo valido y usa un nombre distinto al tipo.");
+        
+        // Como el error se muestra en el formulario entonces se captura la excepcion localmente 
+        // para mostrar el mensaje de error en el formulario de login
+        try {
+            habitacionService.guardar(habitacion, tipoId);
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorHabitacion", e.getMessage());
         }
         return "redirect:/admin/habitaciones";
     }
@@ -183,9 +187,10 @@ public class AdminController {
     public String eliminarHabitacion(@PathVariable Long id,
             RedirectAttributes redirectAttributes) {
         List<Reserva> asociadas = habitacionService.reservasAsociadas(id);
-        if (!habitacionService.eliminar(id)) {
-            redirectAttributes.addFlashAttribute("errorHabitacion",
-                    "No se puede eliminar: la habitacion tiene reservas asociadas.");
+        try {
+            habitacionService.eliminar(id);
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorHabitacion", e.getMessage());
             redirectAttributes.addFlashAttribute("reservasAsociadas", asociadas);
         }
         return "redirect:/admin/habitaciones";
@@ -207,21 +212,28 @@ public class AdminController {
      */
     @PostMapping("/tipos_habitacion")
     public String guardarTipoHabitacion(@RequestParam(required = false) Long id,
+            RedirectAttributes redirectAttributes,
             @RequestParam String nombre,
             @RequestParam String descripcion,
             @RequestParam BigDecimal precioNoche,
             @RequestParam Integer capacidadPersonas) {
 
-        TipoHabitacion tipo = id == null
-                ? new TipoHabitacion(nombre, descripcion, precioNoche, capacidadPersonas)
-                : tipoHabitacionService.buscarPorId(id);
-        if (tipo == null) {
-            return "redirect:/admin/tipos_habitacion";
+        TipoHabitacion tipo;
+        if (id == null) {
+            tipo = new TipoHabitacion(nombre, descripcion, precioNoche, capacidadPersonas);
+        } else {
+            try {
+                tipo = tipoHabitacionService.buscarPorId(id);
+                tipo.setNombre(nombre);
+                tipo.setDescripcion(descripcion);
+                tipo.setPrecioNoche(precioNoche);
+                tipo.setCapacidadPersonas(capacidadPersonas);
+            } catch (Exception e) {
+                redirectAttributes.addFlashAttribute("errorTipo", e.getMessage());
+                return "redirect:/admin/tipos_habitacion";
+            }
         }
-        tipo.setNombre(nombre);
-        tipo.setDescripcion(descripcion);
-        tipo.setPrecioNoche(precioNoche);
-        tipo.setCapacidadPersonas(capacidadPersonas);
+        
         tipoHabitacionService.guardar(tipo);
         return "redirect:/admin/tipos_habitacion";
     }
@@ -233,9 +245,11 @@ public class AdminController {
     @PostMapping("/tipos_habitacion/{id}/eliminar")
     public String eliminarTipoHabitacion(@PathVariable Long id,
             RedirectAttributes redirectAttributes) {
-        if (!tipoHabitacionService.eliminar(id)) {
-            redirectAttributes.addFlashAttribute("errorTipo",
-                    "No se puede eliminar: hay habitaciones asignadas a este tipo.");
+
+        try{
+            tipoHabitacionService.eliminar(id);
+        }catch(Exception e){
+            redirectAttributes.addFlashAttribute("errorTipo", e.getMessage());
         }
         return "redirect:/admin/tipos_habitacion";
     }

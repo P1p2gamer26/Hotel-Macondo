@@ -5,6 +5,7 @@ import java.util.Collection;
 import com.hotel.macondo.entities.Cliente;
 import com.hotel.macondo.entities.Rol;
 import com.hotel.macondo.entities.Usuario;
+import com.hotel.macondo.errors.FormularioErroneoException;
 
 public interface UsuarioService {
 
@@ -20,7 +21,10 @@ public interface UsuarioService {
     /** Valida que una contraseña se pueda usar. */
     boolean validarContrasena(String contrasena);
 
-    /** Valida las credenciales y retorna el usuario autenticado. */
+    /** Valida las credenciales y retorna el usuario autenticado. 
+     *
+     * @throws FormularioErroneoException si el correo o la contraseña no son validos
+     */
     Usuario autenticar(String correo, String contrasena);
 
     /** Registra un usuario cuando el correo no esta en uso. */

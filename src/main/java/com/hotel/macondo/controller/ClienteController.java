@@ -37,10 +37,9 @@ public class ClienteController {
      */
     @GetMapping("/{id}")
     public String mostrarDashboard(@PathVariable Long id, Model model) {
+
+        // Esta funcion puede lanzar un error pero este es manejado por el GlobalExceptionHandler
         Cliente cliente = clienteService.buscarPorId(id);
-        if (cliente == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Cliente no encontrado");
-        }
 
         // Toda la logica la calculan los servicios :D
         Reserva reservaActiva = clienteService.obtenerReservaActiva(cliente);

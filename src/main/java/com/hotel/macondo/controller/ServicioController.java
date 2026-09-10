@@ -30,12 +30,9 @@ public class ServicioController {
     /** Construye el detalle publico de un servicio activo. */
     @GetMapping("/{id}")
     public String mostrarDetalle(@PathVariable Long id, Model model) {
-        Servicio servicio = service.buscarPorId(id);
         // Un servicio inexistente o retirado del catalogo no tiene ficha publica.
-        if (servicio == null || !servicio.isActivo()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
-                    "Servicio no encontrado");
-        }
+        // La funcion lanza una excepcion la cual es manejada por el GlobalExceptionHandler.
+        Servicio servicio = service.buscarPorId(id);
 
         model.addAttribute("servicio", servicio);
         // La vista de detalle recibe servicios alternativos para continuar la

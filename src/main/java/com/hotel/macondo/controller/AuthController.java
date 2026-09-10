@@ -68,25 +68,22 @@ public class AuthController {
             @RequestParam(name = "password") String contrasena,
             Model model) {
 
-        Usuario usuario = serviceUsuario.autenticar(correo, contrasena);
+        // Como el error se muestra en el formulario de login entonces se captura la excepcion
+        // localmente para mostrar el mensaje de error en el formulario de login
+        try{
+            Usuario usuario = serviceUsuario.autenticar(correo, contrasena);
 
-        if (usuario == null) {
-            model.addAttribute("error", "Correo o contraseña incorrectos.");
-            return "login";
-        }
-
-        // Redirecciones por rol
-        if (usuario.getRol() == Rol.ADMINISTRADOR) {
-            return "redirect:/admin";
-        } else if (usuario.getRol() == Rol.OPERADOR) {
-            return "redirect:/operador";
-        } else if (usuario.getRol() == Rol.CLIENTE) {
-            Cliente cliente = usuario.getCliente();
-            if (cliente == null || cliente.getId() == null) {
-                model.addAttribute("error", "El usuario no tiene un cliente asociado.");
-                return "login";
+            // Redirecciones por rol
+            if (usuario.getRol() == Rol.ADMINISTRADOR) {
+                return "redirect:/admin";
+            } else if (usuario.getRol() == Rol.OPERADOR) {
+                return "redirect:/operador";
+            } else if (usuario.getRol() == Rol.CLIENTE) {
+                return "redirect:/cliente/" + usuario.getCliente().getId();
             }
-            return "redirect:/cliente/" + cliente.getId();
+        }catch (Exception e){
+            model.addAttribute("error", e.getMessage());
+            return "login";
         }
 
         return "redirect:/";
@@ -100,8 +97,13 @@ public class AuthController {
     @PostMapping("/registro")
     public String agregarCliente(@ModelAttribute("cliente") Cliente clienteNuevo, @RequestParam("contrasena") String contrasena, Model model){
 
-        if (!cuentaClienteService.crearCuenta(clienteNuevo, contrasena)) {
-            return "registro"; // Si la creacion de la cuenta falla, redirige al formulario de registro
+        // Como el error se muestra en el formulario de register entonces se captura la excepcion
+        // localmente para mostrar el mensaje de error en el formulario de login
+        try{
+            cuentaClienteService.crearCuenta(clienteNuevo, contrasena);
+        }catch (Exception e){
+            model.addAttribute("error", e.getMessage());
+            return "registro"; // Si hay un error, redirige al formulario de registro con el mensaje de error
         }
 
         // Cuando se termina de crear la cuenta del cliente se redirecciona a la pagina de su cuenta
