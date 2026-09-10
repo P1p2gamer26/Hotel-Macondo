@@ -1,12 +1,15 @@
 package com.hotel.macondo.service;
 
-import com.hotel.macondo.entities.Servicio;
-import com.hotel.macondo.repository.ServicioRepository;
 import java.util.Collection;
 import java.util.List;
+
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.hotel.macondo.entities.Servicio;
+import com.hotel.macondo.repository.ServicioRepository;
+import com.hotel.macondo.errors.RecursoNoEncontradoException;
 
 @Service
 @Transactional
@@ -27,7 +30,14 @@ public class ServicioServiceImpl implements ServicioService {
   /** {@inheritDoc} */
   @Override
   public Servicio buscarPorId(Long id) {
-    return repository.findById(id).orElse(null);
+    Servicio servicio = repository.findById(id).orElseThrow(
+        () -> new RecursoNoEncontradoException("Servicio no encontrado"));
+
+      if(!servicio.isActivo()){
+        throw new RecursoNoEncontradoException("Servicio no encontrado");
+      }
+
+    return servicio;
   }
 
   /** {@inheritDoc} */

@@ -1,6 +1,5 @@
 package com.hotel.macondo.controller;
 
-import java.util.Collection;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
@@ -10,7 +9,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -34,21 +32,14 @@ public class ClienteController {
     @Autowired
     private ServicioService servicioService;
 
-    private final AdminController adminController;
-
-    ClienteController(AdminController adminController) {
-        this.adminController = adminController;
-    }
-
     /**
      * Muestra el dashboard del cliente identificado por la URL.
      */
     @GetMapping("/{id}")
     public String mostrarDashboard(@PathVariable Long id, Model model) {
+
+        // Esta funcion puede lanzar un error pero este es manejado por el GlobalExceptionHandler
         Cliente cliente = clienteService.buscarPorId(id);
-        if (cliente == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Cliente no encontrado");
-        }
 
         // Toda la logica la calculan los servicios :D
         Reserva reservaActiva = clienteService.obtenerReservaActiva(cliente);

@@ -46,10 +46,8 @@ public class ReservaController {
 
     /** Evita renderizar vistas privadas para identificadores inexistentes. */
     private Cliente obtenerCliente(Long id) {
+        // Esta funcion puede lanzar una excepcion la cual es manejada por el GlobalExceptionHandler.
         Cliente cliente = clienteService.buscarPorId(id);
-        if (cliente == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Cliente no encontrado");
-        }
         return cliente;
     }
 }

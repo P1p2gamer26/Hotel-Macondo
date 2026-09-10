@@ -1,13 +1,17 @@
 package com.hotel.macondo.service;
 
+import java.util.Collection;
+import java.util.Locale;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.hotel.macondo.entities.Cliente;
 import com.hotel.macondo.entities.Rol;
 import com.hotel.macondo.entities.Usuario;
 import com.hotel.macondo.repository.UsuarioRepository;
-import java.util.Collection;
-import java.util.Locale;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import com.hotel.macondo.errors.FormularioErroneoException;
+
 
 @Service
 @Transactional
@@ -37,9 +41,7 @@ public class UsuarioServiceImpl implements UsuarioService {
   /** {@inheritDoc} */
   @Override
   public boolean validarCorreo(String correo) {
-    return correo != null
-        && !correo.isBlank()
-        && !repository.existsByCorreoIgnoreCase(normalizarCorreo(correo));
+    return !repository.existsByCorreoIgnoreCase(normalizarCorreo(correo));
   }
 
   /** {@inheritDoc} */
@@ -52,7 +54,7 @@ public class UsuarioServiceImpl implements UsuarioService {
   @Override
   public Usuario autenticar(String correo, String contrasena) {
     if (correo == null) {
-      return null;
+      throw new FormularioErroneoException("Ingrese un correo valido");
     }
     String correoNormalizado = normalizarCorreo(correo);
     Usuario usuario =
@@ -60,7 +62,7 @@ public class UsuarioServiceImpl implements UsuarioService {
     if (usuario == null
         || usuario.getContrasena() == null
         || !usuario.getContrasena().equals(contrasena)) {
-      return null;
+      throw new FormularioErroneoException("Correo o contraseña incorrectos");
     }
     return usuario;
   }

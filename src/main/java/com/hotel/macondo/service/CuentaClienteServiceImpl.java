@@ -1,29 +1,31 @@
 package com.hotel.macondo.service;
 
-import com.hotel.macondo.entities.Cliente;
-import com.hotel.macondo.entities.Usuario;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.hotel.macondo.entities.Cliente;
+import com.hotel.macondo.entities.Usuario;
+import com.hotel.macondo.errors.FormularioErroneoException;
 
 @Service
 @Transactional
 public class CuentaClienteServiceImpl implements CuentaClienteService {
 
-  private final ClienteService clienteService;
-  private final UsuarioService usuarioService;
-
-  public CuentaClienteServiceImpl(
-      ClienteService clienteService, UsuarioService usuarioService) {
-    this.clienteService = clienteService;
-    this.usuarioService = usuarioService;
-  }
+  @Autowired 
+  private ClienteService clienteService;
+  @Autowired 
+  private UsuarioService usuarioService;
 
   /** {@inheritDoc} */
   @Override
-  public Boolean crearCuenta(Cliente cliente, String contrasena) {
+  public void crearCuenta(Cliente cliente, String contrasena) {
     String correo = cliente.getCorreo();
     if (!usuarioService.validarCorreo(correo)) {
-      return false;
+      throw new FormularioErroneoException("Correo electrónico ya en uso.");
+    }
+    if (correo == null || correo.isBlank()) {
+      throw new FormularioErroneoException("El correo no puede estar vacío.");
     }
 
     Cliente clienteGuardado = clienteService.guardar(cliente);
@@ -32,9 +34,9 @@ public class CuentaClienteServiceImpl implements CuentaClienteService {
 
     if (usuarioGuardado == null) {
       clienteService.eliminar(clienteGuardado.getId());
-      return false;
+      throw new FormularioErroneoException(
+          "No se pudo crear la cuenta de usuario para el cliente.");
     }
-    return true;
   }
 
   /** {@inheritDoc} */

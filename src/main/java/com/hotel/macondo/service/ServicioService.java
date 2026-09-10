@@ -10,7 +10,10 @@ public interface ServicioService {
     // Retorna todos los servicios del hotel
     Collection<Servicio> buscarTodos();
 
-    // Busca un servicio por identificador
+    /**
+     * Busca un servicio por identificador.
+     * @throws RecursoNoEncontradoException si no se encuentra el servicio o si el servicio esta desactivado.
+     */
     Servicio buscarPorId(Long id);
 
     // Crea o actualiza un servicio

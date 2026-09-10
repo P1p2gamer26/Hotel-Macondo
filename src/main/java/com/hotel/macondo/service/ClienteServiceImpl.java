@@ -1,5 +1,15 @@
 package com.hotel.macondo.service;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+import java.util.Collection;
+import java.util.List;
+import java.util.Locale;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.hotel.macondo.entities.Cliente;
 import com.hotel.macondo.entities.Habitacion;
 import com.hotel.macondo.entities.Reserva;
@@ -7,14 +17,7 @@ import com.hotel.macondo.entities.Usuario;
 import com.hotel.macondo.repository.ClienteRepository;
 import com.hotel.macondo.repository.ReservaRepository;
 import com.hotel.macondo.repository.UsuarioRepository;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
-import java.util.Collection;
-import java.util.List;
-import java.util.Locale;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import com.hotel.macondo.errors.RecursoNoEncontradoException;
 
 @Service
 @Transactional
@@ -46,13 +49,15 @@ public class ClienteServiceImpl implements ClienteService {
   /** {@inheritDoc} */
   @Override
   public Cliente buscarPorId(Long id) {
-    return repository.findById(id).orElse(null);
+    return repository.findById(id).orElseThrow(
+      () -> new RecursoNoEncontradoException("No se encontró cliente con id " + id));
   }
 
   /** {@inheritDoc} */
   @Override
   public Cliente buscarPorCedula(String cedula) {
-    return repository.findByCedula(cedula).orElse(null);
+    return repository.findByCedula(cedula).orElseThrow(
+      () -> new RecursoNoEncontradoException("No se encontró cliente con esa cédula"));
   }
 
   /** {@inheritDoc} */

@@ -39,6 +39,8 @@ public interface HabitacionService {
      *
      * Toda habitacion debe tener un tipo valido: si el identificador es nulo
      * o no corresponde a ningun tipo, no se guarda nada y retorna null.
+     * 
+     * @throws FormularioErroneoException si el tipo es nulo o no existe, o si el nombre de la habitacion es invalido
      */
     Habitacion guardar(Habitacion habitacion, Long idTipo);
 
@@ -70,6 +72,9 @@ public interface HabitacionService {
      * Elimina una habitacion por identificador. No la elimina si todavia
      * tiene reservas asociadas, porque esas reservas quedarian sin
      * habitacion. Retorna false cuando el borrado se rechaza.
+     * 
+     * @throws RecursoNoEncontradoException si no existe una habitacion con ese id
+     * @throws PeticionImposible si la habitacion tiene reservas asociadas
      */
-    boolean eliminar(Long id);
+    void eliminar(Long id);
 }
