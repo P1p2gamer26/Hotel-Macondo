@@ -89,6 +89,7 @@ public class DataLoader implements CommandLineRunner {
                                 TipoHabitacion.builder()
                                                 .nombre("Castaño Fundacional")
                                                 .descripcion("Refugio íntimo con vista al gran patio de Macondo, cama queen y brisa fresca.")
+                                                .imagen("/images/HabitacionNormal.avif")
                                                 .precioNoche(BigDecimal.valueOf(280000))
                                                 .capacidadPersonas(2)
                                                 .build()));
@@ -97,6 +98,7 @@ public class DataLoader implements CommandLineRunner {
                                 TipoHabitacion.builder()
                                                 .nombre("Orfebrería Buendía")
                                                 .descripcion("Espacio distinguido con detalles artesanales en oro, balcón y sala de lectura.")
+                                                .imagen("/images/HabitacionExecutive.avif")
                                                 .precioNoche(BigDecimal.valueOf(450000))
                                                 .capacidadPersonas(3)
                                                 .build()));
@@ -106,6 +108,7 @@ public class DataLoader implements CommandLineRunner {
                                                 .nombre("Mariposas Amarillas")
                                                 .descripcion(
                                                                 "Suite boutique luminosa decorada con motivos botánicos, cama king size y terraza caribeña.")
+                                                .imagen("/images/HabitacionVIP.avif")
                                                 .precioNoche(BigDecimal.valueOf(650000))
                                                 .capacidadPersonas(4)
                                                 .build()));
@@ -115,6 +118,7 @@ public class DataLoader implements CommandLineRunner {
                                                 .nombre("Cuarto de Melquíades")
                                                 .descripcion(
                                                                 "Suite ejecutiva con estudio privado, selección de libros clásicos y vista al río.")
+                                                .imagen("/images/HabitacionExecutive.avif")
                                                 .precioNoche(BigDecimal.valueOf(980000))
                                                 .capacidadPersonas(2)
                                                 .build()));
@@ -124,6 +128,7 @@ public class DataLoader implements CommandLineRunner {
                                                 .nombre("Cien Años Presidencial")
                                                 .descripcion(
                                                                 "Villa exclusiva frente al mar con piscina privada y atención personalizada 24 horas.")
+                                                .imagen("/images/HabitacionLuxury.avif")
                                                 .precioNoche(BigDecimal.valueOf(1900000))
                                                 .capacidadPersonas(6)
                                                 .build()));
@@ -134,71 +139,22 @@ public class DataLoader implements CommandLineRunner {
         private List<Habitacion> cargarHabitaciones(List<TipoHabitacion> tipos) {
                 List<Habitacion> habitaciones = new ArrayList<>();
 
-                // matriz de nombres tematicos (5 pisos x 10 nombres inspirados en la obra)
-                String[][] nombresPorPiso = {
-                                { // piso 1: castano fundacional
-                                                "Sombra del Castaño", "Río de Piedras", "Sendero del Galeón",
-                                                "Trocha de la Ciénaga",
-                                                "Brisa del Río", "Tierra Colorada", "Remanso de la Ceiba",
-                                                "Platanal Dorado",
-                                                "Canto de Chicharras", "Rocío Matinal"
-                                },
-                                { // piso 2: orfebreria buendia
-                                                "Pescaíto de Oro", "Taller de Orfebrería", "Yunque y Fuego",
-                                                "Fragua Colonial",
-                                                "Muralla y Sol", "Reloj de Arena", "Sala de Tertulia", "Alcandora Real",
-                                                "Baúl de Recuerdos", "Crisol del Mar"
-                                },
-                                { // piso 3: mariposas amarillas
-                                                "Nube de Mariposas", "Patio de Begonias", "Remanso de Remedios",
-                                                "Balcón de la Ciénaga",
-                                                "Jardín Encantado", "Susurro del Alba", "Mirador de Amaranta",
-                                                "Llovizna de Flores",
-                                                "Sueño de Guayaba", "Azahares del Viento"
-                                },
-                                { // piso 4: cuarto de melquiades
-                                                "Cuarto del Hielo", "Taller de Alquimia", "Espejo de Agua",
-                                                "Salón de Imanes",
-                                                "Astrolabio Mayor", "Gabinete Gitano", "Prisma del Sol",
-                                                "Brújula Antigua",
-                                                "Viento del Trópico", "Atalaya Secreta"
-                                },
-                                { // piso 5: cien anos presidencial
-                                                "Galeón Perdido", "Ciudad de los Espejos", "Horizonte Caribe",
-                                                "Refugio del Patriarca",
-                                                "Cúpula Macondo", "Terraza del Olvido", "Mirador del Océano",
-                                                "Brisa de Ultramar",
-                                                "Palacio de Palmeras", "Cumbre Solitaria"
-                                }
-                };
-
-                String[] imagenesPorTipo = {
-                                "/images/HabitacionNormal.avif",
-                                "/images/HabitacionExecutive.avif",
-                                "/images/HabitacionVIP.avif",
-                                "/images/HabitacionExecutive.avif",
-                                "/images/HabitacionLuxury.avif"
-                };
-
                 String[] etiquetas = { "ACOGEDORA", "POPULAR", "EXCLUSIVA", "HISTÓRICA", "ÚNICA" };
 
                 // generacion sistematica de las 50 habitaciones fisicas
                 for (int piso = 1; piso <= 5; piso++) {
                         TipoHabitacion tipo = tipos.get(piso - 1);
                         String etiqueta = etiquetas[piso - 1];
-                        String imagen = imagenesPorTipo[piso - 1];
 
                         for (int hab = 1; hab <= 10; hab++) {
                                 String numero = String.format("%d%02d", piso, hab);
-                                String nombre = nombresPorPiso[piso - 1][hab - 1] + " " + numero;
+                                String nombre = "Habitación " + numero;
 
                                 Habitacion h = Habitacion.builder()
                                                 .nombre(nombre)
                                                 .etiqueta(etiqueta)
-                                                .descripcion(tipo.getDescripcion())
                                                 .precio(tipo.getPrecioNoche())
                                                 .capacidad(tipo.getCapacidadPersonas())
-                                                .imagen(imagen)
                                                 .numero(numero)
                                                 .estado("DISPONIBLE")
                                                 .piso(piso)

@@ -76,7 +76,6 @@
                   <option
                     th:each="tipo : ${tiposHabitacion}"
                     th:value="${tipo.id}"
-                    th:data-descripcion="${tipo.descripcion}"
                     th:data-precio="${tipo.precioNoche}"
                     th:data-capacidad="${tipo.capacidadPersonas}"
                     th:text="${tipo.nombre}"
@@ -88,14 +87,14 @@
                 <label
                   class="block text-sm font-bold text-[var(--azul-oscuro)] mb-2"
                   for="campo-nombre"
-                  >Nombre</label
+                  >Etiqueta interna</label
                 >
                 <input
                   class="w-full border border-gray-200 rounded-lg px-4 py-3 focus:outline-none focus:border-[var(--azul)]"
                   type="text"
                   id="campo-nombre"
                   name="nombre"
-                  placeholder="Jardín Tropical"
+                  placeholder="Habitación 301"
                   required
                 />
               </div>
@@ -198,42 +197,6 @@
                 </select>
               </div>
 
-              <div>
-                <label
-                  class="block text-sm font-bold text-[var(--azul-oscuro)] mb-2"
-                  for="campo-imagen"
-                  >Imagen</label
-                >
-                <input
-                  class="w-full border border-gray-200 rounded-lg px-4 py-3 focus:outline-none focus:border-[var(--azul)]"
-                  type="text"
-                  id="campo-imagen"
-                  name="imagen"
-                  list="imagenes-habitacion"
-                  placeholder="/images/HabitacionVIP.avif"
-                  required
-                />
-                <datalist id="imagenes-habitacion">
-                  <option value="/images/HabitacionNormal.avif"></option>
-                  <option value="/images/HabitacionExecutive.avif"></option>
-                  <option value="/images/HabitacionVIP.avif"></option>
-                  <option value="/images/HabitacionLuxury.avif"></option>
-                </datalist>
-              </div>
-            </div>
-
-            <div class="mt-6">
-              <label
-                class="block text-sm font-bold text-[var(--azul-oscuro)] mb-2"
-                for="campo-descripcion"
-                >Descripcion</label
-              >
-<textarea
-                  class="w-full border border-gray-200 rounded-lg px-4 py-3 focus:outline-none focus:border-[var(--azul)] min-h-32 bg-gray-50"
-                  id="campo-descripcion"
-                  name="descripcion"
-                  readonly
-                ></textarea>
             </div>
 
             <div class="flex flex-wrap gap-4 mt-8">
@@ -318,7 +281,7 @@
                   <div class="flex items-center gap-3">
                     <img
                       class="w-14 h-14 rounded-lg object-cover bg-[var(--crema)]"
-                      th:src="@{${h.imagen}}"
+                      th:src="@{${h.tipoHabitacion.imagen}}"
                       th:alt="${h.nombre}"
                     />
                     <div>
@@ -359,7 +322,8 @@
                 <td class="px-6 py-4 text-right whitespace-nowrap">
                   <a
                     class="text-[var(--azul)] hover:underline font-medium"
-                    th:href="@{/habitaciones/{id}(id=${h.id})}"
+                    th:href="@{/habitaciones/{id}(id=${h.tipoHabitacion.id})}"
+                    th:if="${h.tipoHabitacion != null}"
                     target="_blank"
                     >Ver</a
                   >
@@ -370,10 +334,8 @@
                     th:data-tipo="${h.tipoHabitacion != null} ? ${h.tipoHabitacion.id} : ''"
                     th:data-nombre="${h.nombre}"
                     th:data-etiqueta="${h.etiqueta}"
-                    th:data-descripcion="${h.descripcion}"
                     th:data-precio="${h.precio}"
                     th:data-capacidad="${h.capacidad}"
-                    th:data-imagen="${h.imagen}"
                     th:data-numero="${h.numero}"
                     th:data-estado="${h.estado}"
                     th:data-piso="${h.piso}"
@@ -439,10 +401,8 @@
         document.getElementById("campo-tipo").value = "";
         document.getElementById("campo-nombre").value = "";
         document.getElementById("campo-etiqueta").value = "";
-        document.getElementById("campo-descripcion").value = "";
         document.getElementById("campo-precio").value = "";
         document.getElementById("campo-capacidad").value = "";
-        document.getElementById("campo-imagen").value = "";
         document.getElementById("campo-numero").value = "";
         document.getElementById("campo-estado").value = "DISPONIBLE";
         document.getElementById("campo-piso").value = "1";
@@ -451,8 +411,6 @@
       function rellenarDesdeTipo() {
         var select = document.getElementById("campo-tipo");
         var opcion = select.options[select.selectedIndex];
-        document.getElementById("campo-descripcion").value =
-          opcion.dataset.descripcion || "";
         document.getElementById("campo-precio").value = opcion.dataset.precio || "";
         document.getElementById("campo-capacidad").value =
           opcion.dataset.capacidad || "";
@@ -464,7 +422,6 @@
         document.getElementById("campo-nombre").value = boton.dataset.nombre || "";
         rellenarDesdeTipo();
         document.getElementById("campo-etiqueta").value = boton.dataset.etiqueta;
-        document.getElementById("campo-imagen").value = boton.dataset.imagen;
         document.getElementById("campo-numero").value = boton.dataset.numero;
         document.getElementById("campo-estado").value = boton.dataset.estado;
         document.getElementById("campo-piso").value = boton.dataset.piso;

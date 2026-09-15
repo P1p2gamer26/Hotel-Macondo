@@ -40,53 +40,49 @@
         </div>
 
         <!-- Estado vacio cuando no existe una habitacion con la capacidad solicitada. -->
-<p class="mb-10 rounded-lg bg-red-50 px-5 py-4 text-center text-lg font-medium text-red-600" th:if="${habitaciones.isEmpty()}">
-          No tenemos habitaciones con esa capacidad. Escríbenos y armamos algo a tu medida.
+<p class="mb-10 rounded-lg bg-red-50 px-5 py-4 text-center text-lg font-medium text-red-600" th:if="${tiposHabitacion.isEmpty()}">
+          No tenemos tipos de habitación con esa capacidad. Escríbenos y armamos algo a tu medida.
         </p>
 
-        <!-- Rejilla responsive de las habitaciones que llegan desde HabitacionController. -->
+        <!-- Rejilla de tipos de habitación disponibles para selección. -->
 <div class="grid grid-cols-1 gap-8 lg:grid-cols-2">
-          <!-- Tarjeta de una Habitacion: presenta solo datos existentes en la entidad. -->
+          <!-- Cada tarjeta representa una categoría, no una unidad física. -->
 <article
             class="flex h-full flex-col overflow-hidden rounded-lg bg-white shadow-[0_12px_30px_rgba(30,58,70,0.10)]"
-            th:each="habitacion : ${habitaciones}"
+            th:each="tipo : ${tiposHabitacion}"
           >
             <!-- Imagen y datos superpuestos: etiqueta comercial y precio por noche. -->
 <div class="relative h-[240px] overflow-hidden md:h-[270px]">
-              <img class="h-full w-full object-cover transition duration-500 hover:scale-105" th:src="@{${habitacion.imagen}}" th:alt="${habitacion.nombre}" />
-              <span class="absolute left-4 top-4 rounded-full bg-white px-3 py-1 text-[11px] font-bold uppercase tracking-[1px] text-[var(--azul)] shadow-sm" th:text="${habitacion.etiqueta}"></span>
-              <span class="absolute bottom-3 right-0 rounded-l-md bg-[var(--dorado)] px-5 py-2 text-sm font-bold text-[var(--azul-oscuro)]" th:text="${'Desde $' + #numbers.formatInteger(habitacion.precio, 1, 'POINT')}"></span>
+              <img class="h-full w-full object-cover transition duration-500 hover:scale-105" th:src="@{${tipo.imagen}}" th:alt="${tipo.nombre}" />
+              <span class="absolute left-4 top-4 rounded-full bg-white px-3 py-1 text-[11px] font-bold uppercase tracking-[1px] text-[var(--azul)] shadow-sm">Tipo de habitación</span>
+              <span class="absolute bottom-3 right-0 rounded-l-md bg-[var(--dorado)] px-5 py-2 text-sm font-bold text-[var(--azul-oscuro)]" th:text="${'Desde $' + #numbers.formatInteger(tipo.precioNoche, 1, 'POINT')}"></span>
             </div>
 
             <!-- Datos principales: numero, nombre, capacidad y descripcion de la habitacion. -->
 <div class="flex flex-1 flex-col p-6 md:p-7">
               <div class="flex items-start justify-between gap-5">
                 <div>
-                  <p
-                    class="text-xs font-bold uppercase tracking-[1px] text-[var(--azul)]"
-                    th:text="${habitacion.tipoHabitacion != null ? 'Habitación ' + habitacion.tipoHabitacion.nombre : 'Habitación sin tipo'}"
-                  ></p>
-                  <h2 class="mt-1 font-serif text-2xl font-bold text-[var(--azul-oscuro)]" th:text="${habitacion.nombre}"></h2>
+                  <p class="text-xs font-bold uppercase tracking-[1px] text-[var(--azul)]">Categoría de hospedaje</p>
+                  <h2 class="mt-1 font-serif text-2xl font-bold text-[var(--azul-oscuro)]" th:text="${tipo.nombre}"></h2>
                 </div>
-                <span class="shrink-0 rounded-full bg-[#eef6f9] px-3 py-1.5 text-xs font-semibold text-[var(--azul)]" th:text="${'Hasta ' + habitacion.capacidad + ' huéspedes'}"></span>
+                <span class="shrink-0 rounded-full bg-[#eef6f9] px-3 py-1.5 text-xs font-semibold text-[var(--azul)]" th:text="${'Hasta ' + tipo.capacidadPersonas + ' huéspedes'}"></span>
               </div>
 
-              <p class="mt-4 min-h-[72px] text-[15px] leading-6 text-[var(--texto)]" th:text="${habitacion.descripcion}"></p>
+              <p class="mt-4 min-h-[72px] text-[15px] leading-6 text-[var(--texto)]" th:text="${tipo.descripcion}"></p>
 
-              <!-- Resumen operativo con capacidad, piso y estado disponibles en Habitacion. -->
+              <!-- La unidad física se determina después según disponibilidad. -->
 <section class="mt-5 rounded-lg border border-[#d8e8ee] bg-[#f3f9fb] p-4" aria-label="Información de la habitación">
                 <h3 class="mb-3 text-[11px] font-bold uppercase tracking-[1px] text-[var(--azul)]">Información</h3>
-                <ul class="grid grid-cols-1 gap-x-5 gap-y-2 text-sm sm:grid-cols-3">
-                  <li class="flex items-center gap-2"><i class="bi bi-people text-[#218b83]" aria-hidden="true"></i><span th:text="${habitacion.capacidad + ' personas'}"></span></li>
-                  <li class="flex items-center gap-2"><i class="bi bi-building text-[#218b83]" aria-hidden="true"></i><span th:text="${'Piso ' + habitacion.piso}"></span></li>
-                  <li class="flex items-center gap-2"><i class="bi bi-check-circle text-[#218b83]" aria-hidden="true"></i><span th:text="${habitacion.estado == 'DISPONIBLE' ? 'Disponible' : 'No disponible'}"></span></li>
+                <ul class="grid grid-cols-1 gap-x-5 gap-y-2 text-sm sm:grid-cols-2">
+                  <li class="flex items-center gap-2"><i class="bi bi-people text-[#218b83]" aria-hidden="true"></i><span th:text="${tipo.capacidadPersonas + ' personas'}"></span></li>
+                  <li class="flex items-center gap-2"><i class="bi bi-door-open text-[#218b83]" aria-hidden="true"></i><span>Unidad asignada según disponibilidad</span></li>
                 </ul>
               </section>
 
               <!-- Enlace a la ficha individual y referencia visual de la tarifa nocturna. -->
 <div class="mt-5 grid grid-cols-[minmax(0,1fr)_auto] gap-3">
-                <a class="flex min-h-11 items-center justify-center gap-2 rounded-md bg-[var(--azul)] px-5 py-3 font-bold text-white transition hover:bg-[var(--azul-oscuro)]" th:href="@{/habitaciones/{id}(id=${habitacion.id})}">
-                  Ver habitación <i class="bi bi-arrow-right" aria-hidden="true"></i>
+                <a class="flex min-h-11 items-center justify-center gap-2 rounded-md bg-[var(--azul)] px-5 py-3 font-bold text-white transition hover:bg-[var(--azul-oscuro)]" th:href="@{/habitaciones/{id}(id=${tipo.id})}">
+                  Seleccionar tipo <i class="bi bi-arrow-right" aria-hidden="true"></i>
                 </a>
               </div>
             </div>

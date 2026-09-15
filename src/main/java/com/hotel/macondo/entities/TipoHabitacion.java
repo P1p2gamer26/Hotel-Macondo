@@ -34,6 +34,9 @@ public class TipoHabitacion {
   @Column(nullable = false, length = 2000)
   private String descripcion;
 
+  @Column(nullable = false, length = 255)
+  private String imagen;
+
   @Column(nullable = false, precision = 12, scale = 2)
   private BigDecimal precioNoche;
 
@@ -44,9 +47,14 @@ public class TipoHabitacion {
   private List<Habitacion> habitaciones = new ArrayList<>();
 
   public TipoHabitacion(
-      String nombre, String descripcion, BigDecimal precioNoche, Integer capacidadPersonas) {
+      String nombre,
+      String descripcion,
+      String imagen,
+      BigDecimal precioNoche,
+      Integer capacidadPersonas) {
     this.nombre = nombre;
     this.descripcion = descripcion;
+    this.imagen = imagen;
     this.precioNoche = precioNoche;
     this.capacidadPersonas = capacidadPersonas;
   }

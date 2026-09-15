@@ -52,9 +52,9 @@ memoria, así el proyecto se levanta sin instalar ni configurar nada.
 | URL | Descripción |
 |---|---|
 | `/` | Landing page (hero, disponibilidad, habitaciones, servicios, testimonios) |
-| `/habitaciones` | Listado de habitaciones |
-| `/habitaciones?personas=4` | Filtro por capacidad |
-| `/habitaciones/{id}` | Detalle de una habitación |
+| `/habitaciones` | Catálogo de tipos de habitación |
+| `/habitaciones?personas=4` | Tipos filtrados por capacidad |
+| `/habitaciones/{id}` | Detalle de un tipo de habitación |
 
 ## Estructura
 

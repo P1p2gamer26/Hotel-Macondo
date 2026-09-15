@@ -72,11 +72,11 @@
                 <!-- Nombre de la categoria con icono tematico -->
                 <td class="px-6 py-4">
                   <div class="flex items-center gap-3">
-                    <div
-                      class="w-10 h-10 rounded-lg bg-[var(--crema)] text-[var(--azul)] flex items-center justify-center font-bold"
-                    >
-                      <i class="bi bi-tag text-lg"></i>
-                    </div>
+                    <img
+                      class="w-12 h-12 rounded-lg object-cover bg-[var(--crema)]"
+                      th:src="@{${tipo.imagen}}"
+                      th:alt="${tipo.nombre}"
+                    />
                     <div>
                       <p
                         class="font-medium text-[var(--azul-oscuro)]"
@@ -113,6 +113,7 @@
                     th:data-id="${tipo.id}"
                     th:data-nombre="${tipo.nombre}"
                     th:data-descripcion="${tipo.descripcion}"
+                    th:data-imagen="${tipo.imagen}"
                     th:data-precio="${tipo.precioNoche}"
                     th:data-capacidad="${tipo.capacidadPersonas}"
                     onclick="abrirEditarHabitacion(this)"
@@ -211,6 +212,29 @@
               required
               class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3.5 py-2.5 text-sm focus:outline-none focus:border-[var(--azul)]"
             ></textarea>
+          </div>
+
+          <div>
+            <label
+              for="formImagen"
+              class="block text-xs font-bold uppercase tracking-wider text-[var(--azul)] mb-1"
+              >Imagen</label
+            >
+            <input
+              type="text"
+              id="formImagen"
+              name="imagen"
+              list="imagenes-tipo-habitacion"
+              placeholder="/images/HabitacionVIP.avif"
+              required
+              class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3.5 py-2.5 text-sm focus:outline-none focus:border-[var(--azul)]"
+            />
+            <datalist id="imagenes-tipo-habitacion">
+              <option value="/images/HabitacionNormal.avif"></option>
+              <option value="/images/HabitacionExecutive.avif"></option>
+              <option value="/images/HabitacionVIP.avif"></option>
+              <option value="/images/HabitacionLuxury.avif"></option>
+            </datalist>
           </div>
 
           <div class="grid grid-cols-2 gap-4">

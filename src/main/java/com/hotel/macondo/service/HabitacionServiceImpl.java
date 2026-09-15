@@ -76,6 +76,20 @@ public class HabitacionServiceImpl implements HabitacionService {
 
   /** {@inheritDoc} */
   @Override
+  public Habitacion buscarDisponiblePorTipo(Long idTipo) {
+    if (idTipo == null) {
+      throw new FormularioErroneoException("El tipo de habitación es obligatorio.");
+    }
+    return repository
+        .findFirstByTipoHabitacionIdAndEstadoOrderByIdAsc(idTipo, "DISPONIBLE")
+        .orElseThrow(
+            () ->
+                new RecursoNoEncontradoException(
+                    "No hay habitaciones disponibles para el tipo seleccionado."));
+  }
+
+  /** {@inheritDoc} */
+  @Override
   public Habitacion guardar(Habitacion habitacion, Long idTipo) {
     if (idTipo == null) {
       throw new FormularioErroneoException("El tipo de habitación es obligatorio.");
@@ -154,7 +168,6 @@ public class HabitacionServiceImpl implements HabitacionService {
 
   private void aplicarDatosDelTipo(Habitacion habitacion, TipoHabitacion tipo) {
     habitacion.aplicarTipo(tipo);
-    habitacion.setDescripcion(tipo.getDescripcion());
     habitacion.setPrecio(tipo.getPrecioNoche());
     habitacion.setCapacidad(tipo.getCapacidadPersonas());
   }
