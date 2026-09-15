@@ -9,4 +9,6 @@ import org.springframework.stereotype.Repository;
 public interface TipoHabitacionRepository extends JpaRepository<TipoHabitacion, Long> {
 
   List<TipoHabitacion> findAllByOrderByIdAsc();
+
+  List<TipoHabitacion> findByCapacidadPersonasGreaterThanEqualOrderByIdAsc(int capacidad);
 }

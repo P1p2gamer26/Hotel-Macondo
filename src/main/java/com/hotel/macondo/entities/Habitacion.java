@@ -35,17 +35,11 @@ public class Habitacion {
   @Column(length = 100)
   private String etiqueta;
 
-  @Column(length = 2000)
-  private String descripcion;
-
   @Column(nullable = false, precision = 12, scale = 2)
   private BigDecimal precio = BigDecimal.ZERO;
 
   @Column(nullable = false)
   private int capacidad;
-
-  @Column(length = 255)
-  private String imagen;
 
   @Column(nullable = false, unique = true, length = 10)
   private String numero;
@@ -63,19 +57,15 @@ public class Habitacion {
   public Habitacion(
       String nombre,
       String etiqueta,
-      String descripcion,
       BigDecimal precio,
       int capacidad,
-      String imagen,
       String numero,
       String estado,
       Integer piso) {
     this.nombre = nombre;
     this.etiqueta = etiqueta;
-    this.descripcion = descripcion;
     this.precio = precio;
     this.capacidad = capacidad;
-    this.imagen = imagen;
     this.numero = numero;
     this.estado = estado;
     this.piso = piso;

@@ -126,7 +126,7 @@
           <!-- Botón Reservar (.btn-dorado) -->
           <a
             class="bg-[var(--dorado)] text-[var(--azul-oscuro)] font-semibold px-4 py-2 rounded-md border-2 border-[var(--dorado)] shadow hover:bg-[var(--dorado-oscuro)] hover:border-[var(--dorado-oscuro)] transition"
-            href="#"
+            th:href="@{/habitaciones}"
             >Reservar</a
           >
         </div>
@@ -225,7 +225,7 @@
               <li>
                 <a
                   class="hover:text-[var(--azul)] transition inline-block py-1"
-                  href="#"
+                  th:href="@{/habitaciones}"
                   >Reservar Ahora</a
                 >
               </li>
@@ -250,36 +250,8 @@
               <li>
                 <a
                   class="hover:text-[var(--azul)] transition inline-block py-1"
-                  th:href="@{/habitaciones/1}"
-                  >Normal</a
-                >
-              </li>
-              <li>
-                <a
-                  class="hover:text-[var(--azul)] transition inline-block py-1"
-                  th:href="@{/habitaciones/2}"
-                  >Executive</a
-                >
-              </li>
-              <li>
-                <a
-                  class="hover:text-[var(--azul)] transition inline-block py-1"
-                  th:href="@{/habitaciones/3}"
-                  >VIP</a
-                >
-              </li>
-              <li>
-                <a
-                  class="hover:text-[var(--azul)] transition inline-block py-1"
-                  th:href="@{/habitaciones/4}"
-                  >Luxury</a
-                >
-              </li>
-              <li>
-                <a
-                  class="hover:text-[var(--azul)] transition inline-block py-1"
                   th:href="@{/habitaciones}"
-                  >Suites Especiales</a
+                  >Ver tipos de habitación</a
                 >
               </li>
             </ul>
