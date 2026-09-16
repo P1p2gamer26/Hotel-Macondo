@@ -1,5 +1,8 @@
 package com.hotel.macondo.controller;
 
+import java.util.Collection;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -8,46 +11,62 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.hotel.macondo.entities.Habitacion;
+import com.hotel.macondo.entities.TipoHabitacion;
+import com.hotel.macondo.errors.RecursoNoEncontradoException;
 import com.hotel.macondo.service.HabitacionService;
+import com.hotel.macondo.service.TipoHabitacionService;
 
 @RequestMapping("/habitaciones")
 @Controller
 public class HabitacionController {
 
     @Autowired
-    private HabitacionService service;
+    private TipoHabitacionService tipoHabitacionService;
+
+    @Autowired
+    private HabitacionService habitacionService;
 
     /**
-     * Muestra todas las habitaciones.
+     * Muestra todos los tipos de habitacion disponibles para seleccionar.
      */
     @GetMapping
-    public String mostrarHabitaciones(Model model) {
-        // Se entrega el catalogo completo a la vista publica de habitaciones.
-        model.addAttribute("habitaciones", service.buscarTodas());
-        return "habitacion/habitaciones";
-    }
+    public String mostrarHabitaciones(
+            @RequestParam(required = false) Integer personas,
+            @RequestParam(required = false) Long tipoId,
+            Model model) {
+        Collection<TipoHabitacion> tipos;
+        if (tipoId != null) {
+            TipoHabitacion tipo = tipoHabitacionService.buscarPorId(tipoId);
+            tipos = personas == null || tipo.getCapacidadPersonas() >= personas
+                    ? List.of(tipo)
+                    : List.of();
+        } else if (personas != null) {
+            tipos = tipoHabitacionService.buscarPorPersonas(personas);
+        } else {
+            tipos = tipoHabitacionService.buscarTodos();
+        }
 
-    /**
-     * Filtra habitaciones por capacidad.
-     */
-    @GetMapping(params = "personas")
-    public String buscarPorPersonas(@RequestParam int personas, Model model) {
-        // El servicio aplica la capacidad minima solicitada antes de renderizar la
-        // vista.
-        model.addAttribute("habitaciones", service.buscarPorPersonas(personas));
+        model.addAttribute("tiposHabitacion", tipos);
         model.addAttribute("personas", personas);
         return "habitacion/habitaciones";
     }
 
     /**
-     * Muestra el detalle de una habitacion o vuelve al listado si no existe.
+     * Muestra el tipo elegido; la unidad fisica se asigna al confirmar la reserva.
      */
     @GetMapping("/{id}")
     public String mostrarHabitacion(@PathVariable("id") Long id, Model model) {
-        Habitacion habitacion = service.buscarPorId(id);
-        model.addAttribute("habitacion", habitacion);
+        TipoHabitacion tipoHabitacion = tipoHabitacionService.buscarPorId(id);
+        boolean hayDisponibilidad;
+        try {
+            habitacionService.buscarDisponiblePorTipo(id);
+            hayDisponibilidad = true;
+        } catch (RecursoNoEncontradoException e) {
+            hayDisponibilidad = false;
+        }
+
+        model.addAttribute("tipoHabitacion", tipoHabitacion);
+        model.addAttribute("hayDisponibilidad", hayDisponibilidad);
         return "habitacion/detalle_habitacion";
-        
     }
 }

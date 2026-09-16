@@ -19,5 +19,8 @@ public interface HabitacionRepository extends JpaRepository<Habitacion, Long> {
 
   List<Habitacion> findByTipoHabitacionId(Long tipoId);
 
+  Optional<Habitacion> findFirstByTipoHabitacionIdAndEstadoOrderByIdAsc(
+      Long tipoId, String estado);
+
   boolean existsByTipoHabitacionId(Long tipoId);
 }

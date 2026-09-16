@@ -9,6 +9,9 @@ public interface TipoHabitacionService {
     // Busca todos los tipos de habitacion ordenados por ID.
     Collection<TipoHabitacion> buscarTodos();
 
+    // Busca los tipos que admiten al menos la cantidad indicada de personas.
+    Collection<TipoHabitacion> buscarPorPersonas(int personas);
+
     /**
      * Busca un tipo de habitacion por su ID.
      *

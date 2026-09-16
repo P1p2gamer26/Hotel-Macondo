@@ -41,7 +41,7 @@
       <!-- Uso directo de la paleta de colores inyectada en utilidades de Tailwind -->
       <a
         class="bg-[var(--dorado)] text-[var(--azul-oscuro)] font-bold px-8 py-3 rounded-lg border-2 border-[var(--dorado)] shadow-lg hover:bg-[var(--dorado-oscuro)] hover:border-[var(--dorado-oscuro)] transition text-lg"
-        href="#"
+        th:href="@{/habitaciones}"
       >
         Reservar Ahora
       </a>
@@ -63,7 +63,7 @@
         <!-- Se usa grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 en lugar de los row y col de Bootstrap para una distribucion limpia -->
         <form
           class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 items-end"
-          action="#"
+          th:action="@{/habitaciones}"
           method="get"
         >
           <div>
@@ -103,12 +103,12 @@
             <select
               class="w-full rounded-lg px-4 py-3 border border-gray-300 focus:outline-none focus:border-[var(--azul)] bg-gray-50 text-[var(--texto)]"
               id="tipoHabitacion"
-              name="tipoHabitacion"
+              name="tipoId"
             >
               <option value="">Seleccionar...</option>
               <option
                 th:each="tipo : ${tiposHabitacion}"
-                th:value="${tipo.nombre}"
+                th:value="${tipo.id}"
                 th:text="${tipo.nombre}"
               ></option>
             </select>
@@ -170,27 +170,27 @@
           <!-- Uso de la etiqueta semantica article, mejor que un div generico para las tarjetas de informacion -->
           <article
             class="bg-white rounded-[16px] overflow-hidden shadow-[0_8px_24px_rgba(0,0,0,0.08)] hover:shadow-[0_16px_34px_rgba(0,0,0,0.16)] hover:-translate-y-2 transition-all duration-300 relative flex flex-col h-full"
-            th:each="habitacion : ${habitaciones}"
+            th:each="tipo : ${tiposHabitacion}"
           >
             <img
-              th:src="@{${habitacion.imagen}}"
+              th:src="@{${tipo.imagen}}"
               class="h-[200px] w-full object-cover"
-              th:alt="${habitacion.nombre}"
+              th:alt="${tipo.nombre}"
             />
             <!-- Etiqueta sobre la imagen -->
             <span
               class="absolute top-[14px] left-[14px] bg-[var(--dorado)] text-[var(--azul-oscuro)] text-[0.7rem] font-bold tracking-[1px] px-[0.8rem] py-[0.3rem] rounded-[20px]"
-              th:text="${habitacion.etiqueta}"
+              th:text="${'Hasta ' + tipo.capacidadPersonas + ' huéspedes'}"
             ></span>
 
             <div class="p-5 flex flex-col flex-grow">
               <h3
                 class="font-serif text-xl font-bold text-[var(--azul-oscuro)] mb-2"
-                th:text="${habitacion.nombre}"
+                th:text="${tipo.nombre}"
               ></h3>
               <p
                 class="text-[var(--texto)] flex-grow mb-6 text-[0.95rem]"
-                th:text="${habitacion.descripcion}"
+                th:text="${tipo.descripcion}"
               ></p>
 
               <div class="flex justify-between items-end mt-auto">
@@ -200,14 +200,14 @@
                   ><br />
                   <span
                     class="font-serif text-[1.4rem] font-bold text-[var(--azul-oscuro)]"
-                    th:text="'$' + ${#numbers.formatInteger(habitacion.precio, 1, 'POINT')}"
+                    th:text="'$' + ${#numbers.formatInteger(tipo.precioNoche, 1, 'POINT')}"
                   ></span>
                   <small class="text-gray-400 text-xs">/noche</small>
                 </div>
                 <!-- Reemplazo de .btn-borde-azul -->
                 <a
                   class="border-2 border-[var(--azul)] text-[var(--azul)] font-bold rounded-[10px] px-4 py-2 hover:bg-[var(--azul)] hover:text-white transition text-sm"
-                  th:href="@{/habitaciones/{id}(id=${habitacion.id})}"
+                  th:href="@{/habitaciones/{id}(id=${tipo.id})}"
                   >Ver más</a
                 >
               </div>
@@ -405,7 +405,7 @@
           >
           <a
             class="bg-transparent text-[var(--azul-oscuro)] font-bold px-8 py-3 rounded-[10px] border-2 border-[var(--azul-oscuro)] hover:bg-white hover:text-[var(--azul-oscuro)] transition text-lg"
-            href="#"
+            th:href="@{/habitaciones}"
             >Reservar Ahora</a
           >
         </div>

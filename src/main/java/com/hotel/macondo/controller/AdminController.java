@@ -215,17 +215,19 @@ public class AdminController {
             RedirectAttributes redirectAttributes,
             @RequestParam String nombre,
             @RequestParam String descripcion,
+            @RequestParam String imagen,
             @RequestParam BigDecimal precioNoche,
             @RequestParam Integer capacidadPersonas) {
 
         TipoHabitacion tipo;
         if (id == null) {
-            tipo = new TipoHabitacion(nombre, descripcion, precioNoche, capacidadPersonas);
+            tipo = new TipoHabitacion(nombre, descripcion, imagen, precioNoche, capacidadPersonas);
         } else {
             try {
                 tipo = tipoHabitacionService.buscarPorId(id);
                 tipo.setNombre(nombre);
                 tipo.setDescripcion(descripcion);
+                tipo.setImagen(imagen);
                 tipo.setPrecioNoche(precioNoche);
                 tipo.setCapacidadPersonas(capacidadPersonas);
             } catch (Exception e) {

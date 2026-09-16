@@ -31,6 +31,12 @@ public class TipoHabitacionServiceImpl implements TipoHabitacionService {
 
   /** {@inheritDoc} */
   @Override
+  public Collection<TipoHabitacion> buscarPorPersonas(int personas) {
+    return repository.findByCapacidadPersonasGreaterThanEqualOrderByIdAsc(personas);
+  }
+
+  /** {@inheritDoc} */
+  @Override
   public TipoHabitacion buscarPorId(Long id) {
     return repository.findById(id).orElseThrow(
       () -> new RecursoNoEncontradoException("Tipo de habitacion no encontrado.")

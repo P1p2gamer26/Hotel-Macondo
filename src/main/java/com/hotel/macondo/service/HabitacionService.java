@@ -20,7 +20,7 @@ public interface HabitacionService {
      */
     Habitacion buscarPorId(Long id);
 
-    /** Busca una habitacion por su nombre comercial. */
+    /** Busca una habitacion por su etiqueta operativa. */
     Habitacion buscarPorNombre(String nombre);
 
     /** Filtra las habitaciones que admiten la cantidad de personas indicada. */
@@ -32,10 +32,13 @@ public interface HabitacionService {
     /** Cuenta las habitaciones que estan disponibles para reservar. */
     long contarDisponibles();
 
+    /** Localiza la primera unidad fisica disponible del tipo solicitado. */
+    Habitacion buscarDisponiblePorTipo(Long idTipo);
+
     /**
      * Crea o actualiza una habitacion asignandole un tipo de habitacion por
-     * su identificador. El tipo es la fuente de verdad: de el se derivan la
-     * descripcion, el precio y la capacidad de la habitacion.
+     * su identificador. El tipo es la fuente de verdad: de el se derivan el
+     * precio y la capacidad de la habitacion.
      *
      * Toda habitacion debe tener un tipo valido: si el identificador es nulo
      * o no corresponde a ningun tipo, no se guarda nada y retorna null.
@@ -51,8 +54,7 @@ public interface HabitacionService {
     Habitacion cambiarEstado(Long id);
 
     /**
-     * Propaga los cambios de un tipo de habitacion a todas las habitaciones
-     * que lo referencian, de modo que reflejen los nuevos datos comerciales.
+     * Propaga tarifa y capacidad a las habitaciones que referencian el tipo.
      */
     void actualizarHabitacionesPorTipo(TipoHabitacion tipo);
 

@@ -7,12 +7,14 @@ function abrirNuevaHabitacion() {
   const formId = document.getElementById("formId");
   const formNombre = document.getElementById("formNombre");
   const formDescripcion = document.getElementById("formDescripcion");
+  const formImagen = document.getElementById("formImagen");
   const formCapacidad = document.getElementById("formCapacidad");
   const formPrecio = document.getElementById("formPrecio");
 
   if (formId) formId.value = "";
   if (formNombre) formNombre.value = "";
   if (formDescripcion) formDescripcion.value = "";
+  if (formImagen) formImagen.value = "";
   if (formCapacidad) formCapacidad.value = "";
   if (formPrecio) formPrecio.value = "";
 
@@ -28,12 +30,14 @@ function abrirEditarHabitacion(btn) {
   const formId = document.getElementById("formId");
   const formNombre = document.getElementById("formNombre");
   const formDescripcion = document.getElementById("formDescripcion");
+  const formImagen = document.getElementById("formImagen");
   const formCapacidad = document.getElementById("formCapacidad");
   const formPrecio = document.getElementById("formPrecio");
 
   if (formId) formId.value = btn.getAttribute("data-id") || "";
   if (formNombre) formNombre.value = btn.getAttribute("data-nombre") || "";
   if (formDescripcion) formDescripcion.value = btn.getAttribute("data-descripcion") || "";
+  if (formImagen) formImagen.value = btn.getAttribute("data-imagen") || "";
   if (formCapacidad) formCapacidad.value = btn.getAttribute("data-capacidad") || "";
   if (formPrecio) formPrecio.value = btn.getAttribute("data-precio") || "";
 
