@@ -6,6 +6,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +18,7 @@ import lombok.ToString;
 
 @Getter
 @Setter
-@ToString
+@ToString(exclude = "detalles")
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
@@ -61,6 +62,9 @@ public class Servicio {
 
   @ElementCollection
   private List<String> etiquetas = new ArrayList<>();
+
+  @OneToMany(mappedBy = "servicio")
+  private List<DetalleCuenta> detalles = new ArrayList<>();
 
   public Servicio(
       String nombre,

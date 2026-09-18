@@ -78,7 +78,7 @@ public class ClienteServiceImpl implements ClienteService {
     // entera: si quedan hijos en la sesion apuntando al cliente borrado, el
     // flush falla. Por eso se sueltan y se borran aqui, de arriba hacia abajo.
     for (Reserva reserva : cliente.getReservas()) {
-      reserva.getHabitaciones().clear();
+      reserva.asignarHabitacion(null);
       reservaRepository.delete(reserva);
     }
     cliente.getReservas().clear();
@@ -106,12 +106,7 @@ public class ClienteServiceImpl implements ClienteService {
   /** {@inheritDoc} */
   @Override
   public Habitacion obtenerHabitacionActiva(Reserva reserva) {
-    if (reserva == null
-        || reserva.getHabitaciones() == null
-        || reserva.getHabitaciones().isEmpty()) {
-      return null;
-    }
-    return reserva.getHabitaciones().get(0);
+    return reserva == null ? null : reserva.getHabitacion();
   }
 
   /** {@inheritDoc} */

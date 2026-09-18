@@ -94,6 +94,12 @@
           </div>
 
           <form th:action="@{/login}" method="post">
+            <input
+              type="hidden"
+              name="tipoId"
+              th:if="${tipoId != null}"
+              th:value="${tipoId}"
+            />
             <div class="mb-5">
               <label
                 for="username"

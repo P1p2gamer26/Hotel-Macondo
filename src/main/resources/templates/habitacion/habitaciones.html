@@ -35,7 +35,7 @@
             Habitaciones disponibles para
             <strong class="font-bold text-[var(--azul-oscuro)]" th:text="${personas}"></strong>
             persona(s).
-            <a class="ml-2 font-bold text-[var(--azul)] hover:underline" th:href="@{/habitaciones}">Ver todas</a>
+            <a class="ml-2 font-bold text-[var(--azul)] hover:underline" th:href="@{/habitaciones(clienteId=${clienteId})}">Ver todas</a>
           </p>
         </div>
 
@@ -81,7 +81,7 @@
 
               <!-- Enlace a la ficha individual y referencia visual de la tarifa nocturna. -->
 <div class="mt-5 grid grid-cols-[minmax(0,1fr)_auto] gap-3">
-                <a class="flex min-h-11 items-center justify-center gap-2 rounded-md bg-[var(--azul)] px-5 py-3 font-bold text-white transition hover:bg-[var(--azul-oscuro)]" th:href="@{/habitaciones/{id}(id=${tipo.id})}">
+                <a class="flex min-h-11 items-center justify-center gap-2 rounded-md bg-[var(--azul)] px-5 py-3 font-bold text-white transition hover:bg-[var(--azul-oscuro)]" th:href="@{/habitaciones/{id}(id=${tipo.id}, clienteId=${clienteId})}">
                   Seleccionar tipo <i class="bi bi-arrow-right" aria-hidden="true"></i>
                 </a>
               </div>
@@ -94,7 +94,7 @@
           <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-full border border-[var(--dorado)]/60 bg-white/10 text-2xl text-[var(--dorado)]"><i class="bi bi-moon-stars" aria-hidden="true"></i></div>
           <h2 class="mt-6 font-serif text-3xl font-bold !text-white md:text-4xl" id="llamado-reserva">Elige el espacio para tu próxima historia</h2>
           <p class="mx-auto mt-4 max-w-2xl text-lg leading-7 text-white/90">Consulta disponibilidad y encuentra la habitación que acompaña mejor tu estadía.</p>
-          <a class="mt-8 inline-flex rounded-md bg-[var(--dorado)] px-10 py-3.5 font-bold text-[var(--azul-oscuro)] transition hover:bg-[var(--dorado-oscuro)]" th:href="@{/habitaciones}">Consultar habitaciones</a>
+          <a class="mt-8 inline-flex rounded-md bg-[var(--dorado)] px-10 py-3.5 font-bold text-[var(--azul-oscuro)] transition hover:bg-[var(--dorado-oscuro)]" th:href="@{/habitaciones(clienteId=${clienteId})}">Consultar habitaciones</a>
         </section>
       </section>
     </main>

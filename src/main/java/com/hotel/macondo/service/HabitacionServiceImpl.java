@@ -158,7 +158,7 @@ public class HabitacionServiceImpl implements HabitacionService {
 
     // Una reserva sin habitacion no tiene sentido, y la cascada tampoco es
     // opcion porque borraria reservas ajenas a esta habitacion. Se rechaza.
-    if (!habitacion.getReservas().isEmpty()) {
+    if (!reservaRepository.buscarPorHabitacion(id).isEmpty()) {
       throw new PeticionImposible(
           "No se puede eliminar: la habitacion tiene reservas asociadas.");
     }

@@ -33,6 +33,7 @@ public class HabitacionController {
     public String mostrarHabitaciones(
             @RequestParam(required = false) Integer personas,
             @RequestParam(required = false) Long tipoId,
+            @RequestParam(required = false) Long clienteId,
             Model model) {
         Collection<TipoHabitacion> tipos;
         if (tipoId != null) {
@@ -48,6 +49,7 @@ public class HabitacionController {
 
         model.addAttribute("tiposHabitacion", tipos);
         model.addAttribute("personas", personas);
+        model.addAttribute("clienteId", clienteId);
         return "habitacion/habitaciones";
     }
 
@@ -55,7 +57,10 @@ public class HabitacionController {
      * Muestra el tipo elegido; la unidad fisica se asigna al confirmar la reserva.
      */
     @GetMapping("/{id}")
-    public String mostrarHabitacion(@PathVariable("id") Long id, Model model) {
+    public String mostrarHabitacion(
+            @PathVariable("id") Long id,
+            @RequestParam(required = false) Long clienteId,
+            Model model) {
         TipoHabitacion tipoHabitacion = tipoHabitacionService.buscarPorId(id);
         boolean hayDisponibilidad;
         try {
@@ -67,6 +72,7 @@ public class HabitacionController {
 
         model.addAttribute("tipoHabitacion", tipoHabitacion);
         model.addAttribute("hayDisponibilidad", hayDisponibilidad);
+        model.addAttribute("clienteId", clienteId);
         return "habitacion/detalle_habitacion";
     }
 }
