@@ -1,6 +1,5 @@
 package com.hotel.macondo.service;
 
-import java.time.LocalDate;
 import java.util.List;
 
 import com.hotel.macondo.entities.Cliente;
@@ -36,8 +35,8 @@ public interface ReservaService {
     /** Unidades físicas disponibles para un tipo y un intervalo de fechas. */
     List<Habitacion> consultarDisponibilidad(
         Long tipoId,
-        LocalDate fechaEntrada,
-        LocalDate fechaSalida,
+        String fechaEntrada,
+        String fechaSalida,
         Integer cantidadPersonas);
 
     /**
@@ -47,8 +46,8 @@ public interface ReservaService {
     List<Habitacion> consultarDisponibilidad(
         Reserva reserva,
         Long tipoId,
-        LocalDate fechaEntrada,
-        LocalDate fechaSalida,
+        String fechaEntrada,
+        String fechaSalida,
         Integer cantidadPersonas);
 
     /** Obtiene una reserva futura que el cliente indicado puede modificar. */
@@ -58,8 +57,8 @@ public interface ReservaService {
     Reserva crear(
         Long clienteId,
         Long tipoId,
-        LocalDate fechaEntrada,
-        LocalDate fechaSalida,
+        String fechaEntrada,
+        String fechaSalida,
         Integer cantidadPersonas);
 
     /** Modifica una reserva futura y vuelve a comprobar su disponibilidad. */
@@ -67,8 +66,8 @@ public interface ReservaService {
         Long clienteId,
         Long reservaId,
         Long tipoId,
-        LocalDate fechaEntrada,
-        LocalDate fechaSalida,
+        String fechaEntrada,
+        String fechaSalida,
         Integer cantidadPersonas);
 
     /** Cancela una reserva futura perteneciente al cliente indicado. */

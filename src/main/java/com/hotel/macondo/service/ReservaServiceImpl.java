@@ -17,6 +17,7 @@ import com.hotel.macondo.repository.TipoHabitacionRepository;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.UUID;
@@ -120,8 +121,8 @@ public class ReservaServiceImpl implements ReservaService {
   @Transactional(readOnly = true)
   public List<Habitacion> consultarDisponibilidad(
       Long tipoId,
-      LocalDate fechaEntrada,
-      LocalDate fechaSalida,
+      String fechaEntrada,
+      String fechaSalida,
       Integer cantidadPersonas) {
     return consultarDisponibilidad(
         null,
@@ -137,18 +138,20 @@ public class ReservaServiceImpl implements ReservaService {
   public List<Habitacion> consultarDisponibilidad(
       Reserva reserva,
       Long tipoId,
-      LocalDate fechaEntrada,
-      LocalDate fechaSalida,
+      String fechaEntrada,
+      String fechaSalida,
       Integer cantidadPersonas) {
-    validarDatosReserva(tipoId, fechaEntrada, fechaSalida, cantidadPersonas);
+    LocalDate entrada = convertirFecha(fechaEntrada, "entrada");
+    LocalDate salida = convertirFecha(fechaSalida, "salida");
+    validarDatosReserva(tipoId, entrada, salida, cantidadPersonas);
     TipoHabitacion tipo = buscarTipo(tipoId);
     if (tipo.getCapacidadPersonas() < cantidadPersonas) {
       return List.of();
     }
     return buscarHabitacionesDisponibles(
         tipoId,
-        fechaEntrada,
-        fechaSalida,
+        entrada,
+        salida,
         cantidadPersonas,
         reserva == null ? null : reserva.getId());
   }
@@ -167,23 +170,25 @@ public class ReservaServiceImpl implements ReservaService {
   public Reserva crear(
       Long clienteId,
       Long tipoId,
-      LocalDate fechaEntrada,
-      LocalDate fechaSalida,
+      String fechaEntrada,
+      String fechaSalida,
       Integer cantidadPersonas) {
+    LocalDate entrada = convertirFecha(fechaEntrada, "entrada");
+    LocalDate salida = convertirFecha(fechaSalida, "salida");
     Cliente cliente = buscarCliente(clienteId);
-    validarDatosReserva(tipoId, fechaEntrada, fechaSalida, cantidadPersonas);
+    validarDatosReserva(tipoId, entrada, salida, cantidadPersonas);
     TipoHabitacion tipo = buscarTipo(tipoId);
     validarCapacidad(tipo, cantidadPersonas);
 
     Habitacion habitacion = obtenerPrimeraDisponible(
-        tipoId, fechaEntrada, fechaSalida, cantidadPersonas, null);
+      tipoId, entrada, salida, cantidadPersonas, null);
     BigDecimal precioNoche = tipo.getPrecioNoche();
-    BigDecimal total = calcularTotal(precioNoche, fechaEntrada, fechaSalida);
+    BigDecimal total = calcularTotal(precioNoche, entrada, salida);
 
     Reserva reserva = new Reserva(
         generarNumeroReserva(),
-        fechaEntrada,
-        fechaSalida,
+        entrada,
+        salida,
         cantidadPersonas,
         "CONFIRMADA",
         precioNoche,
@@ -204,26 +209,28 @@ public class ReservaServiceImpl implements ReservaService {
       Long clienteId,
       Long reservaId,
       Long tipoId,
-      LocalDate fechaEntrada,
-      LocalDate fechaSalida,
+      String fechaEntrada,
+      String fechaSalida,
       Integer cantidadPersonas) {
+    LocalDate entrada = convertirFecha(fechaEntrada, "entrada");
+    LocalDate salida = convertirFecha(fechaSalida, "salida");
     Reserva reserva = buscarReservaDelCliente(clienteId, reservaId);
     validarReservaFutura(reserva);
-    validarDatosReserva(tipoId, fechaEntrada, fechaSalida, cantidadPersonas);
+    validarDatosReserva(tipoId, entrada, salida, cantidadPersonas);
     TipoHabitacion tipo = buscarTipo(tipoId);
     validarCapacidad(tipo, cantidadPersonas);
 
     Habitacion habitacion = obtenerPrimeraDisponible(
         tipoId,
-        fechaEntrada,
-        fechaSalida,
+        entrada,
+        salida,
         cantidadPersonas,
         reserva.getId());
     BigDecimal precioNoche = tipo.getPrecioNoche();
-    BigDecimal total = calcularTotal(precioNoche, fechaEntrada, fechaSalida);
+    BigDecimal total = calcularTotal(precioNoche, entrada, salida);
 
-    reserva.setFechaInicio(fechaEntrada);
-    reserva.setFechaFin(fechaSalida);
+    reserva.setFechaInicio(entrada);
+    reserva.setFechaFin(salida);
     reserva.setCantidadPersonas(cantidadPersonas);
     reserva.setPrecioNoche(precioNoche);
     reserva.setTotal(total);
@@ -307,6 +314,18 @@ public class ReservaServiceImpl implements ReservaService {
     if (cantidadPersonas <= 0) {
       throw new FormularioErroneoException(
           "La cantidad de personas debe ser mayor que cero.");
+    }
+  }
+
+  private LocalDate convertirFecha(String fecha, String nombreCampo) {
+    try {
+      if (fecha == null || fecha.isBlank()) {
+        throw new DateTimeParseException("Fecha vacía", fecha == null ? "" : fecha, 0);
+      }
+      return LocalDate.parse(fecha);
+    } catch (DateTimeParseException ex) {
+      throw new FormularioErroneoException(
+          "La fecha de " + nombreCampo + " no tiene un formato válido.");
     }
   }
 
