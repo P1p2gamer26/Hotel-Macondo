@@ -93,8 +93,12 @@ public class AdminController {
      * Elimina un operador del listado.
      */
     @PostMapping("/operadores/{id}/eliminar")
-    public String eliminarOperador(@PathVariable Long id) {
-        operadorService.eliminar(id);
+    public String eliminarOperador(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        try {
+            operadorService.eliminar(id);
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorOperador", e.getMessage());
+        }
         return "redirect:/admin/operadores";
     }
 
@@ -158,8 +162,9 @@ public class AdminController {
     public String guardarHabitacion(@ModelAttribute("habitacion") Habitacion habitacion,
             @RequestParam(required = false) Long tipoId,
             RedirectAttributes redirectAttributes) {
-        
-        // Como el error se muestra en el formulario entonces se captura la excepcion localmente 
+
+        // Como el error se muestra en el formulario entonces se captura la excepcion
+        // localmente
         // para mostrar el mensaje de error en el formulario de login
         try {
             habitacionService.guardar(habitacion, tipoId);
@@ -235,7 +240,7 @@ public class AdminController {
                 return "redirect:/admin/tipos_habitacion";
             }
         }
-        
+
         tipoHabitacionService.guardar(tipo);
         return "redirect:/admin/tipos_habitacion";
     }
@@ -248,9 +253,9 @@ public class AdminController {
     public String eliminarTipoHabitacion(@PathVariable Long id,
             RedirectAttributes redirectAttributes) {
 
-        try{
+        try {
             tipoHabitacionService.eliminar(id);
-        }catch(Exception e){
+        } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorTipo", e.getMessage());
         }
         return "redirect:/admin/tipos_habitacion";

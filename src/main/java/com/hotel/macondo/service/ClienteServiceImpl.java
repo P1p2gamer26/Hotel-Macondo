@@ -17,6 +17,7 @@ import com.hotel.macondo.entities.Usuario;
 import com.hotel.macondo.repository.ClienteRepository;
 import com.hotel.macondo.repository.ReservaRepository;
 import com.hotel.macondo.repository.UsuarioRepository;
+import com.hotel.macondo.errors.PeticionImposible;
 import com.hotel.macondo.errors.RecursoNoEncontradoException;
 
 @Service
@@ -24,8 +25,8 @@ import com.hotel.macondo.errors.RecursoNoEncontradoException;
 public class ClienteServiceImpl implements ClienteService {
 
   private static final Locale LOCALE_COLOMBIA = new Locale("es", "CO");
-  private static final DateTimeFormatter FORMATO_FECHA =
-      DateTimeFormatter.ofPattern("EEEE, dd 'de' MMMM 'de' yyyy", LOCALE_COLOMBIA);
+  private static final DateTimeFormatter FORMATO_FECHA = DateTimeFormatter.ofPattern("EEEE, dd 'de' MMMM 'de' yyyy",
+      LOCALE_COLOMBIA);
 
   private final ClienteRepository repository;
   private final ReservaRepository reservaRepository;
@@ -50,14 +51,14 @@ public class ClienteServiceImpl implements ClienteService {
   @Override
   public Cliente buscarPorId(Long id) {
     return repository.findById(id).orElseThrow(
-      () -> new RecursoNoEncontradoException("No se encontró cliente con id " + id));
+        () -> new RecursoNoEncontradoException("No se encontró cliente con id " + id));
   }
 
   /** {@inheritDoc} */
   @Override
   public Cliente buscarPorCedula(String cedula) {
     return repository.findByCedula(cedula).orElseThrow(
-      () -> new RecursoNoEncontradoException("No se encontró cliente con esa cédula"));
+        () -> new RecursoNoEncontradoException("No se encontró cliente con esa cédula"));
   }
 
   /** {@inheritDoc} */
@@ -74,15 +75,13 @@ public class ClienteServiceImpl implements ClienteService {
       return;
     }
 
-    // El ON DELETE CASCADE de la base cubre la integridad, pero Hibernate no se
-    // entera: si quedan hijos en la sesion apuntando al cliente borrado, el
-    // flush falla. Por eso se sueltan y se borran aqui, de arriba hacia abajo.
-    for (Reserva reserva : cliente.getReservas()) {
-      reserva.asignarHabitacion(null);
-      reservaRepository.delete(reserva);
+    // no se permite el borrado fisico si registra reservas activas o historicas
+    if (cliente.getReservas() != null && !cliente.getReservas().isEmpty()) {
+      throw new PeticionImposible(
+          "No se puede eliminar el cliente: registra reservas en su historial.");
     }
-    cliente.getReservas().clear();
 
+    // si no tiene reservas se desvinculan y eliminan sus credenciales de acceso
     Usuario usuario = cliente.getUsuario();
     if (usuario != null) {
       cliente.setUsuario(null);
@@ -98,8 +97,7 @@ public class ClienteServiceImpl implements ClienteService {
     if (cliente == null) {
       return null;
     }
-    List<Reserva> activas =
-        reservaRepository.buscarVigentesPorCliente(cliente, LocalDate.now());
+    List<Reserva> activas = reservaRepository.buscarVigentesPorCliente(cliente, LocalDate.now());
     return activas.isEmpty() ? null : activas.get(0);
   }
 
