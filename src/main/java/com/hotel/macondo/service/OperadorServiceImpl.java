@@ -15,8 +15,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class OperadorServiceImpl implements OperadorService {
 
   @Autowired
-
   private OperadorRepository repository;
+  @Autowired
   private UsuarioRepository usuarioRepository;
 
   /** {@inheritDoc} */

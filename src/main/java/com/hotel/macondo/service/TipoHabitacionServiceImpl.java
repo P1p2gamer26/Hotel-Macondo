@@ -17,6 +17,7 @@ public class TipoHabitacionServiceImpl implements TipoHabitacionService {
 
   @Autowired
   private TipoHabitacionRepository repository;
+  @Autowired
   private HabitacionService habitacionService;
 
   /** {@inheritDoc} */

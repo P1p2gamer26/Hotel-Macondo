@@ -36,9 +36,13 @@ public class ReservaServiceImpl implements ReservaService {
 
   @Autowired
   private ReservaRepository reservaRepository;
+  @Autowired
   private ClienteRepository clienteRepository;
+  @Autowired
   private TipoHabitacionRepository tipoHabitacionRepository;
+  @Autowired
   private HabitacionRepository habitacionRepository;
+  @Autowired
   private CuentaRepository cuentaRepository;
 
   /** {@inheritDoc} */

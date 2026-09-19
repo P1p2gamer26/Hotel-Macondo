@@ -21,9 +21,10 @@ import org.springframework.transaction.annotation.Transactional;
 public class CuentaServiceImpl implements CuentaService {
 
   @Autowired
-
   private CuentaRepository repository;
+  @Autowired
   private DetalleCuentaRepository detalleCuentaRepository;
+  @Autowired
   private PagoRepository pagoRepository;
 
   /** {@inheritDoc} */

@@ -22,9 +22,10 @@ import com.hotel.macondo.errors.PeticionImposible;
 public class HabitacionServiceImpl implements HabitacionService {
 
   @Autowired
-
   private HabitacionRepository repository;
+  @Autowired
   private TipoHabitacionRepository tipoHabitacionRepository;
+  @Autowired
   private ReservaRepository reservaRepository;
 
   /** {@inheritDoc} */

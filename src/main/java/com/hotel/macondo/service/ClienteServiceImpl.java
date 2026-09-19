@@ -30,9 +30,10 @@ public class ClienteServiceImpl implements ClienteService {
       LOCALE_COLOMBIA);
 
   @Autowired
-
   private ClienteRepository repository;
+  @Autowired
   private ReservaRepository reservaRepository;
+  @Autowired
   private UsuarioRepository usuarioRepository;
 
   /** {@inheritDoc} */
