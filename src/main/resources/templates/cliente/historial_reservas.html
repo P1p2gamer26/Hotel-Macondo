@@ -62,7 +62,7 @@
             Comienza tu primera aventura caribeña hoy.
           </p>
           <a
-            th:href="@{/cliente/{id}(id=${cliente.id})}"
+            th:href="@{/cliente/{id}/reservas/nueva(id=${cliente.id})}"
             class="font-sans text-sm font-bold bg-[var(--dorado)] text-[#333] rounded-xl px-8 py-3.5 inline-flex items-center gap-2 transition-transform hover:scale-105"
           >
             Hacer mi primera reserva <i class="bi bi-arrow-right"></i>
@@ -92,12 +92,15 @@
                   th:text="${h.numeroReserva}"
                 ></span>
               </div>
-              <h3 class="font-serif text-xl font-bold text-[#0e2a3f] mb-1">
-                Habitación Macondo
+              <h3
+                class="font-serif text-xl font-bold text-[#0e2a3f] mb-1"
+                th:text="${h.habitacion != null and h.habitacion.tipoHabitacion != null ? h.habitacion.tipoHabitacion.nombre : 'Tipo no asignado'}"
+              >
+                Tipo de habitación
               </h3>
               <p
                 class="font-sans text-[0.78rem] text-gray-500 mb-0"
-                th:text="${h.cantidadPersonas} + ' personas'"
+                th:text="${(h.habitacion != null ? 'Habitación ' + h.habitacion.numero + ' · ' : '') + h.cantidadPersonas + ' personas'}"
               ></p>
 
               <div class="flex items-center gap-1.5 mt-2">
@@ -113,7 +116,7 @@
             <div class="flex-none">
               <span
                 class="font-serif text-lg md:text-xl font-bold text-[var(--azul)]"
-                th:text="${'$' + h.total}"
+                th:text="${'$' + #numbers.formatInteger(h.total, 1, 'POINT')}"
               ></span>
             </div>
 
@@ -140,7 +143,7 @@
           </p>
           <p
             class="font-serif text-2xl md:text-3xl font-bold text-[#27ae60] m-0"
-            th:text="${historial.size()}"
+            th:text="${totalHistorial}"
           ></p>
         </div>
 
@@ -150,9 +153,8 @@
           </p>
           <p
             class="font-serif text-2xl md:text-3xl font-bold text-[var(--azul)] m-0"
-          >
-            12
-          </p>
+            th:text="${nochesHistorial}"
+          ></p>
         </div>
 
         <div class="bg-white rounded-xl border border-[#e8e0d8] p-5 md:p-6">
@@ -161,9 +163,8 @@
           </p>
           <p
             class="font-serif text-2xl md:text-3xl font-bold text-[#e74c3c] m-0"
-          >
-            0
-          </p>
+            th:text="${totalCanceladas}"
+          ></p>
         </div>
       </div>
     </main>

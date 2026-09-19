@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+  <head
+    th:replace="~{fragmentos :: cabecera('Reserva | Hotel Macondo')}"
+  ></head>
+  <body class="min-h-screen bg-[#eef3f3] text-[var(--texto)] font-sans">
+    <nav th:replace="~{cliente/fragmentos_cliente :: navbar-cliente}"></nav>
+
+    <main class="mx-auto max-w-[1180px] px-5 py-10 md:py-14">
+      <header class="max-w-3xl">
+        <span
+          class="text-xs font-bold uppercase tracking-[1.5px] text-[var(--azul)]"
+          th:text="${reserva != null} ? 'Actualizar estadía' : 'Nueva estadía'"
+          >Nueva estadía</span
+        >
+        <h1
+          class="mt-3 font-serif text-4xl font-bold text-[var(--azul-oscuro)] md:text-5xl"
+          th:text="${reserva != null} ? 'Modifica tu reserva' : 'Crea tu reserva'"
+        >
+          Crea tu reserva
+        </h1>
+        <p
+          class="mt-4 max-w-2xl leading-7 text-gray-600"
+          th:text="${reserva != null} ? 'Actualiza el tipo de habitación, las fechas o la cantidad de huéspedes. Los cambios se guardarán únicamente si existe disponibilidad.' : 'Selecciona el tipo de habitación, las fechas y la cantidad de huéspedes. Al confirmar, el sistema asignará una habitación física disponible.'"
+        >
+          Selecciona el tipo de habitación, las fechas y la cantidad de
+          huéspedes. Al confirmar, el sistema asignará una habitación física
+          disponible.
+        </p>
+      </header>
+
+      <section
+        class="mt-10 grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_360px]"
+      >
+        <form
+          class="rounded-[20px] bg-white p-6 shadow-[0_14px_35px_rgba(30,58,70,0.10)] md:p-9"
+          method="post"
+        >
+          <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+            <label class="md:col-span-2">
+              <span class="mb-2 block text-sm font-bold text-[var(--azul-oscuro)]"
+                >Tipo de habitación</span
+              >
+              <select
+                class="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 outline-none transition focus:border-[var(--azul)] focus:ring-2 focus:ring-[var(--azul)]/15"
+                name="tipoId"
+                required
+              >
+                <option value="" disabled th:selected="${tipoId == null}">
+                  Selecciona un tipo
+                </option>
+                <option
+                  th:each="tipo : ${tiposHabitacion}"
+                  th:value="${tipo.id}"
+                  th:selected="${tipoId != null and tipo.id == tipoId}"
+                  th:text="${tipo.nombre + ' - $' + #numbers.formatInteger(tipo.precioNoche, 1, 'POINT') + ' por noche'}"
+                ></option>
+              </select>
+            </label>
+
+            <label>
+              <span class="mb-2 block text-sm font-bold text-[var(--azul-oscuro)]"
+                >Fecha de entrada</span
+              >
+              <input
+                class="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none transition focus:border-[var(--azul)] focus:ring-2 focus:ring-[var(--azul)]/15"
+                type="date"
+                name="fechaEntrada"
+                th:min="${fechaMinima}"
+                th:value="${fechaEntrada}"
+                required
+              />
+            </label>
+
+            <label>
+              <span class="mb-2 block text-sm font-bold text-[var(--azul-oscuro)]"
+                >Fecha de salida</span
+              >
+              <input
+                class="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none transition focus:border-[var(--azul)] focus:ring-2 focus:ring-[var(--azul)]/15"
+                type="date"
+                name="fechaSalida"
+                th:min="${fechaMinima}"
+                th:value="${fechaSalida}"
+                required
+              />
+            </label>
+
+            <label class="md:col-span-2">
+              <span class="mb-2 block text-sm font-bold text-[var(--azul-oscuro)]"
+                >Cantidad de personas</span
+              >
+              <input
+                class="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none transition focus:border-[var(--azul)] focus:ring-2 focus:ring-[var(--azul)]/15"
+                type="number"
+                name="cantidadPersonas"
+                min="1"
+                th:value="${cantidadPersonas}"
+                placeholder="Ej. 2"
+                required
+              />
+            </label>
+          </div>
+
+          <div
+            class="mt-7 rounded-lg border p-4"
+            th:if="${disponibilidadConsultada}"
+            th:classappend="${hayDisponibilidad} ? 'border-[#9ad7b6] bg-[#effaf4] text-[#166534]' : 'border-[#f1b8b1] bg-[#fff4f2] text-[#b42318]'"
+          >
+            <p
+              class="font-semibold"
+              th:if="${hayDisponibilidad}"
+              th:text="${cantidadDisponibles + ' habitación(es) disponible(s) para las fechas seleccionadas.'}"
+            ></p>
+            <p class="font-semibold" th:unless="${hayDisponibilidad}">
+              No hay habitaciones disponibles con esos criterios.
+            </p>
+          </div>
+
+          <div class="mt-8 flex flex-col gap-3 sm:flex-row">
+            <button
+              class="rounded-md border-2 border-[var(--azul)] px-6 py-3 font-bold text-[var(--azul)] transition hover:bg-[var(--azul)] hover:text-white"
+              type="submit"
+              th:formaction="${reserva != null} ? @{/cliente/{id}/reservas/{reservaId}/disponibilidad(id=${cliente.id}, reservaId=${reserva.id})} : @{/cliente/{id}/reservas/disponibilidad(id=${cliente.id})}"
+            >
+              Consultar disponibilidad
+            </button>
+            <button
+              class="rounded-md bg-[var(--dorado)] px-6 py-3 font-bold text-[var(--azul-oscuro)] transition hover:bg-[var(--dorado-oscuro)]"
+              type="submit"
+              th:if="${hayDisponibilidad}"
+              th:formaction="${reserva != null} ? @{/cliente/{id}/reservas/{reservaId}/modificar(id=${cliente.id}, reservaId=${reserva.id})} : @{/cliente/{id}/reservas(id=${cliente.id})}"
+              th:text="${reserva != null} ? 'Guardar cambios' : 'Confirmar reserva'"
+            >
+              Confirmar reserva
+            </button>
+          </div>
+        </form>
+
+        <aside
+          class="h-fit rounded-[20px] bg-[#14516f] p-7 text-white shadow-[0_14px_35px_rgba(20,81,111,0.18)]"
+        >
+          <i class="bi bi-calendar2-check text-4xl text-[var(--dorado)]"></i>
+          <h2 class="mt-5 font-serif text-2xl font-bold !text-white">
+            Cómo funciona
+          </h2>
+          <ol class="mt-5 space-y-4 text-sm leading-6 text-white/85">
+            <li>1. Elige el tipo de habitación que necesitas.</li>
+            <li>2. Consulta la disponibilidad real para tus fechas.</li>
+            <li>3. Confirma y recibe automáticamente una habitación.</li>
+          </ol>
+          <a
+            class="mt-7 inline-flex font-bold text-[var(--dorado)] hover:text-white"
+            th:href="@{/cliente/{id}/reservas(id=${cliente.id})}"
+            >Volver a mis reservas</a
+          >
+        </aside>
+      </section>
+    </main>
+
+    <footer th:replace="~{fragmentos :: footer}"></footer>
+  </body>
+</html>

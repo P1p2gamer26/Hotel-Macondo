@@ -72,4 +72,11 @@ public class Cuenta {
       detalle.setCuenta(this);
     }
   }
+
+  public void agregarPago(Pago pago) {
+    if (pago != null && !pagos.contains(pago)) {
+      pagos.add(pago);
+      pago.setCuenta(this);
+    }
+  }
 }

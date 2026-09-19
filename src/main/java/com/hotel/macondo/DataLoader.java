@@ -3,6 +3,7 @@ package com.hotel.macondo;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,6 +16,7 @@ import com.hotel.macondo.entities.Cliente;
 import com.hotel.macondo.entities.Cuenta;
 import com.hotel.macondo.entities.Habitacion;
 import com.hotel.macondo.entities.Operador;
+import com.hotel.macondo.entities.Pago;
 import com.hotel.macondo.entities.Reserva;
 import com.hotel.macondo.entities.Rol;
 import com.hotel.macondo.entities.Servicio;
@@ -26,6 +28,7 @@ import com.hotel.macondo.repository.ClienteRepository;
 import com.hotel.macondo.repository.CuentaRepository;
 import com.hotel.macondo.repository.HabitacionRepository;
 import com.hotel.macondo.repository.OperadorRepository;
+import com.hotel.macondo.repository.PagoRepository;
 import com.hotel.macondo.repository.ReservaRepository;
 import com.hotel.macondo.repository.ServicioRepository;
 import com.hotel.macondo.repository.TestimonioRepository;
@@ -68,6 +71,9 @@ public class DataLoader implements CommandLineRunner {
         @Autowired
         private CuentaRepository cuentaRepository;
 
+        @Autowired
+        private PagoRepository pagoRepository;
+
         @Override
         public void run(String... args) {
                 List<TipoHabitacion> tipos = cargarTiposHabitacion();
@@ -77,9 +83,7 @@ public class DataLoader implements CommandLineRunner {
 
                 List<Cliente> clientes = cargarClientes();
                 cargarUsuariosYPerfiles(clientes);
-                cargarReservasPrincipales();
-                cargarReservasDeClientes(clientes, habitaciones);
-                cargarCuenta();
+                cargarReservas(clientes, habitaciones);
         }
 
         private List<TipoHabitacion> cargarTiposHabitacion() {
@@ -397,89 +401,111 @@ public class DataLoader implements CommandLineRunner {
                                                 "/images/IconoP3.avif"));
         }
 
-        private void cargarReservasPrincipales() {
-                reservaRepository.save(
-                                new Reserva(
-                                                "MHC-2025-001",
-                                                LocalDate.now(),
-                                                LocalDate.now().plusDays(3),
-                                                2,
-                                                "ACTIVA",
-                                                new BigDecimal("2850000")));
-                reservaRepository.save(
-                                new Reserva(
-                                                "MHC-2025-002",
-                                                LocalDate.now().plusDays(5),
-                                                LocalDate.now().plusDays(8),
-                                                2,
-                                                "CONFIRMADA",
-                                                new BigDecimal("1740000")));
-                reservaRepository.save(
-                                new Reserva(
-                                                "MHC-2024-089",
-                                                LocalDate.now().minusDays(10),
-                                                LocalDate.now().minusDays(7),
-                                                1,
-                                                "FINALIZADA",
-                                                new BigDecimal("1050000")));
-                reservaRepository.save(
-                                new Reserva(
-                                                "MHC-2023-211",
-                                                LocalDate.now().minusDays(30),
-                                                LocalDate.now().minusDays(25),
-                                                4,
-                                                "CANCELADA",
-                                                new BigDecimal("5700000")));
-        }
-
-        private void cargarReservasDeClientes(
+        private void cargarReservas(
                         List<Cliente> clientes, List<Habitacion> habitaciones) {
+                guardarReserva(
+                                "MHC-2025-001",
+                                LocalDate.now(),
+                                LocalDate.now().plusDays(3),
+                                2,
+                                "ACTIVA",
+                                clientes.get(2),
+                                habitaciones.get(1));
+
+                guardarReserva(
+                                "MHC-2025-002",
+                                LocalDate.now().plusDays(5),
+                                LocalDate.now().plusDays(8),
+                                2,
+                                "CONFIRMADA",
+                                clientes.get(3),
+                                habitaciones.get(11));
+
+                guardarReserva(
+                                "MHC-2024-089",
+                                LocalDate.now().minusDays(10),
+                                LocalDate.now().minusDays(7),
+                                1,
+                                "FINALIZADA",
+                                clientes.get(4),
+                                habitaciones.get(21));
+
+                guardarReserva(
+                                "MHC-2023-211",
+                                LocalDate.now().minusDays(30),
+                                LocalDate.now().minusDays(25),
+                                2,
+                                "CANCELADA",
+                                clientes.get(5),
+                                habitaciones.get(31));
+
                 LocalDate entradaUrsula = LocalDate.now().plusDays(10);
-                guardarReservaDeCliente(
-                                new Reserva(
-                                                "MCD-2026-0915",
-                                                entradaUrsula,
-                                                entradaUrsula.plusDays(3),
-                                                habitaciones.get(0).getCapacidad(),
-                                                "ACTIVA",
-                                                BigDecimal.ZERO),
+                guardarReserva(
+                                "MCD-2026-0915",
+                                entradaUrsula,
+                                entradaUrsula.plusDays(3),
+                                habitaciones.get(0).getCapacidad(),
+                                "CONFIRMADA",
                                 clientes.get(0),
                                 habitaciones.get(0));
 
                 LocalDate salidaUrsula = LocalDate.now().minusDays(15);
-                guardarReservaDeCliente(
-                                new Reserva(
-                                                "MCD-2026-0801",
-                                                salidaUrsula.minusDays(2),
-                                                salidaUrsula,
-                                                habitaciones.get(10).getCapacidad(),
-                                                "FINALIZADA",
-                                                BigDecimal.ZERO),
+                guardarReserva(
+                                "MCD-2026-0801",
+                                salidaUrsula.minusDays(2),
+                                salidaUrsula,
+                                habitaciones.get(10).getCapacidad(),
+                                "FINALIZADA",
                                 clientes.get(0),
                                 habitaciones.get(10));
 
                 LocalDate entradaJoseArcadio = LocalDate.now().plusDays(20);
-                guardarReservaDeCliente(
-                                new Reserva(
-                                                "MCD-2026-0928",
-                                                entradaJoseArcadio,
-                                                entradaJoseArcadio.plusDays(4),
-                                                habitaciones.get(20).getCapacidad(),
-                                                "ACTIVA",
-                                                BigDecimal.ZERO),
+                guardarReserva(
+                                "MCD-2026-0928",
+                                entradaJoseArcadio,
+                                entradaJoseArcadio.plusDays(4),
+                                habitaciones.get(20).getCapacidad(),
+                                "CONFIRMADA",
                                 clientes.get(1),
                                 habitaciones.get(20));
         }
 
-        private void guardarReservaDeCliente(
-                        Reserva reserva, Cliente cliente, Habitacion habitacion) {
+        private void guardarReserva(
+                        String numeroReserva,
+                        LocalDate fechaEntrada,
+                        LocalDate fechaSalida,
+                        Integer cantidadPersonas,
+                        String estado,
+                        Cliente cliente,
+                        Habitacion habitacion) {
+                BigDecimal precioNoche = habitacion.getTipoHabitacion().getPrecioNoche();
+                long noches = ChronoUnit.DAYS.between(fechaEntrada, fechaSalida);
+                BigDecimal total = precioNoche.multiply(BigDecimal.valueOf(noches));
+                Reserva reserva = new Reserva(
+                                numeroReserva,
+                                fechaEntrada,
+                                fechaSalida,
+                                cantidadPersonas,
+                                estado,
+                                precioNoche,
+                                total);
                 reserva.asignarCliente(cliente);
-                reserva.agregarHabitacion(habitacion);
+                reserva.asignarHabitacion(habitacion);
                 reservaRepository.save(reserva);
-        }
 
-        private void cargarCuenta() {
-                cuentaRepository.save(
-                                new Cuenta("ABIERTA", BigDecimal.ZERO, LocalDateTime.now()));
+                boolean finalizada = "FINALIZADA".equals(estado);
+                boolean cancelada = "CANCELADA".equals(estado);
+                String estadoCuenta = finalizada ? "PAGADA" : cancelada ? "CANCELADA" : "ABIERTA";
+                BigDecimal totalCuenta = finalizada || cancelada ? BigDecimal.ZERO : total;
+
+                Cuenta cuenta = new Cuenta(estadoCuenta, totalCuenta, LocalDateTime.now());
+                cuenta.asignarReserva(reserva);
+                cuentaRepository.save(cuenta);
+
+                if (finalizada) {
+                        Pago pago = new Pago(total, "TARJETA", LocalDateTime.now(), "CONFIRMADO");
+                        cuenta.agregarPago(pago);
+                        pagoRepository.save(pago);
+                }
         }
 }

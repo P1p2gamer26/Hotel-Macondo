@@ -39,8 +39,22 @@
           <li>
             <a
               class="hover:text-[#1a759f] transition"
+              th:href="@{/habitaciones(clienteId=${cliente.id})}"
+              >Habitaciones</a
+            >
+          </li>
+          <li>
+            <a
+              class="hover:text-[#1a759f] transition"
               th:href="@{/cliente/{id}/historial(id=${cliente.id})}"
               >Historial</a
+            >
+          </li>
+          <li>
+            <a
+              class="hover:text-[#1a759f] transition"
+              th:href="@{/cliente/{id}/reservas/nueva(id=${cliente.id})}"
+              >Nueva Reserva</a
             >
           </li>
           <li>

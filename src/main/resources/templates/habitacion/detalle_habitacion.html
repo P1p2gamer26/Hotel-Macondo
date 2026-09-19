@@ -27,7 +27,7 @@
         <div class="mx-auto flex max-w-[1180px] items-center gap-2 px-5 py-4 text-sm">
           <a class="text-[var(--azul)] hover:underline" th:href="@{/}">Inicio</a>
           <i class="bi bi-chevron-right text-[10px] text-gray-400" aria-hidden="true"></i>
-          <a class="text-[var(--azul)] hover:underline" th:href="@{/habitaciones}">Habitaciones</a>
+          <a class="text-[var(--azul)] hover:underline" th:href="@{/habitaciones(clienteId=${clienteId})}">Habitaciones</a>
           <i class="bi bi-chevron-right text-[10px] text-gray-400" aria-hidden="true"></i>
           <span class="text-[var(--texto)]" th:text="${tipoHabitacion.nombre}"></span>
         </div>
@@ -68,14 +68,19 @@
           </dl>
           <a
             class="mt-6 block rounded-md bg-[var(--dorado)] px-5 py-3.5 text-center font-bold text-[var(--azul-oscuro)] shadow-[0_8px_20px_rgba(245,205,99,0.30)] transition hover:bg-[var(--dorado-oscuro)]"
-            th:if="${hayDisponibilidad}"
-            th:href="@{/login}"
+            th:if="${hayDisponibilidad and clienteId != null}"
+            th:href="@{/cliente/{clienteId}/reservas/nueva(clienteId=${clienteId}, tipoId=${tipoHabitacion.id})}"
+          >Continuar reserva</a>
+          <a
+            class="mt-6 block rounded-md bg-[var(--dorado)] px-5 py-3.5 text-center font-bold text-[var(--azul-oscuro)] shadow-[0_8px_20px_rgba(245,205,99,0.30)] transition hover:bg-[var(--dorado-oscuro)]"
+            th:if="${hayDisponibilidad and clienteId == null}"
+            th:href="@{/login(tipoId=${tipoHabitacion.id})}"
           >Continuar reserva</a>
           <span
             class="mt-6 block cursor-not-allowed rounded-md bg-gray-200 px-5 py-3.5 text-center font-bold text-gray-500"
             th:unless="${hayDisponibilidad}"
           >Sin unidades disponibles</span>
-          <a class="mt-5 block text-center font-semibold text-[var(--azul)] hover:underline" th:href="@{/habitaciones}">Ver todas las habitaciones</a>
+          <a class="mt-5 block text-center font-semibold text-[var(--azul)] hover:underline" th:href="@{/habitaciones(clienteId=${clienteId})}">Ver todas las habitaciones</a>
         </aside>
       </section>
     </main>

@@ -10,7 +10,6 @@ import com.hotel.macondo.repository.PagoRepository;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.List;
 import java.util.Objects;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -76,7 +75,7 @@ public class CuentaServiceImpl implements CuentaService {
     cuenta.agregarDetalle(detalle);
 
     detalleCuentaRepository.save(detalle);
-    cuenta.setTotal(calcularTotal(cuenta.getDetalles()));
+    cuenta.setTotal(calcularTotal(cuenta));
     repository.save(cuenta);
     return detalle;
   }
@@ -97,7 +96,7 @@ public class CuentaServiceImpl implements CuentaService {
 
     cuenta.getDetalles().removeIf(item -> Objects.equals(item.getId(), detalleId));
     detalleCuentaRepository.delete(detalle);
-    cuenta.setTotal(calcularTotal(cuenta.getDetalles()));
+    cuenta.setTotal(calcularTotal(cuenta));
     repository.save(cuenta);
     return true;
   }
@@ -118,7 +117,7 @@ public class CuentaServiceImpl implements CuentaService {
     }
 
     Pago pago = new Pago(monto, metodoPago, LocalDateTime.now(), "CONFIRMADO");
-    pago.setCuenta(cuenta);
+    cuenta.agregarPago(pago);
 
     detalleCuentaRepository.deleteAllByCuentaId(cuentaId);
     cuenta.getDetalles().clear();
@@ -129,10 +128,15 @@ public class CuentaServiceImpl implements CuentaService {
     return pago;
   }
 
-  private BigDecimal calcularTotal(List<DetalleCuenta> detalles) {
-    return detalles.stream()
+  private BigDecimal calcularTotal(Cuenta cuenta) {
+    BigDecimal alojamiento =
+        cuenta.getReserva() == null || cuenta.getReserva().getTotal() == null
+            ? BigDecimal.ZERO
+            : cuenta.getReserva().getTotal();
+    BigDecimal servicios = cuenta.getDetalles().stream()
         .map(this::calcularSubtotal)
         .reduce(BigDecimal.ZERO, BigDecimal::add);
+    return alojamiento.add(servicios);
   }
 
   private BigDecimal calcularSubtotal(DetalleCuenta detalle) {

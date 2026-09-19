@@ -97,12 +97,15 @@
                   th:text="${r.numeroReserva}"
                 ></span>
               </div>
-              <h3 class="font-serif text-2xl font-bold text-[var(--azul)] mb-1">
-                Habitación Estándar
+              <h3
+                class="font-serif text-2xl font-bold text-[var(--azul)] mb-1"
+                th:text="${r.habitacion != null and r.habitacion.tipoHabitacion != null ? r.habitacion.tipoHabitacion.nombre : 'Tipo no asignado'}"
+              >
+                Tipo de habitación
               </h3>
               <p
                 class="font-sans text-sm text-gray-500 mb-2"
-                th:text="${r.cantidadPersonas} + ' personas'"
+                th:text="${(r.habitacion != null ? 'Habitación ' + r.habitacion.numero + ' · ' : '') + r.cantidadPersonas + ' personas'}"
               ></p>
               <div class="flex items-center gap-1.5">
                 <i class="bi bi-calendar3 text-gray-400 text-xs"></i>
@@ -124,14 +127,15 @@
               <!-- Mostrar el precio real -->
               <span
                 class="font-serif text-lg font-bold text-[#0e2a3f]"
-                th:text="${'$' + r.total}"
+                th:text="${'$' + #numbers.formatInteger(r.total, 1, 'POINT')}"
               ></span>
             </div>
 
             <!-- DERECHA -->
             <div class="flex flex-col gap-2.5 flex-none items-stretch">
               <a
-                href="#"
+                th:if="${r.fechaInicio.isAfter(fechaActual)}"
+                th:href="@{/cliente/{id}/reservas/{reservaId}/editar(id=${cliente.id}, reservaId=${r.id})}"
                 class="font-sans text-sm font-semibold text-center text-white bg-[var(--azul)] hover:bg-[#0e2a3f] rounded-lg px-5 py-2 transition-colors"
               >
                 Modificar
@@ -146,7 +150,7 @@
         </div>
       </div>
 
-      <!-- CINTA DE RESUMEN DUMMY -->
+      <!-- Resumen calculado a partir de las reservas consultadas. -->
       <div
         th:if="${reservas != null and !reservas.isEmpty()}"
         class="mt-8 bg-gradient-to-br from-[var(--azul)]/5 to-[#87ceeb]/10 border border-[var(--azul)]/10 rounded-xl p-4 md:px-6 md:py-4 flex gap-8 flex-wrap"
@@ -157,26 +161,35 @@
           </p>
           <p
             class="font-serif text-2xl font-bold text-[var(--azul)] m-0"
-            th:text="${reservas.size()}"
+            th:text="${totalReservas}"
           ></p>
         </div>
         <div>
           <p class="font-sans text-[0.7rem] text-gray-500 mb-1 tracking-wider">
             Activas
           </p>
-          <p class="font-serif text-2xl font-bold text-[var(--azul)] m-0">1</p>
+          <p
+            class="font-serif text-2xl font-bold text-[var(--azul)] m-0"
+            th:text="${totalActivas}"
+          ></p>
         </div>
         <div>
           <p class="font-sans text-[0.7rem] text-gray-500 mb-1 tracking-wider">
             Confirmadas
           </p>
-          <p class="font-serif text-2xl font-bold text-[var(--azul)] m-0">1</p>
+          <p
+            class="font-serif text-2xl font-bold text-[var(--azul)] m-0"
+            th:text="${totalConfirmadas}"
+          ></p>
         </div>
         <div>
           <p class="font-sans text-[0.7rem] text-gray-500 mb-1 tracking-wider">
             Pendientes
           </p>
-          <p class="font-serif text-2xl font-bold text-[var(--azul)] m-0">0</p>
+          <p
+            class="font-serif text-2xl font-bold text-[var(--azul)] m-0"
+            th:text="${totalPendientes}"
+          ></p>
         </div>
       </div>
     </main>

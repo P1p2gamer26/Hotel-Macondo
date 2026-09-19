@@ -5,7 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.ManyToOne;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
@@ -37,7 +37,7 @@ public class Pago {
   @Column(nullable = false, length = 20)
   private String estado;
 
-  @OneToOne
+  @ManyToOne
   private Cuenta cuenta;
 
   public Pago(BigDecimal monto, String metodoPago, LocalDateTime fechaPago, String estado) {

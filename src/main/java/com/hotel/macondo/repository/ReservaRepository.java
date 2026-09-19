@@ -18,14 +18,18 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
 
   Optional<Reserva> findByNumeroReserva(String numeroReserva);
 
+  boolean existsByNumeroReserva(String numeroReserva);
+
   List<Reserva> findByEstadoInOrderByIdAsc(Collection<String> estados);
 
   @Query(
       """
       SELECT r
       FROM Reserva r
+      LEFT JOIN FETCH r.habitacion h
+      LEFT JOIN FETCH h.tipoHabitacion
       WHERE r.cliente = :cliente
-        AND UPPER(r.estado) <> 'CANCELADA'
+        AND UPPER(r.estado) IN ('ACTIVA', 'CONFIRMADA', 'PENDIENTE')
         AND r.fechaFin >= :fechaActual
       ORDER BY r.fechaInicio
       """)
@@ -36,6 +40,8 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
       """
       SELECT r
       FROM Reserva r
+      LEFT JOIN FETCH r.habitacion h
+      LEFT JOIN FETCH h.tipoHabitacion
       WHERE r.cliente = :cliente
         AND (UPPER(r.estado) = 'CANCELADA' OR r.fechaFin < :fechaActual)
       ORDER BY r.fechaInicio DESC
@@ -48,7 +54,7 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
       SELECT COUNT(r)
       FROM Reserva r
       WHERE r.cliente = :cliente
-        AND UPPER(r.estado) <> 'CANCELADA'
+        AND UPPER(r.estado) IN ('ACTIVA', 'CONFIRMADA', 'PENDIENTE')
         AND r.fechaFin >= :fechaActual
       """)
   long contarVigentesPorCliente(
@@ -73,7 +79,8 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
       """
       SELECT r
       FROM Reserva r
-      JOIN r.habitaciones h
+      JOIN FETCH r.habitacion h
+      LEFT JOIN FETCH h.tipoHabitacion
       LEFT JOIN FETCH r.cliente
       WHERE h.id = :idHabitacion
       ORDER BY r.fechaInicio

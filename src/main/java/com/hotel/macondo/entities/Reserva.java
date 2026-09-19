@@ -5,13 +5,10 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,7 +19,7 @@ import lombok.Builder;
 @Builder
 @Getter
 @Setter
-@ToString(exclude = { "cliente", "habitaciones", "cuenta" })
+@ToString(exclude = { "cliente", "habitacion", "cuenta" })
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
@@ -47,13 +44,16 @@ public class Reserva {
   private String estado;
 
   @Column(nullable = false, precision = 12, scale = 2)
+  private BigDecimal precioNoche;
+
+  @Column(nullable = false, precision = 12, scale = 2)
   private BigDecimal total;
 
   @ManyToOne
   private Cliente cliente;
 
-  @ManyToMany
-  private List<Habitacion> habitaciones = new ArrayList<>();
+  @ManyToOne
+  private Habitacion habitacion;
 
   @OneToOne(mappedBy = "reserva")
   private Cuenta cuenta;
@@ -64,12 +64,14 @@ public class Reserva {
       LocalDate fechaFin,
       Integer cantidadPersonas,
       String estado,
+      BigDecimal precioNoche,
       BigDecimal total) {
     this.numeroReserva = numeroReserva;
     this.fechaInicio = fechaInicio;
     this.fechaFin = fechaFin;
     this.cantidadPersonas = cantidadPersonas;
     this.estado = estado;
+    this.precioNoche = precioNoche;
     this.total = total;
   }
 
@@ -87,12 +89,13 @@ public class Reserva {
     }
   }
 
-  public void agregarHabitacion(Habitacion habitacion) {
-    if (habitacion != null && !habitaciones.contains(habitacion)) {
-      habitaciones.add(habitacion);
-      if (!habitacion.getReservas().contains(this)) {
-        habitacion.getReservas().add(this);
-      }
+  public void asignarHabitacion(Habitacion habitacion) {
+    if (this.habitacion != null && this.habitacion != habitacion) {
+      this.habitacion.getReservas().remove(this);
+    }
+    this.habitacion = habitacion;
+    if (habitacion != null && !habitacion.getReservas().contains(this)) {
+      habitacion.getReservas().add(this);
     }
   }
 }

@@ -26,7 +26,10 @@ public class AuthController {
      * Muestra el formulario de inicio de sesion.
      */
     @GetMapping("/login")
-    public String mostrarLogin() {
+    public String mostrarLogin(
+            @RequestParam(required = false) Long tipoId,
+            Model model) {
+        model.addAttribute("tipoId", tipoId);
         return "login";
     }
 
@@ -66,6 +69,7 @@ public class AuthController {
     @PostMapping("/login")
     public String iniciarSesion(@RequestParam(name = "username") String correo,
             @RequestParam(name = "password") String contrasena,
+            @RequestParam(required = false) Long tipoId,
             Model model) {
 
         // Como el error se muestra en el formulario de login entonces se captura la excepcion
@@ -79,10 +83,16 @@ public class AuthController {
             } else if (usuario.getRol() == Rol.OPERADOR) {
                 return "redirect:/operador";
             } else if (usuario.getRol() == Rol.CLIENTE) {
-                return "redirect:/cliente/" + usuario.getCliente().getId();
+                Long clienteId = usuario.getCliente().getId();
+                if (tipoId != null) {
+                    return "redirect:/cliente/" + clienteId
+                            + "/reservas/nueva?tipoId=" + tipoId;
+                }
+                return "redirect:/cliente/" + clienteId;
             }
         }catch (Exception e){
             model.addAttribute("error", e.getMessage());
+            model.addAttribute("tipoId", tipoId);
             return "login";
         }
 
@@ -95,7 +105,10 @@ public class AuthController {
     * no al cliente
     */
     @PostMapping("/registro")
-    public String agregarCliente(@ModelAttribute("cliente") Cliente clienteNuevo, @RequestParam("contrasena") String contrasena, Model model){
+    public String agregarCliente(
+            @ModelAttribute("cliente") Cliente clienteNuevo,
+            @RequestParam("contrasena") String contrasena,
+            Model model){
 
         // Como el error se muestra en el formulario de register entonces se captura la excepcion
         // localmente para mostrar el mensaje de error en el formulario de login

@@ -5,10 +5,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.hotel.macondo.service.OperadorService;
+import com.hotel.macondo.service.ReservaService;
 
 /**
  * Unico punto de entrada del portal de operador. Todas las pantallas cuelgan
@@ -23,6 +25,9 @@ public class OperadorController {
     @Autowired
     private OperadorService service;
 
+    @Autowired
+    private ReservaService reservaService;
+
     @GetMapping
     public String inicio(Model model) {
         model.addAttribute("seccionActiva", "panel");
@@ -35,9 +40,26 @@ public class OperadorController {
      * Lista las reservas del hotel con su estado actual.
      */
     @GetMapping("/reservas")
-    public String reservas(Model model) {
+    public String reservas(
+            @RequestParam(defaultValue = "todas") String filtro,
+            Model model) {
+        boolean mostrarSoloActivas = "activas".equalsIgnoreCase(filtro);
+
+        model.addAttribute(
+                "reservas",
+                mostrarSoloActivas
+                        ? reservaService.obtenerReservasActivas()
+                        : reservaService.buscarTodas());
+        model.addAttribute("filtro", mostrarSoloActivas ? "activas" : "todas");
         model.addAttribute("seccionActiva", "reservas");
         return "operador/reservas";
+    }
+
+    /** Cancela una reserva futura desde el portal del operador. */
+    @PostMapping("/reservas/{numeroReserva}/cancelar")
+    public String cancelarReserva(@PathVariable String numeroReserva) {
+        reservaService.cancelar(numeroReserva);
+        return "redirect:/operador/reservas";
     }
 
     // ===== CUENTA DE LA HABITACION =====
