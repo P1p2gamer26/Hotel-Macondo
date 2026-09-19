@@ -22,4 +22,20 @@ public class GlobalExceptionHandler {
         model.addAttribute("mensaje", ex.getMessage());
         return "error";
     }
+
+    @ExceptionHandler(FormularioErroneoException.class)
+    public String handleFormularioErroneo(
+            FormularioErroneoException ex,
+            Model model) {
+        model.addAttribute("mensaje", ex.getMessage());
+        return "error";
+    }
+
+    @ExceptionHandler(Exception.class)
+    public String handleException(Exception ex, Model model) {
+        model.addAttribute(
+                "mensaje",
+                "Ocurrió un error inesperado. Intenta nuevamente más tarde.");
+        return "error";
+    }
 }
