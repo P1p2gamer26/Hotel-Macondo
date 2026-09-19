@@ -10,16 +10,14 @@ import org.springframework.transaction.annotation.Transactional;
 import com.hotel.macondo.entities.Servicio;
 import com.hotel.macondo.repository.ServicioRepository;
 import com.hotel.macondo.errors.RecursoNoEncontradoException;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @Service
 @Transactional
 public class ServicioServiceImpl implements ServicioService {
 
-  private final ServicioRepository repository;
-
-  public ServicioServiceImpl(ServicioRepository repository) {
-    this.repository = repository;
-  }
+  @Autowired
+  private ServicioRepository repository;
 
   /** {@inheritDoc} */
   @Override
@@ -33,9 +31,9 @@ public class ServicioServiceImpl implements ServicioService {
     Servicio servicio = repository.findById(id).orElseThrow(
         () -> new RecursoNoEncontradoException("Servicio no encontrado"));
 
-      if(!servicio.isActivo()){
-        throw new RecursoNoEncontradoException("Servicio no encontrado");
-      }
+    if (!servicio.isActivo()) {
+      throw new RecursoNoEncontradoException("Servicio no encontrado");
+    }
 
     return servicio;
   }

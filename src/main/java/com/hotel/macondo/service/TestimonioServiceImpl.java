@@ -5,16 +5,14 @@ import com.hotel.macondo.repository.TestimonioRepository;
 import java.util.Collection;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @Service
 @Transactional(readOnly = true)
 public class TestimonioServiceImpl implements TestimonioService {
 
-  private final TestimonioRepository repository;
-
-  public TestimonioServiceImpl(TestimonioRepository repository) {
-    this.repository = repository;
-  }
+  @Autowired
+  private TestimonioRepository repository;
 
   /** {@inheritDoc} */
   @Override

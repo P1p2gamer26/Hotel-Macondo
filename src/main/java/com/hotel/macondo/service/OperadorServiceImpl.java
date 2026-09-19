@@ -5,6 +5,8 @@ import com.hotel.macondo.entities.Usuario;
 import com.hotel.macondo.repository.OperadorRepository;
 import com.hotel.macondo.repository.UsuarioRepository;
 import java.util.Collection;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -12,13 +14,10 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class OperadorServiceImpl implements OperadorService {
 
-  private final OperadorRepository repository;
-  private final UsuarioRepository usuarioRepository;
+  @Autowired
 
-  public OperadorServiceImpl(OperadorRepository repository, UsuarioRepository usuarioRepository) {
-    this.repository = repository;
-    this.usuarioRepository = usuarioRepository;
-  }
+  private OperadorRepository repository;
+  private UsuarioRepository usuarioRepository;
 
   /** {@inheritDoc} */
   @Override

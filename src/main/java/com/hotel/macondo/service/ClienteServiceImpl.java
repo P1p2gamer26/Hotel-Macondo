@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,18 +29,11 @@ public class ClienteServiceImpl implements ClienteService {
   private static final DateTimeFormatter FORMATO_FECHA = DateTimeFormatter.ofPattern("EEEE, dd 'de' MMMM 'de' yyyy",
       LOCALE_COLOMBIA);
 
-  private final ClienteRepository repository;
-  private final ReservaRepository reservaRepository;
-  private final UsuarioRepository usuarioRepository;
+  @Autowired
 
-  public ClienteServiceImpl(
-      ClienteRepository repository,
-      ReservaRepository reservaRepository,
-      UsuarioRepository usuarioRepository) {
-    this.repository = repository;
-    this.reservaRepository = reservaRepository;
-    this.usuarioRepository = usuarioRepository;
-  }
+  private ClienteRepository repository;
+  private ReservaRepository reservaRepository;
+  private UsuarioRepository usuarioRepository;
 
   /** {@inheritDoc} */
   @Override
