@@ -140,11 +140,18 @@
               >
                 Modificar
               </a>
-              <button
-                class="font-sans text-sm font-semibold text-[#e74c3c] bg-transparent border-[1.5px] border-[#e74c3c] hover:text-[#c0392b] hover:border-[#c0392b] rounded-lg px-5 py-2 transition-colors cursor-pointer"
+              <form
+                th:action="@{/cliente/{id}/reservas/{reservaId}/cancelar(id=${cliente.id}, reservaId=${r.id})}"
+                method="post"
+                class="m-0"
               >
-                Cancelar
-              </button>
+                <button
+                  type="submit"
+                  class="font-sans text-sm font-semibold text-[#e74c3c] bg-transparent border-[1.5px] border-[#e74c3c] hover:text-[#c0392b] hover:border-[#c0392b] rounded-lg px-5 py-2 transition-colors cursor-pointer"
+                >
+                  Cancelar
+                </button>
+              </form>
             </div>
           </div>
         </div>
