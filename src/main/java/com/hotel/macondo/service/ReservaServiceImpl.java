@@ -20,6 +20,9 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.UUID;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.AutoConfigureOrder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,31 +30,20 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class ReservaServiceImpl implements ReservaService {
 
-  private static final List<String> ESTADOS_ACTIVOS =
-      List.of("ACTIVA", "CONFIRMADA", "PENDIENTE");
-  private static final List<String> ESTADOS_HISTORICOS =
-      List.of("FINALIZADA", "CANCELADA");
-  private static final List<String> ESTADOS_QUE_OCUPAN_HABITACION =
-      List.of("ACTIVA", "CONFIRMADA", "PENDIENTE");
+  private static final List<String> ESTADOS_ACTIVOS = List.of("ACTIVA", "CONFIRMADA", "PENDIENTE");
+  private static final List<String> ESTADOS_HISTORICOS = List.of("FINALIZADA", "CANCELADA");
+  private static final List<String> ESTADOS_QUE_OCUPAN_HABITACION = List.of("ACTIVA", "CONFIRMADA", "PENDIENTE");
 
-  private final ReservaRepository reservaRepository;
-  private final ClienteRepository clienteRepository;
-  private final TipoHabitacionRepository tipoHabitacionRepository;
-  private final HabitacionRepository habitacionRepository;
-  private final CuentaRepository cuentaRepository;
-
-  public ReservaServiceImpl(
-      ReservaRepository reservaRepository,
-      ClienteRepository clienteRepository,
-      TipoHabitacionRepository tipoHabitacionRepository,
-      HabitacionRepository habitacionRepository,
-      CuentaRepository cuentaRepository) {
-    this.reservaRepository = reservaRepository;
-    this.clienteRepository = clienteRepository;
-    this.tipoHabitacionRepository = tipoHabitacionRepository;
-    this.habitacionRepository = habitacionRepository;
-    this.cuentaRepository = cuentaRepository;
-  }
+  @Autowired
+  private ReservaRepository reservaRepository;
+  @Autowired
+  private ClienteRepository clienteRepository;
+  @Autowired
+  private TipoHabitacionRepository tipoHabitacionRepository;
+  @Autowired
+  private HabitacionRepository habitacionRepository;
+  @Autowired
+  private CuentaRepository cuentaRepository;
 
   /** {@inheritDoc} */
   @Override
@@ -116,12 +108,10 @@ public class ReservaServiceImpl implements ReservaService {
     }
     return reservas.stream()
         .filter(
-            reserva ->
-                reserva.getFechaInicio() != null && reserva.getFechaFin() != null)
+            reserva -> reserva.getFechaInicio() != null && reserva.getFechaFin() != null)
         .mapToLong(
-            reserva ->
-                ChronoUnit.DAYS.between(
-                    reserva.getFechaInicio(), reserva.getFechaFin()))
+            reserva -> ChronoUnit.DAYS.between(
+                reserva.getFechaInicio(), reserva.getFechaFin()))
         .sum();
   }
 
@@ -185,21 +175,19 @@ public class ReservaServiceImpl implements ReservaService {
     TipoHabitacion tipo = buscarTipo(tipoId);
     validarCapacidad(tipo, cantidadPersonas);
 
-    Habitacion habitacion =
-        obtenerPrimeraDisponible(
-            tipoId, fechaEntrada, fechaSalida, cantidadPersonas, null);
+    Habitacion habitacion = obtenerPrimeraDisponible(
+        tipoId, fechaEntrada, fechaSalida, cantidadPersonas, null);
     BigDecimal precioNoche = tipo.getPrecioNoche();
     BigDecimal total = calcularTotal(precioNoche, fechaEntrada, fechaSalida);
 
-    Reserva reserva =
-        new Reserva(
-            generarNumeroReserva(),
-            fechaEntrada,
-            fechaSalida,
-            cantidadPersonas,
-            "CONFIRMADA",
-            precioNoche,
-            total);
+    Reserva reserva = new Reserva(
+        generarNumeroReserva(),
+        fechaEntrada,
+        fechaSalida,
+        cantidadPersonas,
+        "CONFIRMADA",
+        precioNoche,
+        total);
     reserva.asignarCliente(cliente);
     reserva.asignarHabitacion(habitacion);
     reservaRepository.save(reserva);
@@ -225,13 +213,12 @@ public class ReservaServiceImpl implements ReservaService {
     TipoHabitacion tipo = buscarTipo(tipoId);
     validarCapacidad(tipo, cantidadPersonas);
 
-    Habitacion habitacion =
-        obtenerPrimeraDisponible(
-            tipoId,
-            fechaEntrada,
-            fechaSalida,
-            cantidadPersonas,
-            reserva.getId());
+    Habitacion habitacion = obtenerPrimeraDisponible(
+        tipoId,
+        fechaEntrada,
+        fechaSalida,
+        cantidadPersonas,
+        reserva.getId());
     BigDecimal precioNoche = tipo.getPrecioNoche();
     BigDecimal total = calcularTotal(precioNoche, fechaEntrada, fechaSalida);
 
@@ -255,13 +242,11 @@ public class ReservaServiceImpl implements ReservaService {
   /** {@inheritDoc} */
   @Override
   public Reserva cancelar(String numeroReserva) {
-    Reserva reserva =
-        reservaRepository
-            .findByNumeroReserva(numeroReserva)
-            .orElseThrow(
-                () ->
-                    new RecursoNoEncontradoException(
-                        "No se encontró la reserva " + numeroReserva));
+    Reserva reserva = reservaRepository
+        .findByNumeroReserva(numeroReserva)
+        .orElseThrow(
+            () -> new RecursoNoEncontradoException(
+                "No se encontró la reserva " + numeroReserva));
     return cancelarReserva(reserva);
   }
 
@@ -287,17 +272,16 @@ public class ReservaServiceImpl implements ReservaService {
       Integer cantidadPersonas,
       Long reservaExcluidaId) {
     return buscarHabitacionesDisponibles(
-            tipoId,
-            fechaEntrada,
-            fechaSalida,
-            cantidadPersonas,
-            reservaExcluidaId)
+        tipoId,
+        fechaEntrada,
+        fechaSalida,
+        cantidadPersonas,
+        reservaExcluidaId)
         .stream()
         .findFirst()
         .orElseThrow(
-            () ->
-                new PeticionImposible(
-                    "No hay habitaciones disponibles para las fechas seleccionadas."));
+            () -> new PeticionImposible(
+                "No hay habitaciones disponibles para las fechas seleccionadas."));
   }
 
   private void validarDatosReserva(
@@ -349,26 +333,23 @@ public class ReservaServiceImpl implements ReservaService {
     return clienteRepository
         .findById(clienteId)
         .orElseThrow(
-            () ->
-                new RecursoNoEncontradoException(
-                    "No se encontró cliente con id " + clienteId));
+            () -> new RecursoNoEncontradoException(
+                "No se encontró cliente con id " + clienteId));
   }
 
   private TipoHabitacion buscarTipo(Long tipoId) {
     return tipoHabitacionRepository
         .findById(tipoId)
         .orElseThrow(
-            () ->
-                new RecursoNoEncontradoException(
-                    "No se encontró el tipo de habitación seleccionado."));
+            () -> new RecursoNoEncontradoException(
+                "No se encontró el tipo de habitación seleccionado."));
   }
 
   private Reserva buscarReservaDelCliente(Long clienteId, Long reservaId) {
-    Reserva reserva =
-        reservaRepository
-            .findById(reservaId)
-            .orElseThrow(
-                () -> new RecursoNoEncontradoException("No se encontró la reserva."));
+    Reserva reserva = reservaRepository
+        .findById(reservaId)
+        .orElseThrow(
+            () -> new RecursoNoEncontradoException("No se encontró la reserva."));
     if (reserva.getCliente() == null
         || !reserva.getCliente().getId().equals(clienteId)) {
       throw new RecursoNoEncontradoException(
@@ -394,10 +375,9 @@ public class ReservaServiceImpl implements ReservaService {
     if (cuenta == null || !"ABIERTA".equalsIgnoreCase(cuenta.getEstado())) {
       return;
     }
-    BigDecimal totalServicios =
-        cuenta.getDetalles().stream()
-            .map(this::calcularSubtotal)
-            .reduce(BigDecimal.ZERO, BigDecimal::add);
+    BigDecimal totalServicios = cuenta.getDetalles().stream()
+        .map(this::calcularSubtotal)
+        .reduce(BigDecimal.ZERO, BigDecimal::add);
     cuenta.setTotal(reserva.getTotal().add(totalServicios));
     cuentaRepository.save(cuenta);
   }
@@ -421,12 +401,11 @@ public class ReservaServiceImpl implements ReservaService {
   private String generarNumeroReserva() {
     String numero;
     do {
-      numero =
-          "MCD-"
-              + UUID.randomUUID()
-                  .toString()
-                  .substring(0, 8)
-                  .toUpperCase();
+      numero = "MCD-"
+          + UUID.randomUUID()
+              .toString()
+              .substring(0, 8)
+              .toUpperCase();
     } while (reservaRepository.existsByNumeroReserva(numero));
     return numero;
   }

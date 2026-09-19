@@ -14,8 +14,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.Builder;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
 @Builder
 @Getter
@@ -39,9 +37,9 @@ public class Usuario {
   @Column(nullable = false, length = 20)
   private Rol rol;
 
-  // Al borrar el cliente se borra su usuario: la credencial no sobrevive al perfil.
+  // relacion 1 a 1 controlada por logica de servicio, para evistar que un borrado
+  // directo en usuario destruya el cliente
   @OneToOne
-  @OnDelete(action = OnDeleteAction.CASCADE)
   private Cliente cliente;
 
   @OneToOne(mappedBy = "usuario")

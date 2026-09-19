@@ -11,6 +11,8 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Objects;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,18 +20,12 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class CuentaServiceImpl implements CuentaService {
 
-  private final CuentaRepository repository;
-  private final DetalleCuentaRepository detalleCuentaRepository;
-  private final PagoRepository pagoRepository;
-
-  public CuentaServiceImpl(
-      CuentaRepository repository,
-      DetalleCuentaRepository detalleCuentaRepository,
-      PagoRepository pagoRepository) {
-    this.repository = repository;
-    this.detalleCuentaRepository = detalleCuentaRepository;
-    this.pagoRepository = pagoRepository;
-  }
+  @Autowired
+  private CuentaRepository repository;
+  @Autowired
+  private DetalleCuentaRepository detalleCuentaRepository;
+  @Autowired
+  private PagoRepository pagoRepository;
 
   /** {@inheritDoc} */
   @Override
@@ -69,8 +65,7 @@ public class CuentaServiceImpl implements CuentaService {
       return null;
     }
 
-    DetalleCuenta detalle =
-        new DetalleCuenta(cantidad, servicio.getPrecio(), LocalDateTime.now());
+    DetalleCuenta detalle = new DetalleCuenta(cantidad, servicio.getPrecio(), LocalDateTime.now());
     detalle.setServicio(servicio);
     cuenta.agregarDetalle(detalle);
 
@@ -88,8 +83,7 @@ public class CuentaServiceImpl implements CuentaService {
       return false;
     }
 
-    DetalleCuenta detalle =
-        detalleCuentaRepository.findByIdAndCuentaId(detalleId, cuentaId).orElse(null);
+    DetalleCuenta detalle = detalleCuentaRepository.findByIdAndCuentaId(detalleId, cuentaId).orElse(null);
     if (detalle == null) {
       return false;
     }
@@ -129,10 +123,9 @@ public class CuentaServiceImpl implements CuentaService {
   }
 
   private BigDecimal calcularTotal(Cuenta cuenta) {
-    BigDecimal alojamiento =
-        cuenta.getReserva() == null || cuenta.getReserva().getTotal() == null
-            ? BigDecimal.ZERO
-            : cuenta.getReserva().getTotal();
+    BigDecimal alojamiento = cuenta.getReserva() == null || cuenta.getReserva().getTotal() == null
+        ? BigDecimal.ZERO
+        : cuenta.getReserva().getTotal();
     BigDecimal servicios = cuenta.getDetalles().stream()
         .map(this::calcularSubtotal)
         .reduce(BigDecimal.ZERO, BigDecimal::add);

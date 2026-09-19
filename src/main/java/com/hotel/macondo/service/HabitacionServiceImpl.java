@@ -3,6 +3,7 @@ package com.hotel.macondo.service;
 import java.util.Collection;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,18 +21,12 @@ import com.hotel.macondo.errors.PeticionImposible;
 @Transactional
 public class HabitacionServiceImpl implements HabitacionService {
 
-  private final HabitacionRepository repository;
-  private final TipoHabitacionRepository tipoHabitacionRepository;
-  private final ReservaRepository reservaRepository;
-
-  public HabitacionServiceImpl(
-      HabitacionRepository repository,
-      TipoHabitacionRepository tipoHabitacionRepository,
-      ReservaRepository reservaRepository) {
-    this.repository = repository;
-    this.tipoHabitacionRepository = tipoHabitacionRepository;
-    this.reservaRepository = reservaRepository;
-  }
+  @Autowired
+  private HabitacionRepository repository;
+  @Autowired
+  private TipoHabitacionRepository tipoHabitacionRepository;
+  @Autowired
+  private ReservaRepository reservaRepository;
 
   /** {@inheritDoc} */
   @Override
@@ -45,9 +40,8 @@ public class HabitacionServiceImpl implements HabitacionService {
     return repository
         .findById(id)
         .orElseThrow(
-            () ->
-                new RecursoNoEncontradoException(
-                    "No se encontro habitacion con id " + id));
+            () -> new RecursoNoEncontradoException(
+                "No se encontro habitacion con id " + id));
   }
 
   /** {@inheritDoc} */
@@ -83,9 +77,8 @@ public class HabitacionServiceImpl implements HabitacionService {
     return repository
         .findFirstByTipoHabitacionIdAndEstadoOrderByIdAsc(idTipo, "DISPONIBLE")
         .orElseThrow(
-            () ->
-                new RecursoNoEncontradoException(
-                    "No hay habitaciones disponibles para el tipo seleccionado."));
+            () -> new RecursoNoEncontradoException(
+                "No hay habitaciones disponibles para el tipo seleccionado."));
   }
 
   /** {@inheritDoc} */
@@ -114,10 +107,9 @@ public class HabitacionServiceImpl implements HabitacionService {
     if (habitacion == null) {
       return null;
     }
-    String nuevoEstado =
-        "DISPONIBLE".equals(habitacion.getEstado())
-            ? "NO_DISPONIBLE"
-            : "DISPONIBLE";
+    String nuevoEstado = "DISPONIBLE".equals(habitacion.getEstado())
+        ? "NO_DISPONIBLE"
+        : "DISPONIBLE";
     habitacion.setEstado(nuevoEstado);
     return repository.save(habitacion);
   }

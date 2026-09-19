@@ -1,8 +1,12 @@
 package com.hotel.macondo.service;
 
 import com.hotel.macondo.entities.Operador;
+import com.hotel.macondo.entities.Usuario;
 import com.hotel.macondo.repository.OperadorRepository;
+import com.hotel.macondo.repository.UsuarioRepository;
 import java.util.Collection;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -10,11 +14,10 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class OperadorServiceImpl implements OperadorService {
 
-  private final OperadorRepository repository;
-
-  public OperadorServiceImpl(OperadorRepository repository) {
-    this.repository = repository;
-  }
+  @Autowired
+  private OperadorRepository repository;
+  @Autowired
+  private UsuarioRepository usuarioRepository;
 
   /** {@inheritDoc} */
   @Override
@@ -60,6 +63,19 @@ public class OperadorServiceImpl implements OperadorService {
   /** {@inheritDoc} */
   @Override
   public void eliminar(Long id) {
-    repository.deleteById(id);
+    Operador operador = repository.findById(id).orElse(null);
+    if (operador == null) {
+      return;
+    }
+
+    // se desvincula y elimina el usuario asociado para evitar registros huerfanos
+    // en usuario
+    Usuario usuario = operador.getUsuario();
+    if (usuario != null) {
+      operador.setUsuario(null);
+      usuarioRepository.delete(usuario);
+    }
+
+    repository.delete(operador);
   }
 }

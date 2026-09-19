@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 import com.hotel.macondo.entities.Admin;
 import com.hotel.macondo.entities.Cliente;
 import com.hotel.macondo.entities.Cuenta;
+import com.hotel.macondo.entities.DetalleCuenta;
 import com.hotel.macondo.entities.Habitacion;
 import com.hotel.macondo.entities.Operador;
 import com.hotel.macondo.entities.Pago;
@@ -78,12 +79,12 @@ public class DataLoader implements CommandLineRunner {
         public void run(String... args) {
                 List<TipoHabitacion> tipos = cargarTiposHabitacion();
                 List<Habitacion> habitaciones = cargarHabitaciones(tipos);
-                cargarServicios();
+                List<Servicio> servicios = cargarServicios();
                 cargarTestimonios();
 
                 List<Cliente> clientes = cargarClientes();
                 cargarUsuariosYPerfiles(clientes);
-                cargarReservas(clientes, habitaciones);
+                cargarReservas(clientes, habitaciones, servicios);
         }
 
         private List<TipoHabitacion> cargarTiposHabitacion() {
@@ -91,7 +92,7 @@ public class DataLoader implements CommandLineRunner {
 
                 tipos.add(tipoHabitacionRepository.save(
                                 TipoHabitacion.builder()
-                                                .nombre("Castaño Fundacional")
+                                                .nombre("Estándar")
                                                 .descripcion("Refugio íntimo con vista al gran patio de Macondo, cama queen y brisa fresca.")
                                                 .imagen("/images/HabitacionNormal.avif")
                                                 .precioNoche(BigDecimal.valueOf(280000))
@@ -100,7 +101,7 @@ public class DataLoader implements CommandLineRunner {
 
                 tipos.add(tipoHabitacionRepository.save(
                                 TipoHabitacion.builder()
-                                                .nombre("Orfebrería Buendía")
+                                                .nombre("Superior")
                                                 .descripcion("Espacio distinguido con detalles artesanales en oro, balcón y sala de lectura.")
                                                 .imagen("/images/HabitacionExecutive.avif")
                                                 .precioNoche(BigDecimal.valueOf(450000))
@@ -109,9 +110,8 @@ public class DataLoader implements CommandLineRunner {
 
                 tipos.add(tipoHabitacionRepository.save(
                                 TipoHabitacion.builder()
-                                                .nombre("Mariposas Amarillas")
-                                                .descripcion(
-                                                                "Suite boutique luminosa decorada con motivos botánicos, cama king size y terraza caribeña.")
+                                                .nombre("Suite")
+                                                .descripcion("Suite boutique luminosa decorada con motivos botánicos, cama king size y terraza caribeña.")
                                                 .imagen("/images/HabitacionVIP.avif")
                                                 .precioNoche(BigDecimal.valueOf(650000))
                                                 .capacidadPersonas(4)
@@ -119,9 +119,8 @@ public class DataLoader implements CommandLineRunner {
 
                 tipos.add(tipoHabitacionRepository.save(
                                 TipoHabitacion.builder()
-                                                .nombre("Cuarto de Melquíades")
-                                                .descripcion(
-                                                                "Suite ejecutiva con estudio privado, selección de libros clásicos y vista al río.")
+                                                .nombre("Executive")
+                                                .descripcion("Suite ejecutiva con estudio privado, selección de libros clásicos y vista al río.")
                                                 .imagen("/images/HabitacionExecutive.avif")
                                                 .precioNoche(BigDecimal.valueOf(980000))
                                                 .capacidadPersonas(2)
@@ -129,9 +128,8 @@ public class DataLoader implements CommandLineRunner {
 
                 tipos.add(tipoHabitacionRepository.save(
                                 TipoHabitacion.builder()
-                                                .nombre("Cien Años Presidencial")
-                                                .descripcion(
-                                                                "Villa exclusiva frente al mar con piscina privada y atención personalizada 24 horas.")
+                                                .nombre("VIP")
+                                                .descripcion("Villa exclusiva frente al mar con piscina privada y atención personalizada 24 horas.")
                                                 .imagen("/images/HabitacionLuxury.avif")
                                                 .precioNoche(BigDecimal.valueOf(1900000))
                                                 .capacidadPersonas(6)
@@ -145,7 +143,6 @@ public class DataLoader implements CommandLineRunner {
 
                 String[] etiquetas = { "ACOGEDORA", "POPULAR", "EXCLUSIVA", "HISTÓRICA", "ÚNICA" };
 
-                // generacion sistematica de las 50 habitaciones fisicas
                 for (int piso = 1; piso <= 5; piso++) {
                         TipoHabitacion tipo = tipos.get(piso - 1);
                         String etiqueta = etiquetas[piso - 1];
@@ -175,8 +172,6 @@ public class DataLoader implements CommandLineRunner {
         private List<Cliente> cargarClientes() {
                 List<Cliente> clientes = new ArrayList<>();
 
-                // 10 clientes con identificadores cortos y correos con formato
-                // nombre@macondo.com
                 String[][] datos = {
                                 { "Úrsula", "Iguarán", "101", "300101", "ursula@macondo.com" },
                                 { "José Arcadio", "Buendía", "102", "300102", "josearcadio@macondo.com" },
@@ -205,7 +200,7 @@ public class DataLoader implements CommandLineRunner {
         }
 
         private void cargarUsuariosYPerfiles(List<Cliente> clientes) {
-                // administrador general
+                // Administrador unico del sistema
                 Usuario userAdmin = usuarioRepository.save(
                                 Usuario.builder()
                                                 .correo("admin@macondo.com")
@@ -216,18 +211,28 @@ public class DataLoader implements CommandLineRunner {
                 admin.asignarUsuario(userAdmin);
                 adminRepository.save(admin);
 
-                // operador de recepcion
-                Usuario userOperador = usuarioRepository.save(
-                                Usuario.builder()
-                                                .correo("operador@macondo.com")
-                                                .contrasena("ope")
-                                                .rol(Rol.OPERADOR)
-                                                .build());
-                Operador operador = new Operador("Recepción Principal", true);
-                operador.asignarUsuario(userOperador);
-                operadorRepository.save(operador);
+                // 5 operadores de recepcion y atencion
+                String[][] datosOpe = {
+                                { "operador@macondo.com", "ope", "Recepción Principal" },
+                                { "operador2@macondo.com", "ope123", "Recepción Nocturna" },
+                                { "operador3@macondo.com", "ope123", "Concierge Principal" },
+                                { "operador4@macondo.com", "ope123", "Atención al Huésped" },
+                                { "operador5@macondo.com", "ope123", "Coordinador de Check-in" }
+                };
 
-                // usuarios asociados a cada cliente con contrasena 123
+                for (String[] dop : datosOpe) {
+                        Usuario u = usuarioRepository.save(
+                                        Usuario.builder()
+                                                        .correo(dop[0])
+                                                        .contrasena(dop[1])
+                                                        .rol(Rol.OPERADOR)
+                                                        .build());
+                        Operador op = new Operador(dop[2], true);
+                        op.asignarUsuario(u);
+                        operadorRepository.save(op);
+                }
+
+                // 10 usuarios asociados a los clientes con contrasena 123
                 for (Cliente c : clientes) {
                         Usuario u = Usuario.builder()
                                         .correo(c.getCorreo())
@@ -239,9 +244,11 @@ public class DataLoader implements CommandLineRunner {
                 }
         }
 
-        private void cargarServicios() {
-                // 1. spa y bienestar
-                servicioRepository.save(
+        private List<Servicio> cargarServicios() {
+                List<Servicio> servicios = new ArrayList<>();
+
+                // 1. Spa & Bienestar
+                servicios.add(servicioRepository.save(
                                 crearServicio(
                                                 "Spa & Bienestar",
                                                 "Bienestar",
@@ -260,10 +267,10 @@ public class DataLoader implements CommandLineRunner {
                                                                 "Cabina privada",
                                                                 "Toallas de lujo"),
                                                 List.of("Masajes", "Hidroterapia", "Aromaterapia",
-                                                                "Tratamientos faciales")));
+                                                                "Tratamientos faciales"))));
 
-                // 2. restaurante gourmet
-                servicioRepository.save(
+                // 2. Restaurante Gourmet
+                servicios.add(servicioRepository.save(
                                 crearServicio(
                                                 "Restaurante Gourmet",
                                                 "Gastronomía",
@@ -281,10 +288,10 @@ public class DataLoader implements CommandLineRunner {
                                                                 "Reserva garantizada",
                                                                 "Opción Vegana",
                                                                 "Menú infantil"),
-                                                List.of("Cocina caribeña", "Maridaje", "Cena", "Productos locales")));
+                                                List.of("Cocina caribeña", "Maridaje", "Cena", "Productos locales"))));
 
-                // 3. piscina infinity
-                servicioRepository.save(
+                // 3. Piscina Infinity
+                servicios.add(servicioRepository.save(
                                 crearServicio(
                                                 "Piscina Infinity",
                                                 "Bienestar",
@@ -297,10 +304,10 @@ public class DataLoader implements CommandLineRunner {
                                                 "Lunes a domingo: 7:00 a.m. - 9:00 p.m.",
                                                 List.of("Camastro reservado", "Toallas", "Bebida de bienvenida",
                                                                 "Servicio junto a la piscina"),
-                                                List.of("Piscina", "Descanso", "Vista al mar")));
+                                                List.of("Piscina", "Descanso", "Vista al mar"))));
 
-                // 4. playa privada
-                servicioRepository.save(
+                // 4. Playa Privada
+                servicios.add(servicioRepository.save(
                                 crearServicio(
                                                 "Playa Privada",
                                                 "Bienestar",
@@ -312,10 +319,10 @@ public class DataLoader implements CommandLineRunner {
                                                 60000,
                                                 "Lunes a domingo: 7:00 a.m. - 6:00 p.m.",
                                                 List.of("Sombrilla", "Camastro", "Toalla", "Bebida de bienvenida"),
-                                                List.of("Playa", "Descanso", "Caribe")));
+                                                List.of("Playa", "Descanso", "Caribe"))));
 
-                // 5. tours guiados
-                servicioRepository.save(
+                // 5. Tours Guiados
+                servicios.add(servicioRepository.save(
                                 crearServicio(
                                                 "Tours Guiados",
                                                 "Aventura",
@@ -328,10 +335,10 @@ public class DataLoader implements CommandLineRunner {
                                                 "Salidas programadas todos los días.",
                                                 List.of("Guía bilingüe", "Transporte incluido", "Snacks y agua",
                                                                 "Seguro de viaje"),
-                                                List.of("Cartagena", "Islas", "Manglares", "Historia")));
+                                                List.of("Cartagena", "Islas", "Manglares", "Historia"))));
 
-                // 6. eventos especiales
-                servicioRepository.save(
+                // 6. Eventos Especiales
+                servicios.add(servicioRepository.save(
                                 crearServicio(
                                                 "Eventos Especiales",
                                                 "Exclusivo",
@@ -347,7 +354,9 @@ public class DataLoader implements CommandLineRunner {
                                                                 "Decoración temática",
                                                                 "Catering gourmet",
                                                                 "Fotografía profesional"),
-                                                List.of("Bodas", "Celebraciones", "Eventos corporativos")));
+                                                List.of("Bodas", "Celebraciones", "Eventos corporativos"))));
+
+                return servicios;
         }
 
         private Servicio crearServicio(
@@ -399,10 +408,29 @@ public class DataLoader implements CommandLineRunner {
                                                 "Madrid, España",
                                                 5,
                                                 "/images/IconoP3.avif"));
+                testimonioRepository.save(
+                                new Testimonio(
+                                                "El personal hizo que cada momento fuera especial. La habitación estaba impecable, la comida deliciosa y el ambiente perfecto para desconectarse.",
+                                                "Camila Rojas",
+                                                "Medellín, Colombia",
+                                                5,
+                                                "/images/IconoP4.avif"));
+                testimonioRepository.save(
+                                new Testimonio(
+                                                "Una experiencia inolvidable junto al mar. El servicio fue cálido y atento, y las instalaciones superaron todas nuestras expectativas.",
+                                                "Andrés Herrera",
+                                                "Lima, Perú",
+                                                5,
+                                                "/images/IconoP5.avif"));
+
+
+                                                
         }
 
         private void cargarReservas(
-                        List<Cliente> clientes, List<Habitacion> habitaciones) {
+                        List<Cliente> clientes, List<Habitacion> habitaciones, List<Servicio> servicios) {
+
+                // 1. Reserva Activa (con abono y consumo)
                 guardarReserva(
                                 "MHC-2025-001",
                                 LocalDate.now(),
@@ -410,8 +438,11 @@ public class DataLoader implements CommandLineRunner {
                                 2,
                                 "ACTIVA",
                                 clientes.get(2),
-                                habitaciones.get(1));
+                                habitaciones.get(1),
+                                true,
+                                List.of(servicios.get(0)));
 
+                // 2. Reserva Confirmada (con abono y consumo)
                 guardarReserva(
                                 "MHC-2025-002",
                                 LocalDate.now().plusDays(5),
@@ -419,8 +450,11 @@ public class DataLoader implements CommandLineRunner {
                                 2,
                                 "CONFIRMADA",
                                 clientes.get(3),
-                                habitaciones.get(11));
+                                habitaciones.get(11),
+                                true,
+                                List.of(servicios.get(1)));
 
+                // 3. Reserva Finalizada (con pago completo y consumo)
                 guardarReserva(
                                 "MHC-2024-089",
                                 LocalDate.now().minusDays(10),
@@ -428,8 +462,11 @@ public class DataLoader implements CommandLineRunner {
                                 1,
                                 "FINALIZADA",
                                 clientes.get(4),
-                                habitaciones.get(21));
+                                habitaciones.get(21),
+                                true,
+                                List.of(servicios.get(2)));
 
+                // 4. Reserva Cancelada
                 guardarReserva(
                                 "MHC-2023-211",
                                 LocalDate.now().minusDays(30),
@@ -437,8 +474,11 @@ public class DataLoader implements CommandLineRunner {
                                 2,
                                 "CANCELADA",
                                 clientes.get(5),
-                                habitaciones.get(31));
+                                habitaciones.get(31),
+                                false,
+                                List.of());
 
+                // 5. Reserva Confirmada (con abono y consumo)
                 LocalDate entradaUrsula = LocalDate.now().plusDays(10);
                 guardarReserva(
                                 "MCD-2026-0915",
@@ -447,8 +487,11 @@ public class DataLoader implements CommandLineRunner {
                                 habitaciones.get(0).getCapacidad(),
                                 "CONFIRMADA",
                                 clientes.get(0),
-                                habitaciones.get(0));
+                                habitaciones.get(0),
+                                true,
+                                List.of(servicios.get(3)));
 
+                // 6. Reserva Finalizada (con pago completo y consumo)
                 LocalDate salidaUrsula = LocalDate.now().minusDays(15);
                 guardarReserva(
                                 "MCD-2026-0801",
@@ -457,8 +500,11 @@ public class DataLoader implements CommandLineRunner {
                                 habitaciones.get(10).getCapacidad(),
                                 "FINALIZADA",
                                 clientes.get(0),
-                                habitaciones.get(10));
+                                habitaciones.get(10),
+                                true,
+                                List.of(servicios.get(0), servicios.get(1)));
 
+                // 7. Reserva Confirmada
                 LocalDate entradaJoseArcadio = LocalDate.now().plusDays(20);
                 guardarReserva(
                                 "MCD-2026-0928",
@@ -467,7 +513,9 @@ public class DataLoader implements CommandLineRunner {
                                 habitaciones.get(20).getCapacidad(),
                                 "CONFIRMADA",
                                 clientes.get(1),
-                                habitaciones.get(20));
+                                habitaciones.get(20),
+                                false,
+                                List.of());
         }
 
         private void guardarReserva(
@@ -477,10 +525,13 @@ public class DataLoader implements CommandLineRunner {
                         Integer cantidadPersonas,
                         String estado,
                         Cliente cliente,
-                        Habitacion habitacion) {
+                        Habitacion habitacion,
+                        boolean generarPago,
+                        List<Servicio> serviciosConsumidos) {
                 BigDecimal precioNoche = habitacion.getTipoHabitacion().getPrecioNoche();
                 long noches = ChronoUnit.DAYS.between(fechaEntrada, fechaSalida);
-                BigDecimal total = precioNoche.multiply(BigDecimal.valueOf(noches));
+                BigDecimal totalHabitacion = precioNoche.multiply(BigDecimal.valueOf(noches));
+
                 Reserva reserva = new Reserva(
                                 numeroReserva,
                                 fechaEntrada,
@@ -488,7 +539,7 @@ public class DataLoader implements CommandLineRunner {
                                 cantidadPersonas,
                                 estado,
                                 precioNoche,
-                                total);
+                                totalHabitacion);
                 reserva.asignarCliente(cliente);
                 reserva.asignarHabitacion(habitacion);
                 reservaRepository.save(reserva);
@@ -496,14 +547,30 @@ public class DataLoader implements CommandLineRunner {
                 boolean finalizada = "FINALIZADA".equals(estado);
                 boolean cancelada = "CANCELADA".equals(estado);
                 String estadoCuenta = finalizada ? "PAGADA" : cancelada ? "CANCELADA" : "ABIERTA";
-                BigDecimal totalCuenta = finalizada || cancelada ? BigDecimal.ZERO : total;
 
-                Cuenta cuenta = new Cuenta(estadoCuenta, totalCuenta, LocalDateTime.now());
+                Cuenta cuenta = new Cuenta(estadoCuenta, totalHabitacion, LocalDateTime.now());
                 cuenta.asignarReserva(reserva);
+
+                // Se generan los consumos (DetalleCuenta) y se aprovecha la cascada de Cuenta
+                BigDecimal totalServicios = BigDecimal.ZERO;
+                for (Servicio s : serviciosConsumidos) {
+                        DetalleCuenta detalle = new DetalleCuenta();
+                        detalle.setServicio(s);
+                        detalle.setCantidad(1);
+                        detalle.setPrecio(s.getPrecio());
+                        detalle.setFechaRegistro(LocalDateTime.now());
+                        cuenta.agregarDetalle(detalle);
+                        totalServicios = totalServicios.add(s.getPrecio());
+                }
+
+                BigDecimal totalFinal = cancelada ? BigDecimal.ZERO : totalHabitacion.add(totalServicios);
+                cuenta.setTotal(totalFinal);
                 cuentaRepository.save(cuenta);
 
-                if (finalizada) {
-                        Pago pago = new Pago(total, "TARJETA", LocalDateTime.now(), "CONFIRMADO");
+                // Si aplica pago, se registra para completar la cuota minima en Pago
+                if (generarPago && !cancelada) {
+                        BigDecimal montoPago = finalizada ? totalFinal : totalFinal.multiply(BigDecimal.valueOf(0.5));
+                        Pago pago = new Pago(montoPago, "TARJETA", LocalDateTime.now(), "CONFIRMADO");
                         cuenta.agregarPago(pago);
                         pagoRepository.save(pago);
                 }

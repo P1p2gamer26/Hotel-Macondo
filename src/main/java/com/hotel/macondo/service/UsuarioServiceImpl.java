@@ -3,6 +3,7 @@ package com.hotel.macondo.service;
 import java.util.Collection;
 import java.util.Locale;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -12,16 +13,12 @@ import com.hotel.macondo.entities.Usuario;
 import com.hotel.macondo.repository.UsuarioRepository;
 import com.hotel.macondo.errors.FormularioErroneoException;
 
-
 @Service
 @Transactional
 public class UsuarioServiceImpl implements UsuarioService {
 
-  private final UsuarioRepository repository;
-
-  public UsuarioServiceImpl(UsuarioRepository repository) {
-    this.repository = repository;
-  }
+  @Autowired
+  private UsuarioRepository repository;
 
   /** {@inheritDoc} */
   @Override
@@ -57,8 +54,7 @@ public class UsuarioServiceImpl implements UsuarioService {
       throw new FormularioErroneoException("Ingrese un correo valido");
     }
     String correoNormalizado = normalizarCorreo(correo);
-    Usuario usuario =
-        repository.findByCorreoIgnoreCase(correoNormalizado).orElse(null);
+    Usuario usuario = repository.findByCorreoIgnoreCase(correoNormalizado).orElse(null);
     if (usuario == null
         || usuario.getContrasena() == null
         || !usuario.getContrasena().equals(contrasena)) {
@@ -95,8 +91,7 @@ public class UsuarioServiceImpl implements UsuarioService {
       return null;
     }
 
-    Usuario usuario =
-        new Usuario(correoNormalizado, contrasena, Rol.CLIENTE);
+    Usuario usuario = new Usuario(correoNormalizado, contrasena, Rol.CLIENTE);
     usuario.asignarCliente(cliente);
     return repository.save(usuario);
   }
@@ -108,10 +103,9 @@ public class UsuarioServiceImpl implements UsuarioService {
       return null;
     }
 
-    Usuario usuario =
-        repository
-            .findByCorreoIgnoreCase(normalizarCorreo(correo))
-            .orElse(null);
+    Usuario usuario = repository
+        .findByCorreoIgnoreCase(normalizarCorreo(correo))
+        .orElse(null);
     if (usuario == null) {
       return null;
     }
@@ -127,10 +121,9 @@ public class UsuarioServiceImpl implements UsuarioService {
       return null;
     }
 
-    Usuario usuario =
-        repository
-            .findByCorreoIgnoreCase(normalizarCorreo(correoPrevio))
-            .orElse(null);
+    Usuario usuario = repository
+        .findByCorreoIgnoreCase(normalizarCorreo(correoPrevio))
+        .orElse(null);
     if (usuario == null) {
       return null;
     }

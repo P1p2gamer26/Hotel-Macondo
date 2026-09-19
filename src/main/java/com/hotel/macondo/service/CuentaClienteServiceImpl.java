@@ -7,14 +7,15 @@ import org.springframework.transaction.annotation.Transactional;
 import com.hotel.macondo.entities.Cliente;
 import com.hotel.macondo.entities.Usuario;
 import com.hotel.macondo.errors.FormularioErroneoException;
+import com.hotel.macondo.errors.PeticionImposible;
 
 @Service
 @Transactional
 public class CuentaClienteServiceImpl implements CuentaClienteService {
 
-  @Autowired 
+  @Autowired
   private ClienteService clienteService;
-  @Autowired 
+  @Autowired
   private UsuarioService usuarioService;
 
   /** {@inheritDoc} */
@@ -29,8 +30,7 @@ public class CuentaClienteServiceImpl implements CuentaClienteService {
     }
 
     Cliente clienteGuardado = clienteService.guardar(cliente);
-    Usuario usuarioGuardado =
-        usuarioService.registrarCliente(clienteGuardado, contrasena);
+    Usuario usuarioGuardado = usuarioService.registrarCliente(clienteGuardado, contrasena);
 
     if (usuarioGuardado == null) {
       clienteService.eliminar(clienteGuardado.getId());
@@ -84,8 +84,7 @@ public class CuentaClienteServiceImpl implements CuentaClienteService {
       return false;
     }
 
-    Usuario usuarioActualizado =
-        usuarioService.actualizarCorreo(correoPrevio, correoNuevo);
+    Usuario usuarioActualizado = usuarioService.actualizarCorreo(correoPrevio, correoNuevo);
     if (usuarioActualizado == null) {
       return false;
     }
@@ -105,9 +104,12 @@ public class CuentaClienteServiceImpl implements CuentaClienteService {
       return false;
     }
 
-    // Borrar el usuario ya es parte de eliminar el cliente: la cascada vive en
-    // ClienteService y aqui solo se orquesta.
-    clienteService.eliminar(id);
-    return true;
+    try {
+      clienteService.eliminar(id);
+      return true;
+    } catch (PeticionImposible e) {
+      // Si tiene reservas asociadas no se permite eliminar y se retorna false
+      return false;
+    }
   }
 }

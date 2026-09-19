@@ -2,6 +2,7 @@ package com.hotel.macondo.service;
 
 import java.util.Collection;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,14 +15,10 @@ import com.hotel.macondo.errors.RecursoNoEncontradoException;
 @Transactional
 public class TipoHabitacionServiceImpl implements TipoHabitacionService {
 
-  private final TipoHabitacionRepository repository;
-  private final HabitacionService habitacionService;
-
-  public TipoHabitacionServiceImpl(
-      TipoHabitacionRepository repository, HabitacionService habitacionService) {
-    this.repository = repository;
-    this.habitacionService = habitacionService;
-  }
+  @Autowired
+  private TipoHabitacionRepository repository;
+  @Autowired
+  private HabitacionService habitacionService;
 
   /** {@inheritDoc} */
   @Override
@@ -39,8 +36,7 @@ public class TipoHabitacionServiceImpl implements TipoHabitacionService {
   @Override
   public TipoHabitacion buscarPorId(Long id) {
     return repository.findById(id).orElseThrow(
-      () -> new RecursoNoEncontradoException("Tipo de habitacion no encontrado.")
-    );
+        () -> new RecursoNoEncontradoException("Tipo de habitacion no encontrado."));
   }
 
   /** {@inheritDoc} */
