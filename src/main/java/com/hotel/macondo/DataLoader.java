@@ -408,7 +408,23 @@ public class DataLoader implements CommandLineRunner {
                                                 "Madrid, España",
                                                 5,
                                                 "/images/IconoP3.avif"));
+                testimonioRepository.save(
+                                new Testimonio(
+                                                "El personal hizo que cada momento fuera especial. La habitación estaba impecable, la comida deliciosa y el ambiente perfecto para desconectarse.",
+                                                "Camila Rojas",
+                                                "Medellín, Colombia",
+                                                5,
+                                                "/images/IconoP4.avif"));
+                testimonioRepository.save(
+                                new Testimonio(
+                                                "Una experiencia inolvidable junto al mar. El servicio fue cálido y atento, y las instalaciones superaron todas nuestras expectativas.",
+                                                "Andrés Herrera",
+                                                "Lima, Perú",
+                                                5,
+                                                "/images/IconoP5.avif"));
 
+
+                                                
         }
 
         private void cargarReservas(
