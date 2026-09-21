@@ -3,6 +3,7 @@ package com.hotel.macondo.errors;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -20,6 +21,22 @@ public class GlobalExceptionHandler {
             PeticionImposible ex,
             Model model) {
         model.addAttribute("mensaje", ex.getMessage());
+        return "error";
+    }
+
+    @ExceptionHandler(FormularioErroneoException.class)
+    public String handleFormularioErroneo(
+            FormularioErroneoException ex,
+            Model model) {
+        model.addAttribute("mensaje", ex.getMessage());
+        return "error";
+    }
+
+    @ExceptionHandler(Exception.class)
+    public String handleException(Exception ex, Model model) {
+        model.addAttribute(
+                "mensaje",
+                "Ocurrió un error inesperado. Intenta nuevamente más tarde.");
         return "error";
     }
 }

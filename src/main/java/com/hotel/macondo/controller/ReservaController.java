@@ -4,7 +4,6 @@ import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.hotel.macondo.entities.Cliente;
 import com.hotel.macondo.entities.Habitacion;
 import com.hotel.macondo.entities.Reserva;
+import com.hotel.macondo.errors.FormularioErroneoException;
 import com.hotel.macondo.service.ClienteService;
 import com.hotel.macondo.service.ReservaService;
 import com.hotel.macondo.service.TipoHabitacionService;
@@ -99,27 +99,24 @@ public class ReservaController {
     public String consultarDisponibilidad(
             @PathVariable Long id,
             @RequestParam Long tipoId,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaEntrada,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaSalida,
+                @RequestParam(required = false) String fechaEntrada,
+                @RequestParam(required = false) String fechaSalida,
             @RequestParam Integer cantidadPersonas,
             Model model) {
-        List<Habitacion> disponibles = reservaService.consultarDisponibilidad(
-                tipoId,
-                fechaEntrada,
-                fechaSalida,
-                cantidadPersonas);
-
-        cargarFormulario(
-                id,
-                tipoId,
-                fechaEntrada,
-                fechaSalida,
-                cantidadPersonas,
-                null,
-                model);
-        model.addAttribute("disponibilidadConsultada", true);
-        model.addAttribute("cantidadDisponibles", disponibles.size());
-        model.addAttribute("hayDisponibilidad", !disponibles.isEmpty());
+            try {
+                List<Habitacion> disponibles = reservaService.consultarDisponibilidad(
+                    tipoId, fechaEntrada, fechaSalida, cantidadPersonas);
+                cargarFormulario(
+                        id, tipoId, null, null, cantidadPersonas, null, model);
+                    model.addAttribute("fechaEntrada", fechaEntrada);
+                    model.addAttribute("fechaSalida", fechaSalida);
+                model.addAttribute("disponibilidadConsultada", true);
+                model.addAttribute("cantidadDisponibles", disponibles.size());
+                model.addAttribute("hayDisponibilidad", !disponibles.isEmpty());
+            } catch (FormularioErroneoException ex) {
+                cargarFormularioConError(
+                    id, tipoId, fechaEntrada, fechaSalida, cantidadPersonas, null, ex, model);
+            }
         return "cliente/crear_reserva";
     }
 
@@ -129,29 +126,25 @@ public class ReservaController {
             @PathVariable Long id,
             @PathVariable Long reservaId,
             @RequestParam Long tipoId,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaEntrada,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaSalida,
+                @RequestParam(required = false) String fechaEntrada,
+                @RequestParam(required = false) String fechaSalida,
             @RequestParam Integer cantidadPersonas,
             Model model) {
         Reserva reserva = reservaService.buscarParaModificar(id, reservaId);
-        List<Habitacion> disponibles = reservaService.consultarDisponibilidad(
-                reserva,
-                tipoId,
-                fechaEntrada,
-                fechaSalida,
-                cantidadPersonas);
-
-        cargarFormulario(
-                id,
-                tipoId,
-                fechaEntrada,
-                fechaSalida,
-                cantidadPersonas,
-                reserva,
-                model);
-        model.addAttribute("disponibilidadConsultada", true);
-        model.addAttribute("cantidadDisponibles", disponibles.size());
-        model.addAttribute("hayDisponibilidad", !disponibles.isEmpty());
+            try {
+                List<Habitacion> disponibles = reservaService.consultarDisponibilidad(
+                    reserva, tipoId, fechaEntrada, fechaSalida, cantidadPersonas);
+                cargarFormulario(
+                        id, tipoId, null, null, cantidadPersonas, reserva, model);
+                    model.addAttribute("fechaEntrada", fechaEntrada);
+                    model.addAttribute("fechaSalida", fechaSalida);
+                model.addAttribute("disponibilidadConsultada", true);
+                model.addAttribute("cantidadDisponibles", disponibles.size());
+                model.addAttribute("hayDisponibilidad", !disponibles.isEmpty());
+            } catch (FormularioErroneoException ex) {
+                cargarFormularioConError(
+                    id, tipoId, fechaEntrada, fechaSalida, cantidadPersonas, reserva, ex, model);
+            }
         return "cliente/crear_reserva";
     }
 
@@ -160,15 +153,17 @@ public class ReservaController {
     public String crearReserva(
             @PathVariable Long id,
             @RequestParam Long tipoId,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaEntrada,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaSalida,
-            @RequestParam Integer cantidadPersonas) {
-        reservaService.crear(
-                id,
-                tipoId,
-                fechaEntrada,
-                fechaSalida,
-                cantidadPersonas);
+            @RequestParam(required = false) String fechaEntrada,
+            @RequestParam(required = false) String fechaSalida,
+            @RequestParam Integer cantidadPersonas,
+            Model model) {
+        try {
+            reservaService.crear(id, tipoId, fechaEntrada, fechaSalida, cantidadPersonas);
+        } catch (FormularioErroneoException ex) {
+            cargarFormularioConError(
+                    id, tipoId, fechaEntrada, fechaSalida, cantidadPersonas, null, ex, model);
+            return "cliente/crear_reserva";
+        }
         return "redirect:/cliente/" + id + "/reservas";
     }
 
@@ -178,16 +173,18 @@ public class ReservaController {
             @PathVariable Long id,
             @PathVariable Long reservaId,
             @RequestParam Long tipoId,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaEntrada,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaSalida,
-            @RequestParam Integer cantidadPersonas) {
-        reservaService.modificar(
-                id,
-                reservaId,
-                tipoId,
-                fechaEntrada,
-                fechaSalida,
-                cantidadPersonas);
+            @RequestParam(required = false) String fechaEntrada,
+            @RequestParam(required = false) String fechaSalida,
+            @RequestParam Integer cantidadPersonas,
+            Model model) {
+        Reserva reserva = reservaService.buscarParaModificar(id, reservaId);
+        try {
+            reservaService.modificar(id, reservaId, tipoId, fechaEntrada, fechaSalida, cantidadPersonas);
+        } catch (FormularioErroneoException ex) {
+            cargarFormularioConError(
+                    id, tipoId, fechaEntrada, fechaSalida, cantidadPersonas, reserva, ex, model);
+            return "cliente/crear_reserva";
+        }
         return "redirect:/cliente/" + id + "/reservas";
     }
 
@@ -217,6 +214,21 @@ public class ReservaController {
         model.addAttribute("fechaSalida", fechaSalida);
         model.addAttribute("cantidadPersonas", cantidadPersonas);
         model.addAttribute("fechaMinima", LocalDate.now());
+    }
+
+    private void cargarFormularioConError(
+            Long clienteId,
+            Long tipoId,
+            String fechaEntrada,
+            String fechaSalida,
+            Integer cantidadPersonas,
+            Reserva reserva,
+            FormularioErroneoException ex,
+            Model model) {
+        cargarFormulario(clienteId, tipoId, null, null, cantidadPersonas, reserva, model);
+        model.addAttribute("fechaEntrada", fechaEntrada);
+        model.addAttribute("fechaSalida", fechaSalida);
+        model.addAttribute("error", ex.getMessage());
     }
 
     /** Evita renderizar vistas privadas para identificadores inexistentes. */

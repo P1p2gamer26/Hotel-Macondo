@@ -38,7 +38,8 @@
         >
           <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
             <label class="md:col-span-2">
-              <span class="mb-2 block text-sm font-bold text-[var(--azul-oscuro)]"
+              <span
+                class="mb-2 block text-sm font-bold text-[var(--azul-oscuro)]"
                 >Tipo de habitación</span
               >
               <select
@@ -59,7 +60,8 @@
             </label>
 
             <label>
-              <span class="mb-2 block text-sm font-bold text-[var(--azul-oscuro)]"
+              <span
+                class="mb-2 block text-sm font-bold text-[var(--azul-oscuro)]"
                 >Fecha de entrada</span
               >
               <input
@@ -73,7 +75,8 @@
             </label>
 
             <label>
-              <span class="mb-2 block text-sm font-bold text-[var(--azul-oscuro)]"
+              <span
+                class="mb-2 block text-sm font-bold text-[var(--azul-oscuro)]"
                 >Fecha de salida</span
               >
               <input
@@ -87,7 +90,8 @@
             </label>
 
             <label class="md:col-span-2">
-              <span class="mb-2 block text-sm font-bold text-[var(--azul-oscuro)]"
+              <span
+                class="mb-2 block text-sm font-bold text-[var(--azul-oscuro)]"
                 >Cantidad de personas</span
               >
               <input
@@ -101,6 +105,12 @@
               />
             </label>
           </div>
+
+          <p
+            th:if="${error != null}"
+            th:text="${error}"
+            class="mt-7 rounded-lg border border-[#f1b8b1] bg-[#fff4f2] p-4 font-semibold text-[#b42318]"
+          ></p>
 
           <div
             class="mt-7 rounded-lg border p-4"
