@@ -13,7 +13,7 @@
     <!-- CONTENIDO PRINCIPAL -->
     <main class="flex-1 p-6 md:p-10">
       <!-- ENCABEZADO -->
-      <div class="mb-8 pb-4 border-b border-gray-200">
+      <header class="mb-8">
         <a
           th:href="@{/operador/reservas}"
           class="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-[var(--azul)] mb-3"
@@ -33,10 +33,10 @@
             th:text="${reserva.estado}"
           ></span>
         </div>
-        <p class="text-sm text-gray-500 font-medium mt-1">
-          Portal operador — Hotel Macondo
+        <p class="text-[var(--texto)] mt-1">
+          Cliente, habitación asignada y cuenta de la reserva.
         </p>
-      </div>
+      </header>
 
       <!-- TARJETAS: RESERVA / CLIENTE / HABITACIÓN -->
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
@@ -198,7 +198,7 @@
           <div class="overflow-x-auto mb-8">
             <table class="w-full text-sm text-left">
               <thead
-                class="text-[0.68rem] font-bold text-gray-400 tracking-wider uppercase border-b border-gray-100"
+                class="bg-[var(--crema)] text-[var(--azul-oscuro)] text-xs uppercase tracking-wider"
               >
                 <tr>
                   <th class="py-3 px-4">Servicio</th>
@@ -209,8 +209,8 @@
                   <th class="py-3 px-4">Registrado</th>
                 </tr>
               </thead>
-              <tbody class="divide-y divide-gray-100">
-                <tr th:each="detalle : ${reserva.cuenta.detalles}">
+              <tbody>
+                <tr class="border-t border-gray-100" th:each="detalle : ${reserva.cuenta.detalles}">
                   <td
                     class="py-3 px-4 font-semibold text-[var(--azul-oscuro)]"
                     th:text="${detalle.servicio != null ? detalle.servicio.nombre : '-'}"
@@ -251,7 +251,7 @@
           <div class="overflow-x-auto mb-6">
             <table class="w-full text-sm text-left">
               <thead
-                class="text-[0.68rem] font-bold text-gray-400 tracking-wider uppercase border-b border-gray-100"
+                class="bg-[var(--crema)] text-[var(--azul-oscuro)] text-xs uppercase tracking-wider"
               >
                 <tr>
                   <th class="py-3 px-4">Fecha</th>
@@ -260,8 +260,8 @@
                   <th class="py-3 px-4 text-center">Estado</th>
                 </tr>
               </thead>
-              <tbody class="divide-y divide-gray-100">
-                <tr th:each="pago : ${reserva.cuenta.pagos}">
+              <tbody>
+                <tr class="border-t border-gray-100" th:each="pago : ${reserva.cuenta.pagos}">
                   <td
                     class="py-3 px-4"
                     th:text="${#temporals.format(pago.fechaPago, 'dd MMM yyyy HH:mm')}"
