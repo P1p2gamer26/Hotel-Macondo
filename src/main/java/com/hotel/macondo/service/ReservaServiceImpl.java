@@ -103,6 +103,22 @@ public class ReservaServiceImpl implements ReservaService {
   /** {@inheritDoc} */
   @Override
   @Transactional(readOnly = true)
+  public Reserva obtenerDetalle(String numeroReserva) {
+    Reserva reserva = reservaRepository
+        .buscarDetalleCompleto(numeroReserva)
+        .orElseThrow(
+            () -> new RecursoNoEncontradoException("No existe la reserva " + numeroReserva));
+    // Los pagos no van en el JOIN FETCH (ver repositorio); se cargan aqui
+    // dentro de la transaccion para que la vista pueda recorrerlos.
+    if (reserva.getCuenta() != null) {
+      reserva.getCuenta().getPagos().size();
+    }
+    return reserva;
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  @Transactional(readOnly = true)
   public long calcularNoches(List<Reserva> reservas) {
     if (reservas == null) {
       return 0;

@@ -12,112 +12,75 @@
 
     <!-- CONTENIDO PRINCIPAL -->
     <main class="flex-1 p-6 md:p-10">
-      <!-- ENCABEZADO -->
-      <div class="mb-8 pb-4 border-b border-gray-200">
-        <h1
-          class="text-3xl md:text-4xl font-serif font-bold text-[var(--azul-oscuro)] mb-2"
-        >
-          Reservas
-        </h1>
-        <p class="text-sm text-gray-500 font-medium mt-1">
-          Portal operador — Hotel Macondo
-        </p>
-      </div>
+      <!-- ENCABEZADO (mismo fragmento de titulo que usa el panel admin) -->
+      <header
+        th:replace="~{operador/fragmentos_operador :: titulo('Reservas', 'Reservas registradas en el hotel y su estado actual.')}"
+      ></header>
 
-      <p class="text-[var(--texto)] mb-8">
-        Reservas registradas en el hotel y su estado actual.
-      </p>
-
-      <!-- TARJETAS DE MÉTRICAS (METRICS DASHBOARD) -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <!-- Tarjeta 1: Reservas Hoy -->
-        <div
-          class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex justify-between items-start"
-        >
-          <div>
+      <!-- TARJETAS DE MÉTRICAS (mismo estilo que el tablero de admin) -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <!-- 1. Total de reservas listadas -->
+        <div class="bg-white rounded-2xl shadow-sm p-6">
+          <div class="flex items-center justify-between mb-4">
             <span
-              class="text-[0.68rem] font-bold text-gray-400 tracking-wider uppercase block mb-3"
-              >Reservas hoy</span
+              class="text-[0.7rem] tracking-[3px] uppercase text-[var(--azul)] font-bold"
+              >Reservas</span
             >
-            <span class="text-3xl font-bold text-[var(--azul-oscuro)] block"
-              >7</span
-            >
-            <span class="text-xs text-gray-400 mt-1 block">Total del día</span>
+            <i class="bi bi-clipboard-check text-2xl text-[var(--dorado)]"></i>
           </div>
-          <div
-            class="w-10 h-10 rounded-xl bg-blue-50 text-[var(--azul)] flex items-center justify-center text-lg"
-          >
-            <i class="bi bi-clipboard-check"></i>
-          </div>
+          <p
+            class="font-serif text-4xl font-bold text-[var(--azul-oscuro)]"
+            th:text="${totalReservas}"
+          ></p>
+          <p class="mt-1 text-sm text-gray-500">En la lista actual</p>
         </div>
 
-        <!-- Tarjeta 2: Check-ins Hoy -->
-        <div
-          class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex justify-between items-start"
-        >
-          <div>
+        <!-- 2. Activas -->
+        <div class="bg-white rounded-2xl shadow-sm p-6">
+          <div class="flex items-center justify-between mb-4">
             <span
-              class="text-[0.68rem] font-bold text-gray-400 tracking-wider uppercase block mb-3"
-              >Check-ins hoy</span
+              class="text-[0.7rem] tracking-[3px] uppercase text-[var(--azul)] font-bold"
+              >Activas</span
             >
-            <span class="text-3xl font-bold text-[var(--azul-oscuro)] block"
-              >3</span
-            >
-            <span class="text-xs text-gray-400 mt-1 block"
-              >Llegadas esperadas</span
-            >
+            <i class="bi bi-person-check text-2xl text-[var(--dorado)]"></i>
           </div>
-          <div
-            class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-lg"
-          >
-            <i class="bi bi-person-check"></i>
-          </div>
+          <p
+            class="font-serif text-4xl font-bold text-[var(--azul-oscuro)]"
+            th:text="${activas}"
+          ></p>
+          <p class="mt-1 text-sm text-gray-500">Huéspedes en el hotel</p>
         </div>
 
-        <!-- Tarjeta 3: Check-outs Hoy -->
-        <div
-          class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex justify-between items-start"
-        >
-          <div>
+        <!-- 3. Confirmadas -->
+        <div class="bg-white rounded-2xl shadow-sm p-6">
+          <div class="flex items-center justify-between mb-4">
             <span
-              class="text-[0.68rem] font-bold text-gray-400 tracking-wider uppercase block mb-3"
-              >Check-outs hoy</span
+              class="text-[0.7rem] tracking-[3px] uppercase text-[var(--azul)] font-bold"
+              >Confirmadas</span
             >
-            <span class="text-3xl font-bold text-[var(--azul-oscuro)] block"
-              >2</span
-            >
-            <span class="text-xs text-gray-400 mt-1 block"
-              >Salidas programadas</span
-            >
+            <i class="bi bi-calendar-event text-2xl text-[var(--dorado)]"></i>
           </div>
-          <div
-            class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-lg"
-          >
-            <i class="bi bi-calendar-event"></i>
-          </div>
+          <p
+            class="font-serif text-4xl font-bold text-[var(--azul-oscuro)]"
+            th:text="${confirmadas}"
+          ></p>
+          <p class="mt-1 text-sm text-gray-500">Próximas llegadas</p>
         </div>
 
-        <!-- Tarjeta 4: Ocupación -->
-        <div
-          class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex justify-between items-start"
-        >
-          <div>
+        <!-- 4. Canceladas -->
+        <div class="bg-white rounded-2xl shadow-sm p-6">
+          <div class="flex items-center justify-between mb-4">
             <span
-              class="text-[0.68rem] font-bold text-gray-400 tracking-wider uppercase block mb-3"
-              >Ocupación</span
+              class="text-[0.7rem] tracking-[3px] uppercase text-[var(--azul)] font-bold"
+              >Canceladas</span
             >
-            <span class="text-3xl font-bold text-[var(--azul-oscuro)] block"
-              >78%</span
-            >
-            <span class="text-xs text-gray-400 mt-1 block"
-              >Habitaciones ocupadas</span
-            >
+            <i class="bi bi-x-circle text-2xl text-[var(--dorado)]"></i>
           </div>
-          <div
-            class="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center text-lg"
-          >
-            <i class="bi bi-door-closed"></i>
-          </div>
+          <p
+            class="font-serif text-4xl font-bold text-[var(--azul-oscuro)]"
+            th:text="${canceladas}"
+          ></p>
+          <p class="mt-1 text-sm text-gray-500">Reservas anuladas</p>
         </div>
       </div>
 
@@ -159,29 +122,24 @@
       </div>
 
       <!-- TABLA DE RESERVAS -->
-      <div
-        class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden"
-      >
-        <div class="overflow-x-auto">
-          <table class="w-full text-left border-collapse">
-            <thead>
-              <tr
-                class="bg-[var(--azul)] text-white text-[0.72rem] font-bold uppercase tracking-wider"
-              >
+      <div class="bg-white rounded-2xl shadow-sm overflow-x-auto">
+          <table class="w-full text-left min-w-[960px]">
+            <thead
+              class="bg-[var(--crema)] text-[var(--azul-oscuro)] text-sm uppercase tracking-wider"
+            >
+              <tr>
                 <th class="py-4 px-6">Código</th>
                 <th class="py-4 px-6">Cliente</th>
                 <th class="py-4 px-6">Habitación / Tipo</th>
                 <th class="py-4 px-6">Entrada</th>
                 <th class="py-4 px-6">Salida</th>
-                <th class="py-4 px-6 text-center">Estado</th>
-                <th class="py-4 px-6 text-center">Acciones</th>
+                <th class="py-4 px-6">Estado</th>
+                <th class="py-4 px-6 text-right">Acciones</th>
               </tr>
             </thead>
-            <tbody
-              class="divide-y divide-gray-100 text-sm font-medium text-[var(--texto)]"
-            >
+            <tbody class="text-sm font-medium text-[var(--texto)]">
               <tr
-                class="hover:bg-gray-50/50 transition"
+                class="border-t border-gray-100"
                 th:each="reserva : ${reservas}"
               >
                 <td
@@ -207,28 +165,36 @@
                   class="py-4 px-6 text-gray-600"
                   th:text="${#temporals.format(reserva.fechaFin, 'dd MMM yyyy')}"
                 ></td>
-                <td class="py-4 px-6 text-center">
+                <td class="py-4 px-6">
                   <span
                     class="inline-block px-4 py-1 rounded-full text-xs font-semibold border"
                     th:classappend="${reserva.estado == 'ACTIVA'} ? ' bg-sky-50 text-sky-600 border-sky-200' : (${reserva.estado == 'CANCELADA'} ? ' bg-red-50 text-red-600 border-red-200' : (${reserva.estado == 'FINALIZADA'} ? ' bg-emerald-50 text-emerald-700 border-emerald-200' : ' bg-amber-50 text-amber-700 border-amber-200'))"
                     th:text="${reserva.estado}"
                   ></span>
                 </td>
-                <td class="py-4 px-6 text-center">
-                  <div class="flex justify-center items-center gap-2">
+                <!-- Acciones como enlaces de texto, igual que en el panel admin -->
+                <td class="py-4 px-6 text-right whitespace-nowrap">
+                  <!-- Detalle: cliente, habitación y cuenta de la reserva -->
+                  <a
+                    class="text-[var(--azul)] hover:underline font-medium"
+                    th:href="@{/operador/reservas/{n}(n=${reserva.numeroReserva})}"
+                    >Ver</a
+                  >
+                  <!-- Solo se pueden cancelar las reservas vigentes -->
+                  <form
+                    class="inline ml-4"
+                    method="post"
+                    th:if="${#strings.toUpperCase(reserva.estado) == 'CONFIRMADA' or #strings.toUpperCase(reserva.estado) == 'PENDIENTE'}"
+                    th:action="@{/operador/reservas/{n}/cancelar(n=${reserva.numeroReserva})}"
+                    onsubmit="return confirm('¿Cancelar la reserva?')"
+                  >
                     <button
-                      type="button"
-                      class="px-4 py-1.5 bg-[var(--azul)] text-white rounded-lg text-xs font-semibold hover:bg-[var(--azul-oscuro)] transition"
-                    >
-                      Ver
-                    </button>
-                    <button
-                      type="button"
-                      class="px-3 py-1.5 bg-white border border-red-300 text-red-500 rounded-lg text-xs font-semibold hover:bg-red-50 transition"
+                      class="text-red-600 hover:underline font-medium"
+                      type="submit"
                     >
                       Cancelar
                     </button>
-                  </div>
+                  </form>
                 </td>
               </tr>
               <tr th:if="${reservas.isEmpty()}">
@@ -238,7 +204,6 @@
               </tr>
             </tbody>
           </table>
-        </div>
       </div>
     </main>
 

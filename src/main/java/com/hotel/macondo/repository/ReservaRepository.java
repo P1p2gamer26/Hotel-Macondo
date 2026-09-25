@@ -86,4 +86,24 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
       ORDER BY r.fechaInicio
       """)
   List<Reserva> buscarPorHabitacion(@Param("idHabitacion") Long idHabitacion);
+
+  /**
+   * Detalle completo de una reserva para el panel del operador: cliente,
+   * habitacion con su tipo y la cuenta con sus consumos (servicios). Los pagos
+   * se cargan aparte en el servicio porque hacer JOIN FETCH de dos listas a la
+   * vez lanza MultipleBagFetchException.
+   */
+  @Query(
+      """
+      SELECT DISTINCT r
+      FROM Reserva r
+      LEFT JOIN FETCH r.cliente
+      LEFT JOIN FETCH r.habitacion h
+      LEFT JOIN FETCH h.tipoHabitacion
+      LEFT JOIN FETCH r.cuenta c
+      LEFT JOIN FETCH c.detalles d
+      LEFT JOIN FETCH d.servicio
+      WHERE r.numeroReserva = :numeroReserva
+      """)
+  Optional<Reserva> buscarDetalleCompleto(@Param("numeroReserva") String numeroReserva);
 }

@@ -29,6 +29,12 @@ public interface ReservaService {
     /** Cuenta las reservas de una lista que coinciden con el estado indicado. */
     long contarPorEstado(List<Reserva> reservas, String estado);
 
+    /**
+     * Reserva con cliente, habitación y cuenta (consumos y pagos) cargados.
+     * Lanza RecursoNoEncontradoException si el número no existe.
+     */
+    Reserva obtenerDetalle(String numeroReserva);
+
     /** Suma las noches correspondientes a una lista de reservas. */
     long calcularNoches(List<Reserva> reservas);
 

@@ -9,8 +9,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.hotel.macondo.service.OperadorService;
+import com.hotel.macondo.entities.Reserva;
 import com.hotel.macondo.service.ReservaService;
+import java.util.List;
 
 /**
  * Unico punto de entrada del portal de operador. Todas las pantallas cuelgan
@@ -19,11 +20,6 @@ import com.hotel.macondo.service.ReservaService;
 @Controller
 @RequestMapping("/operador")
 public class OperadorController {
-
-    // Como no esta implementada ninguna funcionalidad entonces todavia no se utiliza
-    // Pero este se utilizara en un futuro, asi que por eso se mantiene la inyeccion de dependencias
-    @Autowired
-    private OperadorService service;
 
     @Autowired
     private ReservaService reservaService;
@@ -45,14 +41,31 @@ public class OperadorController {
             Model model) {
         boolean mostrarSoloActivas = "activas".equalsIgnoreCase(filtro);
 
-        model.addAttribute(
-                "reservas",
-                mostrarSoloActivas
-                        ? reservaService.obtenerReservasActivas()
-                        : reservaService.buscarTodas());
+        List<Reserva> reservas = mostrarSoloActivas
+                ? reservaService.obtenerReservasActivas()
+                : reservaService.buscarTodas();
+
+        model.addAttribute("reservas", reservas);
+        // Metricas reales de la lista mostrada (antes eran valores quemados)
+        model.addAttribute("totalReservas", reservas.size());
+        model.addAttribute("activas", reservaService.contarPorEstado(reservas, "ACTIVA"));
+        model.addAttribute("confirmadas", reservaService.contarPorEstado(reservas, "CONFIRMADA"));
+        model.addAttribute("canceladas", reservaService.contarPorEstado(reservas, "CANCELADA"));
         model.addAttribute("filtro", mostrarSoloActivas ? "activas" : "todas");
         model.addAttribute("seccionActiva", "reservas");
         return "operador/reservas";
+    }
+
+    /**
+     * Detalle de una reserva: cliente, habitacion asignada y cuenta con los
+     * servicios consumidos y pagos. Si no existe, el servicio lanza
+     * RecursoNoEncontradoException y la atrapa el GlobalExceptionHandler.
+     */
+    @GetMapping("/reservas/{numeroReserva}")
+    public String detalleReserva(@PathVariable String numeroReserva, Model model) {
+        model.addAttribute("reserva", reservaService.obtenerDetalle(numeroReserva));
+        model.addAttribute("seccionActiva", "reservas");
+        return "operador/detalle_reserva";
     }
 
     /** Cancela una reserva futura desde el portal del operador. */
