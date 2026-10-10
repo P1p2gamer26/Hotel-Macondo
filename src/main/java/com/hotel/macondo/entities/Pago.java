@@ -1,5 +1,6 @@
 package com.hotel.macondo.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -37,6 +38,7 @@ public class Pago {
   @Column(nullable = false, length = 20)
   private String estado;
 
+  @JsonIgnore
   @ManyToOne
   private Cuenta cuenta;
 

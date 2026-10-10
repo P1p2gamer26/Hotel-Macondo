@@ -1,5 +1,6 @@
 package com.hotel.macondo.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -46,10 +47,12 @@ public class Cliente {
   private String correo;
 
   // Al borrar el cliente se borran sus reservas (ON DELETE CASCADE sobre la FK).
+  @JsonIgnore
   @OneToMany(mappedBy = "cliente")
   @OnDelete(action = OnDeleteAction.CASCADE)
   private List<Reserva> reservas = new ArrayList<>();
 
+  @JsonIgnore
   @OneToOne(mappedBy = "cliente")
   private Usuario usuario;
 

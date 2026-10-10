@@ -1,5 +1,6 @@
 package com.hotel.macondo.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
@@ -63,6 +64,7 @@ public class Servicio {
   @ElementCollection
   private List<String> etiquetas = new ArrayList<>();
 
+  @JsonIgnore
   @OneToMany(mappedBy = "servicio")
   private List<DetalleCuenta> detalles = new ArrayList<>();
 
