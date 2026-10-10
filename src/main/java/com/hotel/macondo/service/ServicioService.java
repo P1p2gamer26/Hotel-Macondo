@@ -16,6 +16,12 @@ public interface ServicioService {
      */
     Servicio buscarPorId(Long id);
 
+    /**
+     * Busca un servicio por identificador sin importar si esta activo (lo usa el panel admin para editar).
+     * @throws RecursoNoEncontradoException si no existe un servicio con ese id.
+     */
+    Servicio buscarPorIdIncluyendoInactivos(Long id);
+
     // Crea o actualiza un servicio
     Servicio guardar(Servicio servicio);
 

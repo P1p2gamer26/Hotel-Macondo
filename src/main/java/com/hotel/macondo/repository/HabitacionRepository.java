@@ -54,4 +54,9 @@ public interface HabitacionRepository extends JpaRepository<Habitacion, Long> {
       @Param("reservaExcluidaId") Long reservaExcluidaId);
 
   boolean existsByTipoHabitacionId(Long tipoId);
+
+  /**
+   * Busca la habitación asociada a una reserva por el ID de la reserva.
+   */
+  Habitacion findByReservasId(Long reservaId);
 }
