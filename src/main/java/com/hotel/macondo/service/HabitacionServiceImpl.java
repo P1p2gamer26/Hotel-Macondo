@@ -46,6 +46,15 @@ public class HabitacionServiceImpl implements HabitacionService {
 
   /** {@inheritDoc} */
   @Override
+  public Habitacion buscarPorReserva(Long reservaId) {
+    if (reservaId == null) {
+      throw new RecursoNoEncontradoException("ID de reserva no proporcionado");
+    }
+    return repository.findByReservasId(reservaId);
+  }
+
+  /** {@inheritDoc} */
+  @Override
   public Habitacion buscarPorNombre(String nombre) {
     return repository.findByNombreIgnoreCase(nombre).orElse(null);
   }

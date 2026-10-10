@@ -1,5 +1,6 @@
 package com.hotel.macondo.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -51,6 +52,7 @@ public class Habitacion {
   @ManyToOne
   private TipoHabitacion tipoHabitacion;
 
+  @JsonIgnore
   @OneToMany(mappedBy = "habitacion")
   private List<Reserva> reservas = new ArrayList<>();
 

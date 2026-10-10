@@ -1,5 +1,6 @@
 package com.hotel.macondo.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -49,12 +50,15 @@ public class Reserva {
   @Column(nullable = false, precision = 12, scale = 2)
   private BigDecimal total;
 
+  @JsonIgnore
   @ManyToOne
   private Cliente cliente;
 
+  @JsonIgnore
   @ManyToOne
   private Habitacion habitacion;
 
+  @JsonIgnore
   @OneToOne(mappedBy = "reserva")
   private Cuenta cuenta;
 

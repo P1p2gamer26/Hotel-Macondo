@@ -1,5 +1,6 @@
 package com.hotel.macondo.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -41,17 +42,20 @@ public class Cuenta {
   private LocalDateTime fechaApertura = LocalDateTime.now();
 
   // La cuenta no existe sin su reserva: al borrar la reserva se borra la cuenta.
+  @JsonIgnore
   @OneToOne
   @OnDelete(action = OnDeleteAction.CASCADE)
   private Reserva reserva;
 
   // cascade = ALL: los consumos se guardan/borran junto con la cuenta
   // (sin esto agregarDetalle() + save(cuenta) no persistia los detalles).
+  @JsonIgnore
   @OneToMany(mappedBy = "cuenta", cascade = CascadeType.ALL)
   @OnDelete(action = OnDeleteAction.CASCADE)
   private List<DetalleCuenta> detalles = new ArrayList<>();
 
   // Lado inverso de Pago.cuenta: sin el, borrar una cuenta dejaba pagos huerfanos.
+  @JsonIgnore
   @OneToMany(mappedBy = "cuenta", cascade = CascadeType.ALL)
   @OnDelete(action = OnDeleteAction.CASCADE)
   private List<Pago> pagos = new ArrayList<>();

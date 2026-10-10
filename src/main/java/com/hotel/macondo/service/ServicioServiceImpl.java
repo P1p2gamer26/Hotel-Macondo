@@ -40,6 +40,13 @@ public class ServicioServiceImpl implements ServicioService {
 
   /** {@inheritDoc} */
   @Override
+  public Servicio buscarPorIdIncluyendoInactivos(Long id) {
+    return repository.findById(id).orElseThrow(
+        () -> new RecursoNoEncontradoException("Servicio no encontrado"));
+  }
+
+  /** {@inheritDoc} */
+  @Override
   public Servicio guardar(Servicio servicio) {
     return repository.save(servicio);
   }

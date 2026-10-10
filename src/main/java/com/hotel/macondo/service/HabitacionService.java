@@ -14,6 +14,13 @@ public interface HabitacionService {
     Collection<Habitacion> buscarTodas();
 
     /**
+     * Busca la habitacion asociada a una reserva por el ID de la reserva.
+     *
+     * Retorna null si la reserva no tiene habitacion asignada.
+     */
+    Habitacion buscarPorReserva(Long reservaId);
+
+    /**
      * Busca una habitacion por su identificador.
      *
      * @throws RecursoNoEncontradoException si no existe una habitacion con ese id

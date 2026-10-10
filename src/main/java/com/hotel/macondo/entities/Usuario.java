@@ -1,5 +1,6 @@
 package com.hotel.macondo.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -39,12 +40,15 @@ public class Usuario {
 
   // relacion 1 a 1 controlada por logica de servicio, para evistar que un borrado
   // directo en usuario destruya el cliente
+  @JsonIgnore
   @OneToOne
   private Cliente cliente;
 
+  @JsonIgnore
   @OneToOne(mappedBy = "usuario")
   private Operador operador;
 
+  @JsonIgnore
   @OneToOne(mappedBy = "usuario")
   private Admin admin;
 

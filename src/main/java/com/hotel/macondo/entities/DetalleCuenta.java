@@ -1,5 +1,6 @@
 package com.hotel.macondo.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -34,9 +35,11 @@ public class DetalleCuenta {
   @Column(nullable = false)
   private LocalDateTime fechaRegistro;
 
+  @JsonIgnore
   @ManyToOne
   private Cuenta cuenta;
 
+  @JsonIgnore
   @ManyToOne
   private Servicio servicio;
 

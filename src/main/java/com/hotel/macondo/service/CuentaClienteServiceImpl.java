@@ -8,6 +8,7 @@ import com.hotel.macondo.entities.Cliente;
 import com.hotel.macondo.entities.Usuario;
 import com.hotel.macondo.errors.FormularioErroneoException;
 import com.hotel.macondo.errors.PeticionImposible;
+import com.hotel.macondo.repository.ClienteRepository;
 
 @Service
 @Transactional
@@ -17,6 +18,8 @@ public class CuentaClienteServiceImpl implements CuentaClienteService {
   private ClienteService clienteService;
   @Autowired
   private UsuarioService usuarioService;
+  @Autowired
+  private ClienteRepository clienteRepository;
 
   /** {@inheritDoc} */
   @Override
@@ -27,6 +30,10 @@ public class CuentaClienteServiceImpl implements CuentaClienteService {
     }
     if (correo == null || correo.isBlank()) {
       throw new FormularioErroneoException("El correo no puede estar vacío.");
+    }
+    // La cedula es unica: se valida antes de guardar para dar un mensaje claro y no un error de BD
+    if (clienteRepository.findByCedula(cliente.getCedula()).isPresent()) {
+      throw new FormularioErroneoException("Ya existe un cliente con esa cédula.");
     }
 
     Cliente clienteGuardado = clienteService.guardar(cliente);
