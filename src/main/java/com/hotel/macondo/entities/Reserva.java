@@ -54,7 +54,6 @@ public class Reserva {
   @ManyToOne
   private Cliente cliente;
 
-  @JsonIgnore
   @ManyToOne
   private Habitacion habitacion;
 

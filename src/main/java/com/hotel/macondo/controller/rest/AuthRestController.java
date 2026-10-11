@@ -1,5 +1,6 @@
 package com.hotel.macondo.controller.rest;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +24,7 @@ public class AuthRestController {
     private UsuarioService usuarioService;
 
     @PostMapping("/login")
-    public Usuario login(@RequestBody Map<String, String> credenciales) {
+    public Map<String, Object> login(@RequestBody Map<String, String> credenciales) {
         String correo = credenciales.get("correo");
         String contrasena = credenciales.get("contrasena");
 
@@ -32,7 +33,19 @@ public class AuthRestController {
         }
 
         try {
-            return usuarioService.autenticar(correo, contrasena);
+            Usuario usuario = usuarioService.autenticar(correo, contrasena);
+
+            Map<String, Object> respuesta = new HashMap<>();
+            respuesta.put("id", usuario.getId());
+            respuesta.put("correo", usuario.getCorreo());
+            respuesta.put("rol", usuario.getRol().name());
+
+            // Si es un cliente se tiene que dar el ID real del cliente asociado
+            if (usuario.getCliente() != null) {
+                respuesta.put("clienteId", usuario.getCliente().getId());
+            }
+
+            return respuesta;
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Correo o contraseña incorrectos");
         }
