@@ -45,7 +45,7 @@ public class ServicioRestController {
      *
      * @param id identificador del servicio
      * @return el servicio encontrado
-     * Incluye los desactivados, porque el admin tambien los edita.
+     *         Incluye los desactivados, porque el admin tambien los edita.
      * @throws RecursoNoEncontradoException si no existe un servicio con ese id
      */
     @GetMapping("/find/{id}")
@@ -99,5 +99,26 @@ public class ServicioRestController {
             throw new RecursoNoEncontradoException("Servicio no encontrado");
         }
         return servicio;
+    }
+
+    /**
+     * Retorna solo los servicios que esten ACTIVOS para el landing
+     *
+     * @return lista de servicios activos
+     */
+    @GetMapping("/catalogo")
+    public List<Servicio> catalogoActivo() {
+        return servicioService.obtenerCatalogoActivo();
+    }
+
+    /**
+     * Retorna servicios relacionados para la ficha de detalle.
+     *
+     * @param id identificador del servicio actual
+     * @return lista de servicios relacionados
+     */
+    @GetMapping("/relacionados/{id}")
+    public List<Servicio> relacionados(@PathVariable Long id) {
+        return servicioService.obtenerRelacionados(id, 2);
     }
 }

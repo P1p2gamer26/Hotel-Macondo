@@ -49,6 +49,7 @@ public class Habitacion {
   private String estado;
 
   private Integer piso;
+
   @ManyToOne
   private TipoHabitacion tipoHabitacion;
 
