@@ -6,6 +6,8 @@ import com.hotel.macondo.entities.DetalleCuenta;
 import com.hotel.macondo.entities.Habitacion;
 import com.hotel.macondo.entities.Reserva;
 import com.hotel.macondo.entities.TipoHabitacion;
+import com.hotel.macondo.dto.ReservaOperadorResponse;
+import com.hotel.macondo.dto.ReservaDetalleOperadorResponse;
 import com.hotel.macondo.errors.FormularioErroneoException;
 import com.hotel.macondo.errors.PeticionImposible;
 import com.hotel.macondo.errors.RecursoNoEncontradoException;
@@ -51,6 +53,126 @@ public class ReservaServiceImpl implements ReservaService {
   @Transactional(readOnly = true)
   public List<Reserva> buscarTodas() {
     return reservaRepository.findAllByOrderByIdAsc();
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  @Transactional(readOnly = true)
+  public List<ReservaOperadorResponse> obtenerTodasParaOperador() {
+    return reservaRepository.findAllByOrderByIdAsc().stream()
+        .map(this::convertirARespuestaOperador)
+        .toList();
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public ReservaOperadorResponse cancelarParaOperador(String numeroReserva) {
+    return convertirARespuestaOperador(cancelar(numeroReserva));
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  @Transactional(readOnly = true)
+  public ReservaDetalleOperadorResponse obtenerDetalleParaOperador(String numeroReserva) {
+    Reserva reserva = obtenerDetalle(numeroReserva);
+    Cliente cliente = reserva.getCliente();
+    Habitacion habitacion = reserva.getHabitacion();
+    TipoHabitacion tipoHabitacion =
+        habitacion == null ? null : habitacion.getTipoHabitacion();
+    Cuenta cuenta = reserva.getCuenta();
+
+    return new ReservaDetalleOperadorResponse(
+        reserva.getId(),
+        reserva.getNumeroReserva(),
+        reserva.getFechaInicio(),
+        reserva.getFechaFin(),
+        reserva.getCantidadPersonas(),
+        reserva.getEstado(),
+        reserva.getPrecioNoche(),
+        reserva.getTotal(),
+        cliente == null
+            ? null
+            : new ReservaDetalleOperadorResponse.ClienteDetalle(
+                cliente.getId(),
+                cliente.getNombre(),
+                cliente.getApellido(),
+                cliente.getCedula(),
+                cliente.getTelefono(),
+                cliente.getCorreo()),
+        habitacion == null
+            ? null
+            : new ReservaDetalleOperadorResponse.HabitacionDetalle(
+                habitacion.getId(),
+                habitacion.getNombre(),
+                habitacion.getEtiqueta(),
+                habitacion.getPrecio(),
+                habitacion.getCapacidad(),
+                habitacion.getNumero(),
+                habitacion.getEstado(),
+                habitacion.getPiso(),
+                tipoHabitacion == null
+                    ? null
+                    : new ReservaDetalleOperadorResponse.TipoHabitacionDetalle(
+                        tipoHabitacion.getId(),
+                        tipoHabitacion.getNombre(),
+                        tipoHabitacion.getDescripcion(),
+                        tipoHabitacion.getImagen(),
+                        tipoHabitacion.getPrecioNoche(),
+                        tipoHabitacion.getCapacidadPersonas())),
+        cuenta == null
+            ? null
+            : new ReservaDetalleOperadorResponse.CuentaDetalle(
+                cuenta.getId(),
+                cuenta.getEstado(),
+                cuenta.getTotal(),
+                cuenta.getFechaApertura(),
+                cuenta.getDetalles().stream()
+                    .map(detalle -> new ReservaDetalleOperadorResponse.ConsumoDetalle(
+                        detalle.getId(),
+                        detalle.getCantidad(),
+                        detalle.getPrecio(),
+                        detalle.getFechaRegistro(),
+                        detalle.getServicio() == null ? null : detalle.getServicio().getNombre()))
+                    .toList(),
+                cuenta.getPagos().stream()
+                    .map(pago -> new ReservaDetalleOperadorResponse.PagoDetalle(
+                        pago.getId(),
+                        pago.getMonto(),
+                        pago.getMetodoPago(),
+                        pago.getFechaPago(),
+                        pago.getEstado()))
+                    .toList()));
+  }
+
+  private ReservaOperadorResponse convertirARespuestaOperador(Reserva reserva) {
+    Cliente cliente = reserva.getCliente();
+    Habitacion habitacion = reserva.getHabitacion();
+    TipoHabitacion tipoHabitacion =
+        habitacion == null ? null : habitacion.getTipoHabitacion();
+
+    return new ReservaOperadorResponse(
+        reserva.getId(),
+        reserva.getNumeroReserva(),
+        reserva.getFechaInicio(),
+        reserva.getFechaFin(),
+        reserva.getCantidadPersonas(),
+        reserva.getEstado(),
+        reserva.getPrecioNoche(),
+        reserva.getTotal(),
+        cliente == null
+            ? null
+            : new ReservaOperadorResponse.ClienteResumen(
+                cliente.getId(), cliente.getNombre(), cliente.getApellido()),
+        habitacion == null
+            ? null
+            : new ReservaOperadorResponse.HabitacionResumen(
+                habitacion.getId(),
+                habitacion.getNumero(),
+                habitacion.getNombre(),
+                tipoHabitacion == null
+                    ? null
+                    : new ReservaOperadorResponse.TipoHabitacionResumen(
+                        tipoHabitacion.getId(), tipoHabitacion.getNombre())));
   }
 
   /** {@inheritDoc} */

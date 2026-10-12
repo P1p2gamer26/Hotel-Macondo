@@ -6,9 +6,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.hotel.macondo.dto.ReservaOperadorResponse;
+import com.hotel.macondo.dto.ReservaDetalleOperadorResponse;
 import com.hotel.macondo.entities.Cliente;
 import com.hotel.macondo.entities.Reserva;
 import com.hotel.macondo.service.ClienteService;
@@ -28,6 +31,39 @@ public class ReservaRestController {
 
     @Autowired
     private ClienteService clienteService;
+
+    /**
+     * Obtiene las reservas del hotel con los datos necesarios para la vista del operador.
+     *
+     * @return lista resumida de reservas ordenadas por identificador
+     */
+    @GetMapping
+    public List<ReservaOperadorResponse> obtenerTodas() {
+        return reservaService.obtenerTodasParaOperador();
+    }
+
+    /**
+     * Cancela una reserva futura del operador.
+     *
+     * @param numeroReserva código público de la reserva
+     * @return reserva actualizada
+     */
+    @PostMapping("/{numeroReserva}/cancelar")
+    public ReservaOperadorResponse cancelar(@PathVariable String numeroReserva) {
+        return reservaService.cancelarParaOperador(numeroReserva);
+    }
+
+    /**
+     * Obtiene el detalle de una reserva por su código público.
+     *
+     * @param numeroReserva código público de la reserva
+     * @return detalle de la reserva
+     */
+    @GetMapping("/{numeroReserva}")
+    public ReservaDetalleOperadorResponse obtenerDetalle(
+            @PathVariable String numeroReserva) {
+        return reservaService.obtenerDetalleParaOperador(numeroReserva);
+    }
 
     /**
      * Obtiene las reservas activas de un cliente.

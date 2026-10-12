@@ -2,6 +2,8 @@ package com.hotel.macondo.service;
 
 import java.util.List;
 
+import com.hotel.macondo.dto.ReservaOperadorResponse;
+import com.hotel.macondo.dto.ReservaDetalleOperadorResponse;
 import com.hotel.macondo.entities.Cliente;
 import com.hotel.macondo.entities.Habitacion;
 import com.hotel.macondo.entities.Reserva;
@@ -10,6 +12,15 @@ public interface ReservaService {
 
     /** Todas las reservas del hotel ordenadas por identificador. */
     List<Reserva> buscarTodas();
+
+    /** Reservas resumidas con la información requerida por el panel del operador. */
+    List<ReservaOperadorResponse> obtenerTodasParaOperador();
+
+    /** Cancela una reserva por su código y devuelve su representación para el operador. */
+    ReservaOperadorResponse cancelarParaOperador(String numeroReserva);
+
+    /** Obtiene el detalle completo de una reserva para el panel del operador. */
+    ReservaDetalleOperadorResponse obtenerDetalleParaOperador(String numeroReserva);
 
     /** Reservas del hotel que siguen en un estado operativo abierto. */
     List<Reserva> obtenerReservasActivas();
