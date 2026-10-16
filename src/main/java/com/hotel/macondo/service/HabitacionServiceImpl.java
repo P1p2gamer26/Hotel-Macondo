@@ -105,6 +105,27 @@ public class HabitacionServiceImpl implements HabitacionService {
         || habitacion.getNombre().equalsIgnoreCase(tipo.getNombre())) {
       throw new FormularioErroneoException("El nombre de la habitación es inválido.");
     }
+    if (habitacion.getNumero() == null || habitacion.getNumero().isBlank()) {
+      throw new FormularioErroneoException("El número de la habitación es obligatorio.");
+    }
+
+    // Validar si ya existe otra habitacion con el mismo numero de puerta
+    boolean numeroRepetido = repository.findAll().stream()
+        .anyMatch(h -> h.getNumero().trim().equalsIgnoreCase(habitacion.getNumero().trim())
+            && !h.getId().equals(habitacion.getId()));
+
+    if (numeroRepetido) {
+      throw new FormularioErroneoException(
+          "Ya existe una habitación registrada con el número " + habitacion.getNumero() + ".");
+    }
+
+    // Validar si ya existe otra habitacion con el mismo nombre
+    Habitacion conMismoNombre = buscarPorNombre(habitacion.getNombre().trim());
+    if (conMismoNombre != null && !conMismoNombre.getId().equals(habitacion.getId())) {
+      throw new FormularioErroneoException(
+          "Ya existe una habitación registrada con el nombre '" + habitacion.getNombre() + "'.");
+    }
+
     aplicarDatosDelTipo(habitacion, tipo);
     return repository.save(habitacion);
   }
