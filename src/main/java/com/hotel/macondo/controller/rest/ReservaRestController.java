@@ -3,20 +3,27 @@ package com.hotel.macondo.controller.rest;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.hotel.macondo.dto.ReservaOperadorResponse;
 import com.hotel.macondo.dto.ReservaDetalleOperadorResponse;
 import com.hotel.macondo.entities.Cliente;
+import com.hotel.macondo.entities.Habitacion;
 import com.hotel.macondo.entities.Reserva;
 import com.hotel.macondo.service.ClienteService;
 import com.hotel.macondo.service.ReservaService;
 import com.hotel.macondo.errors.RecursoNoEncontradoException;
+import io.swagger.v3.oas.annotations.Operation;
 
 /**
  * Controlador REST para gestionar reservas.
@@ -48,7 +55,7 @@ public class ReservaRestController {
      * @param numeroReserva código público de la reserva
      * @return reserva actualizada
      */
-    @PostMapping("/{numeroReserva}/cancelar")
+    @PutMapping("/{numeroReserva}/cancelar")
     public ReservaOperadorResponse cancelar(@PathVariable String numeroReserva) {
         return reservaService.cancelarParaOperador(numeroReserva);
     }
@@ -89,5 +96,65 @@ public class ReservaRestController {
     public List<Reserva> historialDeCliente(@PathVariable Long id) {
         Cliente cliente = clienteService.buscarPorId(id);
         return reservaService.buscarHistorialDeCliente(cliente);
+    }
+
+    @GetMapping("/cliente/{id}/disponibilidad")
+    @Operation(summary = "Consulta disponibilidad real para crear o modificar una reserva del cliente")
+    public List<Habitacion> disponibilidadDeCliente(
+            @PathVariable Long id,
+            @RequestParam Long tipoId,
+            @RequestParam(required = false) String fechaEntrada,
+            @RequestParam(required = false) String fechaSalida,
+            @RequestParam Integer cantidadPersonas,
+            @RequestParam(required = false) Long reservaId) {
+        clienteService.buscarPorId(id);
+        if (reservaId != null) {
+            Reserva reserva = reservaService.buscarParaModificar(id, reservaId);
+            return reservaService.consultarDisponibilidad(
+                    reserva, tipoId, fechaEntrada, fechaSalida, cantidadPersonas);
+        }
+        return reservaService.consultarDisponibilidad(
+                tipoId, fechaEntrada, fechaSalida, cantidadPersonas);
+    }
+
+    @GetMapping("/cliente/{id}/find/{reservaId}")
+    @Operation(summary = "Obtiene una reserva futura que pertenece al cliente para precargar su edición")
+    public Reserva reservaParaEditar(@PathVariable Long id, @PathVariable Long reservaId) {
+        return reservaService.buscarParaModificar(id, reservaId);
+    }
+
+    @PostMapping("/cliente/{id}")
+    @ResponseStatus(HttpStatus.CREATED)
+    @Operation(summary = "Crea una reserva, asigna una habitación disponible y abre su cuenta")
+    public Reserva crearReservaDeCliente(
+            @PathVariable Long id,
+            @RequestParam Long tipoId,
+            @RequestBody Reserva datos) {
+        // Solo se utilizan los campos editables. El servicio genera identidad, estado y precios.
+        return reservaService.crear(
+                id, tipoId,
+                datos.getFechaInicio() == null ? null : datos.getFechaInicio().toString(),
+                datos.getFechaFin() == null ? null : datos.getFechaFin().toString(),
+                datos.getCantidadPersonas());
+    }
+
+    @PutMapping("/cliente/{id}/{reservaId}")
+    @Operation(summary = "Modifica una reserva futura del cliente y vuelve a validar su disponibilidad")
+    public Reserva modificarReservaDeCliente(
+            @PathVariable Long id,
+            @PathVariable Long reservaId,
+            @RequestParam Long tipoId,
+            @RequestBody Reserva datos) {
+        return reservaService.modificar(
+                id, reservaId, tipoId,
+                datos.getFechaInicio() == null ? null : datos.getFechaInicio().toString(),
+                datos.getFechaFin() == null ? null : datos.getFechaFin().toString(),
+                datos.getCantidadPersonas());
+    }
+
+    @PutMapping("/cliente/{id}/{reservaId}/cancelar")
+    @Operation(summary = "Cancela una reserva futura del cliente conservando su historial")
+    public Reserva cancelarReservaDeCliente(@PathVariable Long id, @PathVariable Long reservaId) {
+        return reservaService.cancelar(id, reservaId);
     }
 }

@@ -13,6 +13,9 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.bind.MissingServletRequestParameterException;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.server.ResponseStatusException;
 
 /**
  * Manejo de errores para los controladores REST.
@@ -24,6 +27,19 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class RestExceptionHandler {
 
     private static final Logger log = LoggerFactory.getLogger(RestExceptionHandler.class);
+
+    /** Parámetros de ruta o consulta ausentes o con un tipo incorrecto. */
+    @ExceptionHandler({MissingServletRequestParameterException.class, MethodArgumentTypeMismatchException.class})
+    public ResponseEntity<Map<String, String>> handleParametrosInvalidos(Exception ex) {
+        return responder(HttpStatus.BAD_REQUEST, "Faltan parámetros obligatorios o contienen valores inválidos.");
+    }
+
+    /** Conserva los estados explícitos del contrato, por ejemplo 401 al fallar el login. */
+    @ExceptionHandler(ResponseStatusException.class)
+    public ResponseEntity<Map<String, String>> handleEstadoExplicito(ResponseStatusException ex) {
+        return ResponseEntity.status(ex.getStatusCode()).body(
+                Map.of("mensaje", ex.getReason() == null ? "No fue posible completar la operación." : ex.getReason()));
+    }
 
     /** Body JSON mal formado o con tipos invalidos: 400. */
     @ExceptionHandler(HttpMessageNotReadableException.class)

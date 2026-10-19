@@ -40,9 +40,9 @@ public class AuthRestController {
             respuesta.put("correo", usuario.getCorreo());
             respuesta.put("rol", usuario.getRol().name());
 
-            // Si es un cliente se tiene que dar el ID real del cliente asociado
+            // Se envía el perfil básico. Cliente ignora usuario y reservas para evitar ciclos.
             if (usuario.getCliente() != null) {
-                respuesta.put("clienteId", usuario.getCliente().getId());
+                respuesta.put("cliente", usuario.getCliente());
             }
 
             return respuesta;
