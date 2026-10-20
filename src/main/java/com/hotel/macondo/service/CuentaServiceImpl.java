@@ -1,5 +1,13 @@
 package com.hotel.macondo.service;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.Objects;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.hotel.macondo.entities.Cuenta;
 import com.hotel.macondo.entities.DetalleCuenta;
 import com.hotel.macondo.entities.Pago;
@@ -7,14 +15,6 @@ import com.hotel.macondo.entities.Servicio;
 import com.hotel.macondo.repository.CuentaRepository;
 import com.hotel.macondo.repository.DetalleCuentaRepository;
 import com.hotel.macondo.repository.PagoRepository;
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.Objects;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional
@@ -22,36 +22,29 @@ public class CuentaServiceImpl implements CuentaService {
 
   @Autowired
   private CuentaRepository repository;
+
   @Autowired
   private DetalleCuentaRepository detalleCuentaRepository;
+
   @Autowired
   private PagoRepository pagoRepository;
 
-  /** {@inheritDoc} */
-  @Override
-  public Collection<Cuenta> buscarTodas() {
-    return repository.findAllByOrderByIdAsc();
-  }
+  // ==========================================
+  // CONSULTAS DE CUENTA
+  // ==========================================
 
-  /** {@inheritDoc} */
+  // Busca una cuenta por su identificador
   @Override
   public Cuenta buscarPorId(Long id) {
     return repository.findById(id).orElse(null);
   }
 
-  /** {@inheritDoc} */
-  @Override
-  public Cuenta guardar(Cuenta cuenta) {
-    return repository.save(cuenta);
-  }
+  // ==========================================
+  // CONSUMOS ADICIONALES (OPERADOR)
+  // ==========================================
 
-  /** {@inheritDoc} */
-  @Override
-  public void eliminar(Long id) {
-    repository.deleteById(id);
-  }
-
-  /** {@inheritDoc} */
+  // Carga un nuevo servicio a una cuenta que permanezca abierta
+  // y recalcula el monto total acumulado
   @Override
   public DetalleCuenta agregarServicio(
       Long cuentaId, Servicio servicio, int cantidad) {
@@ -75,7 +68,8 @@ public class CuentaServiceImpl implements CuentaService {
     return detalle;
   }
 
-  /** {@inheritDoc} */
+  // Retira un consumo de servicio de una cuenta abierta
+  // y descuenta su valor recalculando el monto global
   @Override
   public boolean eliminarDetalle(Long cuentaId, Long detalleId) {
     Cuenta cuenta = repository.findById(cuentaId).orElse(null);
@@ -95,7 +89,12 @@ public class CuentaServiceImpl implements CuentaService {
     return true;
   }
 
-  /** {@inheritDoc} */
+  // ==========================================
+  // PAGOS Y LIQUIDACIÓN (OPERADOR)
+  // ==========================================
+
+  // Registra el pago exacto de la cuenta, elimina los consumos individuales,
+  // actualiza el estado a PAGADA y reinicia el saldo pendiente a cero.
   @Override
   public Pago pagar(Long cuentaId, BigDecimal monto, String metodoPago) {
     Cuenta cuenta = repository.findById(cuentaId).orElse(null);
@@ -122,6 +121,11 @@ public class CuentaServiceImpl implements CuentaService {
     return pago;
   }
 
+  // ==========================================
+  // CÁLCULOS DE COSTOS Y SUBTOTALES (OPERADOR)
+  // ==========================================
+
+  // Calcula la sumatoria del costo de alojamiento mas los consumos de servicios
   private BigDecimal calcularTotal(Cuenta cuenta) {
     BigDecimal alojamiento = cuenta.getReserva() == null || cuenta.getReserva().getTotal() == null
         ? BigDecimal.ZERO
@@ -132,6 +136,7 @@ public class CuentaServiceImpl implements CuentaService {
     return alojamiento.add(servicios);
   }
 
+  // Multiplica el precio unitario del servicio por la cantidad consumida
   private BigDecimal calcularSubtotal(DetalleCuenta detalle) {
     if (detalle == null
         || detalle.getPrecio() == null

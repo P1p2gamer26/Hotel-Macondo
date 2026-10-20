@@ -16,12 +16,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.hotel.macondo.entities.Operador;
-import com.hotel.macondo.service.OperadorService;
 import com.hotel.macondo.errors.RecursoNoEncontradoException;
+import com.hotel.macondo.service.OperadorService;
 
-/**
- * Controlador REST para gestionar operadores.
- */
+// Controlador REST para la gestión y administración del personal operador
 @RestController
 @RequestMapping("/api/operador")
 @CrossOrigin(origins = "http://localhost:4200")
@@ -30,23 +28,18 @@ public class OperadorRestController {
     @Autowired
     private OperadorService operadorService;
 
-    /**
-     * Retorna todos los operadores.
-     *
-     * @return lista de todos los operadores
-     */
+    // ==========================================
+    // GESTION DE OPERADORES
+    // ==========================================
+
+    // Retorna todos los operadores registrados en el sistema
     @GetMapping
     public List<Operador> buscarTodos() {
         Collection<Operador> operadores = operadorService.buscarTodos();
         return new ArrayList<>(operadores);
     }
 
-    /**
-     * Crea un nuevo operador. Si el campo activo es null, se establece en true.
-     *
-     * @param operador datos del operador a crear
-     * @return el operador creado
-     */
+    // Registra un nuevo operador asignándolo como activo si el valor viene nulo
     @PostMapping
     public Operador crear(@RequestBody Operador operador) {
         if (operador.getActivo() == null) {
@@ -55,13 +48,7 @@ public class OperadorRestController {
         return operadorService.guardar(operador);
     }
 
-    /**
-     * Cambia el estado de un operador (activo/inactivo).
-     *
-     * @param id identificador del operador
-     * @return el operador con el estado cambiado
-     * @throws RecursoNoEncontradoException si no existe un operador con ese id
-     */
+    // Alterna el estado de activación del operador
     @PutMapping("/estado/{id}")
     public Operador cambiarEstado(@PathVariable Long id) {
         Operador operador = operadorService.cambiarEstado(id);
@@ -71,12 +58,7 @@ public class OperadorRestController {
         return operador;
     }
 
-    /**
-     * Elimina un operador por su identificador.
-     *
-     * @param id identificador del operador
-     * @throws RecursoNoEncontradoException si no existe un operador con ese id
-     */
+    // Elimina un operador por su identificador
     @DeleteMapping("/delete/{id}")
     public void eliminar(@PathVariable Long id) {
         Operador operador = operadorService.buscarPorId(id);

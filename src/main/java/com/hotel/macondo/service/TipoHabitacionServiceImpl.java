@@ -7,9 +7,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.hotel.macondo.entities.TipoHabitacion;
-import com.hotel.macondo.repository.TipoHabitacionRepository;
 import com.hotel.macondo.errors.PeticionImposible;
 import com.hotel.macondo.errors.RecursoNoEncontradoException;
+import com.hotel.macondo.repository.TipoHabitacionRepository;
 
 @Service
 @Transactional
@@ -17,29 +17,34 @@ public class TipoHabitacionServiceImpl implements TipoHabitacionService {
 
   @Autowired
   private TipoHabitacionRepository repository;
+
   @Autowired
   private HabitacionService habitacionService;
 
-  /** {@inheritDoc} */
+  // ==========================================
+  // CONSULTAS DE CATEGORÍA
+  // ==========================================
+
+  // Retorna todas las categorias de habitacion ordenadas por identificador
   @Override
   public Collection<TipoHabitacion> buscarTodos() {
     return repository.findAllByOrderByIdAsc();
   }
 
-  /** {@inheritDoc} */
-  @Override
-  public Collection<TipoHabitacion> buscarPorPersonas(int personas) {
-    return repository.findByCapacidadPersonasGreaterThanEqualOrderByIdAsc(personas);
-  }
-
-  /** {@inheritDoc} */
+  // Busca una categoria por su id
   @Override
   public TipoHabitacion buscarPorId(Long id) {
     return repository.findById(id).orElseThrow(
         () -> new RecursoNoEncontradoException("Tipo de habitacion no encontrado."));
   }
 
-  /** {@inheritDoc} */
+  // ==========================================
+  // GESTIÓN Y MANTENIMIENTO (ADMIN)
+  // ==========================================
+
+  // Guarda o actualiza la categoria y propaga en cascada las variaciones
+  // de tarifa y capacidad a todas las habitaciones vinculadas a este tipo
+
   @Override
   public TipoHabitacion guardar(TipoHabitacion tipo) {
     TipoHabitacion guardado = repository.save(tipo);
@@ -47,7 +52,8 @@ public class TipoHabitacionServiceImpl implements TipoHabitacionService {
     return guardado;
   }
 
-  /** {@inheritDoc} */
+  // Elimina la categoria unicamente si no tiene habitaciones asociadas
+  // Si existen registros vinculados bloquea la operacion
   @Override
   public void eliminar(Long id) {
     if (habitacionService.existeHabitacionConTipo(id)) {

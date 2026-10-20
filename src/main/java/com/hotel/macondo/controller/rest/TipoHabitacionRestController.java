@@ -16,14 +16,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.hotel.macondo.entities.TipoHabitacion;
-import com.hotel.macondo.service.TipoHabitacionService;
-import com.hotel.macondo.service.HabitacionService;
-import com.hotel.macondo.errors.RecursoNoEncontradoException;
 import com.hotel.macondo.errors.PeticionImposible;
+import com.hotel.macondo.service.HabitacionService;
+import com.hotel.macondo.service.TipoHabitacionService;
 
-/**
- * Controlador REST para gestionar tipos de habitación.
- */
+// Controlador REST para la gestión de tipos o categorías de habitación
 @RestController
 @RequestMapping("/api/tipo-habitacion")
 @CrossOrigin(origins = "http://localhost:4200")
@@ -35,63 +32,47 @@ public class TipoHabitacionRestController {
     @Autowired
     private HabitacionService habitacionService;
 
-    /**
-     * Retorna todos los tipos de habitación.
-     *
-     * @return lista de todos los tipos de habitación
-     */
+    // ==========================================
+    // CONSULTAS
+    // ==========================================
+
+    // Retorna todos los tipos de habitación registrados
     @GetMapping
     public List<TipoHabitacion> buscarTodos() {
         Collection<TipoHabitacion> tipos = tipoHabitacionService.buscarTodos();
         return new ArrayList<>(tipos);
     }
 
-    /**
-     * Busca un tipo de habitación por su identificador.
-     *
-     * @param id identificador del tipo de habitación
-     * @return el tipo de habitación encontrado
-     * @throws RecursoNoEncontradoException si no existe un tipo con ese id
-     */
+    // Busca un tipo de habitación por su identificador
     @GetMapping("/find/{id}")
     public TipoHabitacion buscarPorId(@PathVariable Long id) {
         return tipoHabitacionService.buscarPorId(id);
     }
 
-    /**
-     * Crea un nuevo tipo de habitación.
-     *
-     * @param tipo datos del tipo de habitación a crear
-     * @return el tipo de habitación creado
-     */
+    // ==========================================
+    // GESTIÓN ADMINISTRATIVA
+    // ==========================================
+
+    // Crea un nuevo tipo o categoría de habitación
     @PostMapping
     public TipoHabitacion crear(@RequestBody TipoHabitacion tipo) {
         return tipoHabitacionService.guardar(tipo);
     }
 
-    /**
-     * Actualiza un tipo de habitación existente.
-     *
-     * @param tipo datos del tipo de habitación a actualizar
-     * @return el tipo de habitación actualizado
-     */
+    // Actualiza la configuración y datos de un tipo de habitación existente
     @PutMapping
     public TipoHabitacion actualizar(@RequestBody TipoHabitacion tipo) {
         return tipoHabitacionService.guardar(tipo);
     }
 
-    /**
-     * Elimina un tipo de habitación por su identificador.
-     *
-     * @param id identificador del tipo de habitación
-     * @throws RecursoNoEncontradoException si no existe un tipo con ese id
-     * @throws PeticionImposible si el tipo tiene habitaciones asociadas
-     */
+    // Elimina una categoría si no tiene habitaciones asociadas
+    // Si existen habitaciones ligadas a esta categoría, bloquea la acción
+
     @DeleteMapping("/delete/{id}")
     public void eliminar(@PathVariable Long id) {
         if (habitacionService.existeHabitacionConTipo(id)) {
             throw new PeticionImposible(
-                "No se puede eliminar el tipo porque tiene habitaciones asociadas.");
+                    "No se puede eliminar el tipo porque tiene habitaciones asociadas.");
         }
         tipoHabitacionService.eliminar(id);
     }

@@ -15,6 +15,8 @@ import org.springframework.web.server.ResponseStatusException;
 import com.hotel.macondo.entities.Usuario;
 import com.hotel.macondo.service.UsuarioService;
 
+// Controlador REST para la autenticación y control de acceso.
+
 @RestController
 @RequestMapping("/api/auth")
 @CrossOrigin(origins = "http://localhost:4200")
@@ -22,6 +24,12 @@ public class AuthRestController {
 
     @Autowired
     private UsuarioService usuarioService;
+
+    // ==========================================
+    // AUTENTICACIÓN / SESIÓN
+    // ==========================================
+
+    // Valida credenciales de acceso para cualquier rol (Cliente, Operador, Admin)
 
     @PostMapping("/login")
     public Map<String, Object> login(@RequestBody Map<String, String> credenciales) {
@@ -40,7 +48,8 @@ public class AuthRestController {
             respuesta.put("correo", usuario.getCorreo());
             respuesta.put("rol", usuario.getRol().name());
 
-            // Se envía el perfil básico. Cliente ignora usuario y reservas para evitar ciclos.
+            // Se envía el perfil básico. Cliente ignora usuario y reservas para evitar
+            // ciclos en JSON
             if (usuario.getCliente() != null) {
                 respuesta.put("cliente", usuario.getCliente());
             }

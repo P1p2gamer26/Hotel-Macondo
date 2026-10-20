@@ -10,12 +10,12 @@ import org.springframework.transaction.annotation.Transactional;
 import com.hotel.macondo.entities.Habitacion;
 import com.hotel.macondo.entities.Reserva;
 import com.hotel.macondo.entities.TipoHabitacion;
+import com.hotel.macondo.errors.FormularioErroneoException;
+import com.hotel.macondo.errors.PeticionImposible;
+import com.hotel.macondo.errors.RecursoNoEncontradoException;
 import com.hotel.macondo.repository.HabitacionRepository;
 import com.hotel.macondo.repository.ReservaRepository;
 import com.hotel.macondo.repository.TipoHabitacionRepository;
-import com.hotel.macondo.errors.RecursoNoEncontradoException;
-import com.hotel.macondo.errors.FormularioErroneoException;
-import com.hotel.macondo.errors.PeticionImposible;
 
 @Service
 @Transactional
@@ -23,18 +23,24 @@ public class HabitacionServiceImpl implements HabitacionService {
 
   @Autowired
   private HabitacionRepository repository;
+
   @Autowired
   private TipoHabitacionRepository tipoHabitacionRepository;
+
   @Autowired
   private ReservaRepository reservaRepository;
 
-  /** {@inheritDoc} */
+  // ==========================================
+  // CONSULTAS DE HABITACIÓN
+  // ==========================================
+
+  // Retorna todas las habitaciones ordenadas por identificador
   @Override
   public Collection<Habitacion> buscarTodas() {
     return repository.findAllByOrderByIdAsc();
   }
 
-  /** {@inheritDoc} */
+  // Busca una habitacion por id
   @Override
   public Habitacion buscarPorId(Long id) {
     return repository
@@ -44,7 +50,7 @@ public class HabitacionServiceImpl implements HabitacionService {
                 "No se encontro habitacion con id " + id));
   }
 
-  /** {@inheritDoc} */
+  // Busca la habitacion asignada a una reserva especifica
   @Override
   public Habitacion buscarPorReserva(Long reservaId) {
     if (reservaId == null) {
@@ -53,44 +59,25 @@ public class HabitacionServiceImpl implements HabitacionService {
     return repository.findByReservasId(reservaId);
   }
 
-  /** {@inheritDoc} */
+  // Retorna la lista de reservas vinculadas a una habitacion
   @Override
-  public Habitacion buscarPorNombre(String nombre) {
-    return repository.findByNombreIgnoreCase(nombre).orElse(null);
+  @Transactional(readOnly = true)
+  public List<Reserva> reservasAsociadas(Long id) {
+    return reservaRepository.buscarPorHabitacion(id);
   }
 
-  /** {@inheritDoc} */
+  // Comprueba si existen habitaciones asignadas a un tipo determinado
   @Override
-  public Collection<Habitacion> buscarPorPersonas(int personas) {
-    return repository.findByCapacidadGreaterThanEqualOrderByIdAsc(personas);
+  public boolean existeHabitacionConTipo(Long idTipo) {
+    return idTipo != null && repository.existsByTipoHabitacionId(idTipo);
   }
 
-  /** {@inheritDoc} */
-  @Override
-  public long contarTodas() {
-    return repository.count();
-  }
+  // ==========================================
+  // GESTIÓN Y MANTENIMIENTO (ADMIN)
+  // ==========================================
 
-  /** {@inheritDoc} */
-  @Override
-  public long contarDisponibles() {
-    return repository.countByEstado("DISPONIBLE");
-  }
-
-  /** {@inheritDoc} */
-  @Override
-  public Habitacion buscarDisponiblePorTipo(Long idTipo) {
-    if (idTipo == null) {
-      throw new FormularioErroneoException("El tipo de habitación es obligatorio.");
-    }
-    return repository
-        .findFirstByTipoHabitacionIdAndEstadoOrderByIdAsc(idTipo, "DISPONIBLE")
-        .orElseThrow(
-            () -> new RecursoNoEncontradoException(
-                "No hay habitaciones disponibles para el tipo seleccionado."));
-  }
-
-  /** {@inheritDoc} */
+  // Guarda o actualiza una habitacion validando unicidad de numero y nombre,
+  // existencia del tipo y sincronizando precio y capacidad desde su categoria.
   @Override
   public Habitacion guardar(Habitacion habitacion, Long idTipo) {
     if (idTipo == null) {
@@ -130,7 +117,7 @@ public class HabitacionServiceImpl implements HabitacionService {
     return repository.save(habitacion);
   }
 
-  /** {@inheritDoc} */
+  // Alterna el estado operativo entre DISPONIBLE y NO_DISPONIBLE
   @Override
   public Habitacion cambiarEstado(Long id) {
     Habitacion habitacion = repository.findById(id).orElse(null);
@@ -144,7 +131,7 @@ public class HabitacionServiceImpl implements HabitacionService {
     return repository.save(habitacion);
   }
 
-  /** {@inheritDoc} */
+  // Actualiza los datos heredados del tipo en todas sus habitaciones asignadas
   @Override
   public void actualizarHabitacionesPorTipo(TipoHabitacion tipo) {
     if (tipo == null || tipo.getId() == null) {
@@ -156,20 +143,10 @@ public class HabitacionServiceImpl implements HabitacionService {
     }
   }
 
-  /** {@inheritDoc} */
-  @Override
-  public boolean existeHabitacionConTipo(Long idTipo) {
-    return idTipo != null && repository.existsByTipoHabitacionId(idTipo);
-  }
-
-  /** {@inheritDoc} */
-  @Override
-  @Transactional(readOnly = true)
-  public List<Reserva> reservasAsociadas(Long id) {
-    return reservaRepository.buscarPorHabitacion(id);
-  }
-
-  /** {@inheritDoc} */
+  /**
+   * Elimina una habitacion si no registra reservas historicas o activas
+   * Si tiene reservas asociadas, bloquea la operacion con PeticionImposible
+   */
   @Override
   public void eliminar(Long id) {
     Habitacion habitacion = repository.findById(id).orElse(null);
@@ -178,8 +155,6 @@ public class HabitacionServiceImpl implements HabitacionService {
           "No se encontro habitacion con id " + id);
     }
 
-    // Una reserva sin habitacion no tiene sentido, y la cascada tampoco es
-    // opcion porque borraria reservas ajenas a esta habitacion. Se rechaza.
     if (!reservaRepository.buscarPorHabitacion(id).isEmpty()) {
       throw new PeticionImposible(
           "No se puede eliminar: la habitacion tiene reservas asociadas.");
@@ -188,6 +163,17 @@ public class HabitacionServiceImpl implements HabitacionService {
     repository.delete(habitacion);
   }
 
+  // ==========================================
+  // MÉTODOS AUXILIARES
+  // ==========================================
+
+  // Busca internamente una habitacion por su nombre exacto ignorando mayusculas
+  @Override
+  public Habitacion buscarPorNombre(String nombre) {
+    return repository.findByNombreIgnoreCase(nombre).orElse(null);
+  }
+
+  // Asigna los valores de referencia del tipo a habitacion
   private void aplicarDatosDelTipo(Habitacion habitacion, TipoHabitacion tipo) {
     habitacion.aplicarTipo(tipo);
     habitacion.setPrecio(tipo.getPrecioNoche());
