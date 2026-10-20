@@ -28,6 +28,7 @@ import com.hotel.macondo.repository.CuentaRepository;
 import com.hotel.macondo.repository.HabitacionRepository;
 import com.hotel.macondo.repository.ReservaRepository;
 import com.hotel.macondo.repository.TipoHabitacionRepository;
+import com.hotel.macondo.utils.FechaUtils;
 
 @Service
 @Transactional
@@ -93,8 +94,8 @@ public class ReservaServiceImpl implements ReservaService {
       String fechaEntrada,
       String fechaSalida,
       Integer cantidadPersonas) {
-    LocalDate entrada = convertirFecha(fechaEntrada, "entrada");
-    LocalDate salida = convertirFecha(fechaSalida, "salida");
+    LocalDate entrada = FechaUtils.convertirFecha(fechaEntrada, "entrada");
+    LocalDate salida = FechaUtils.convertirFecha(fechaSalida, "salida");
     validarDatosReserva(tipoId, entrada, salida, cantidadPersonas);
     TipoHabitacion tipo = buscarTipo(tipoId);
     if (tipo.getCapacidadPersonas() < cantidadPersonas) {
@@ -128,8 +129,8 @@ public class ReservaServiceImpl implements ReservaService {
       String fechaEntrada,
       String fechaSalida,
       Integer cantidadPersonas) {
-    LocalDate entrada = convertirFecha(fechaEntrada, "entrada");
-    LocalDate salida = convertirFecha(fechaSalida, "salida");
+    LocalDate entrada = FechaUtils.convertirFecha(fechaEntrada, "entrada");
+    LocalDate salida = FechaUtils.convertirFecha(fechaSalida, "salida");
     Cliente cliente = buscarCliente(clienteId);
     validarDatosReserva(tipoId, entrada, salida, cantidadPersonas);
     TipoHabitacion tipo = buscarTipo(tipoId);
@@ -168,8 +169,8 @@ public class ReservaServiceImpl implements ReservaService {
       String fechaEntrada,
       String fechaSalida,
       Integer cantidadPersonas) {
-    LocalDate entrada = convertirFecha(fechaEntrada, "entrada");
-    LocalDate salida = convertirFecha(fechaSalida, "salida");
+    LocalDate entrada = FechaUtils.convertirFecha(fechaEntrada, "entrada");
+    LocalDate salida = FechaUtils.convertirFecha(fechaSalida, "salida");
     Reserva reserva = buscarReservaDelCliente(clienteId, reservaId);
     validarReservaFutura(reserva);
     validarDatosReserva(tipoId, entrada, salida, cantidadPersonas);
@@ -489,18 +490,6 @@ public class ReservaServiceImpl implements ReservaService {
     }
     if (cantidadPersonas <= 0) {
       throw new FormularioErroneoException("La cantidad de personas debe ser mayor que cero.");
-    }
-  }
-
-  // Convierte un texto en LocalDate arrojando excepcion si el formato es invalido
-  private LocalDate convertirFecha(String fecha, String nombreCampo) {
-    try {
-      if (fecha == null || fecha.isBlank()) {
-        throw new DateTimeParseException("Fecha vacía", fecha == null ? "" : fecha, 0);
-      }
-      return LocalDate.parse(fecha);
-    } catch (DateTimeParseException ex) {
-      throw new FormularioErroneoException("La fecha de " + nombreCampo + " no tiene un formato válido.");
     }
   }
 

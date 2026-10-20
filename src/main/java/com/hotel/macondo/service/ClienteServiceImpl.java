@@ -16,6 +16,7 @@ import com.hotel.macondo.errors.RecursoNoEncontradoException;
 import com.hotel.macondo.repository.ClienteRepository;
 import com.hotel.macondo.repository.ReservaRepository;
 import com.hotel.macondo.repository.UsuarioRepository;
+import com.hotel.macondo.utils.FechaUtils;
 
 @Service
 @Transactional
@@ -94,11 +95,9 @@ public class ClienteServiceImpl implements ClienteService {
   // Calcula la cantidad de noches de estancia entre fecha de inicio y fin
   @Override
   public long calcularNoches(Reserva reserva) {
-    if (reserva == null
-        || reserva.getFechaInicio() == null
-        || reserva.getFechaFin() == null) {
+    if (reserva == null) {
       return 0;
     }
-    return ChronoUnit.DAYS.between(reserva.getFechaInicio(), reserva.getFechaFin());
+    return FechaUtils.calcularNoches(reserva.getFechaInicio(), reserva.getFechaFin());
   }
 }

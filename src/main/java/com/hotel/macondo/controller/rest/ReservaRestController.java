@@ -23,6 +23,7 @@ import com.hotel.macondo.entities.Reserva;
 import com.hotel.macondo.errors.RecursoNoEncontradoException;
 import com.hotel.macondo.service.ClienteService;
 import com.hotel.macondo.service.ReservaService;
+import com.hotel.macondo.utils.FechaUtils;
 import io.swagger.v3.oas.annotations.Operation;
 
 /**
@@ -125,8 +126,8 @@ public class ReservaRestController {
         // precios.
         return reservaService.crear(
                 id, tipoId,
-                datos.getFechaInicio() == null ? null : datos.getFechaInicio().toString(),
-                datos.getFechaFin() == null ? null : datos.getFechaFin().toString(),
+                FechaUtils.toIsoString(datos.getFechaInicio()),
+                FechaUtils.toIsoString(datos.getFechaFin()),
                 datos.getCantidadPersonas());
     }
 
@@ -140,8 +141,8 @@ public class ReservaRestController {
             @RequestBody Reserva datos) {
         return reservaService.modificar(
                 id, reservaId, tipoId,
-                datos.getFechaInicio() == null ? null : datos.getFechaInicio().toString(),
-                datos.getFechaFin() == null ? null : datos.getFechaFin().toString(),
+                FechaUtils.toIsoString(datos.getFechaInicio()),
+                FechaUtils.toIsoString(datos.getFechaFin()),
                 datos.getCantidadPersonas());
     }
 
