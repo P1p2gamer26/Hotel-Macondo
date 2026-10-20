@@ -144,8 +144,10 @@ public class HabitacionServiceImpl implements HabitacionService {
   }
 
   /**
-   * Elimina una habitacion si no registra reservas historicas o activas
-   * Si tiene reservas asociadas, bloquea la operacion con PeticionImposible
+   * Procesa la baja de una habitacion.
+   * Si registra historial o reservas activas cambia su estado a NO_DISPONIBLE
+   * para impedir futuras reservas.
+   * Si no registra reservas asociadas, procede con el borrado fisico.
    */
   @Override
   public void eliminar(Long id) {
@@ -155,11 +157,14 @@ public class HabitacionServiceImpl implements HabitacionService {
           "No se encontro habitacion con id " + id);
     }
 
+    // Si tiene reservas asociadas, se desactiva (borrado logico)
     if (!reservaRepository.buscarPorHabitacion(id).isEmpty()) {
-      throw new PeticionImposible(
-          "No se puede eliminar: la habitacion tiene reservas asociadas.");
+      habitacion.setEstado("NO_DISPONIBLE");
+      repository.save(habitacion);
+      return;
     }
 
+    // Si no tiene reservas, se elimina fisicamente
     repository.delete(habitacion);
   }
 

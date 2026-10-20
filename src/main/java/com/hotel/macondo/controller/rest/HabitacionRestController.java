@@ -85,13 +85,9 @@ public class HabitacionRestController {
     }
 
     // Elimina una habitación del sistema si NO TIENE reservas asociadas
-    // Lanza PeticionImposible si cuenta con reservas históricas o activas
+    // Pasa a inactiva si registra reservas
     @DeleteMapping("/delete/{id}")
     public void eliminar(@PathVariable Long id) {
-        if (!habitacionService.reservasAsociadas(id).isEmpty()) {
-            throw new PeticionImposible(
-                    "No se puede eliminar la habitación porque tiene reservas asociadas.");
-        }
         habitacionService.eliminar(id);
     }
 
