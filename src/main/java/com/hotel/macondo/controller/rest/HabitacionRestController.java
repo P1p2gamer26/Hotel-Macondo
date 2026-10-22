@@ -16,14 +16,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.hotel.macondo.entities.Habitacion;
-import com.hotel.macondo.service.HabitacionService;
-import com.hotel.macondo.errors.RecursoNoEncontradoException;
 import com.hotel.macondo.errors.FormularioErroneoException;
 import com.hotel.macondo.errors.PeticionImposible;
+import com.hotel.macondo.errors.RecursoNoEncontradoException;
+import com.hotel.macondo.service.HabitacionService;
 
-/**
- * Controlador REST para gestionar habitaciones.
- */
+// Controlador REST para la gestión de habitaciones físicas del hotel
 @RestController
 @RequestMapping("/api/habitacion")
 @CrossOrigin(origins = "http://localhost:4200")
@@ -32,48 +30,35 @@ public class HabitacionRestController {
     @Autowired
     private HabitacionService habitacionService;
 
-    /**
-     * Retorna todas las habitaciones.
-     *
-     * @return lista de todas las habitaciones
-     */
+    // ==========================================
+    // CONSULTAS Y ASIGNACION
+    // ==========================================
+
+    // Retorna la totalidad de habitaciones del hotel
     @GetMapping
     public List<Habitacion> buscarTodas() {
         Collection<Habitacion> habitaciones = habitacionService.buscarTodas();
         return new ArrayList<>(habitaciones);
     }
 
-    /**
-     * Busca una habitación por su identificador.
-     *
-     * @param id identificador de la habitación
-     * @return la habitación encontrada
-     * @throws RecursoNoEncontradoException si no existe una habitación con ese id
-     */
+    // Busca una habitación por su identificador
     @GetMapping("/find/{id}")
     public Habitacion buscarPorId(@PathVariable Long id) {
         return habitacionService.buscarPorId(id);
     }
 
-    /**
-     * Busca la habitación asociada a una reserva.
-     *
-     * @param reservaId identificador de la reserva
-     * @return la habitación encontrada
-     * Retorna vacio (null) si la reserva no tiene habitacion asignada.
-     */
+    // Busca la habitación asignada a una reserva en particular
+    // Retorna null si la reserva aún no tiene una habitación vinculada
     @GetMapping("/reserva/{reservaId}")
     public Habitacion buscarPorReserva(@PathVariable Long reservaId) {
         return habitacionService.buscarPorReserva(reservaId);
     }
 
-    /**
-     * Crea una nueva habitación.
-     *
-     * @param habitacion datos de la habitación a crear
-     * @return la habitación creada
-     * @throws FormularioErroneoException si el tipo de habitación es nulo o no existe
-     */
+    // ==========================================
+    // ADMINISTRACIÓN Y MANTENIMIENTO
+    // ==========================================
+
+    // Crea una nueva habitación validando su categoría asociada
     @PostMapping
     public Habitacion crear(@RequestBody Habitacion habitacion) {
         validarTipoHabitacion(habitacion);
@@ -81,13 +66,7 @@ public class HabitacionRestController {
         return habitacionService.guardar(habitacion, idTipo);
     }
 
-    /**
-     * Actualiza una habitación existente.
-     *
-     * @param habitacion datos de la habitación a actualizar
-     * @return la habitación actualizada
-     * @throws FormularioErroneoException si el tipo de habitación es nulo o no existe
-     */
+    // Actualiza los datos de una habitación existente
     @PutMapping
     public Habitacion actualizar(@RequestBody Habitacion habitacion) {
         validarTipoHabitacion(habitacion);
@@ -95,13 +74,7 @@ public class HabitacionRestController {
         return habitacionService.guardar(habitacion, idTipo);
     }
 
-    /**
-     * Cambia el estado de una habitación (DISPONIBLE/NO_DISPONIBLE).
-     *
-     * @param id identificador de la habitación
-     * @return la habitación con el estado cambiado
-     * @throws RecursoNoEncontradoException si no existe una habitación con ese id
-     */
+    // Cambia el estado operativo de la habitación entre disponible y no disponible
     @PutMapping("/estado/{id}")
     public Habitacion cambiarEstado(@PathVariable Long id) {
         Habitacion habitacion = habitacionService.cambiarEstado(id);
@@ -111,22 +84,18 @@ public class HabitacionRestController {
         return habitacion;
     }
 
-    /**
-     * Elimina una habitación por su identificador.
-     *
-     * @param id identificador de la habitación
-     * @throws RecursoNoEncontradoException si no existe una habitación con ese id
-     * @throws PeticionImposible si la habitación tiene reservas asociadas
-     */
+    // Elimina una habitación del sistema si NO TIENE reservas asociadas
+    // Pasa a inactiva si registra reservas
     @DeleteMapping("/delete/{id}")
     public void eliminar(@PathVariable Long id) {
-        if (!habitacionService.reservasAsociadas(id).isEmpty()) {
-            throw new PeticionImposible(
-                "No se puede eliminar la habitación porque tiene reservas asociadas.");
-        }
         habitacionService.eliminar(id);
     }
 
+    // ==========================================
+    // MÉTODOS AUXILIARES
+    // ==========================================
+
+    // Valida que la habitación contenga la referencia requerida a su tipo
     private void validarTipoHabitacion(Habitacion habitacion) {
         if (habitacion.getTipoHabitacion() == null || habitacion.getTipoHabitacion().getId() == null) {
             throw new FormularioErroneoException("Debes seleccionar un tipo de habitación.");

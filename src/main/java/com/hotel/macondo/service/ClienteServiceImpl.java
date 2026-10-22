@@ -1,68 +1,62 @@
 package com.hotel.macondo.service;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.util.Collection;
 import java.util.List;
-import java.util.Locale;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.hotel.macondo.entities.Cliente;
-import com.hotel.macondo.entities.Habitacion;
 import com.hotel.macondo.entities.Reserva;
 import com.hotel.macondo.entities.Usuario;
+import com.hotel.macondo.errors.PeticionImposible;
+import com.hotel.macondo.errors.RecursoNoEncontradoException;
 import com.hotel.macondo.repository.ClienteRepository;
 import com.hotel.macondo.repository.ReservaRepository;
 import com.hotel.macondo.repository.UsuarioRepository;
-import com.hotel.macondo.errors.PeticionImposible;
-import com.hotel.macondo.errors.RecursoNoEncontradoException;
+import com.hotel.macondo.utils.FechaUtils;
 
 @Service
 @Transactional
 public class ClienteServiceImpl implements ClienteService {
 
-  private static final Locale LOCALE_COLOMBIA = new Locale("es", "CO");
-  private static final DateTimeFormatter FORMATO_FECHA = DateTimeFormatter.ofPattern("EEEE, dd 'de' MMMM 'de' yyyy",
-      LOCALE_COLOMBIA);
-
   @Autowired
   private ClienteRepository repository;
+
   @Autowired
   private ReservaRepository reservaRepository;
+
   @Autowired
   private UsuarioRepository usuarioRepository;
 
-  /** {@inheritDoc} */
-  @Override
-  public Collection<Cliente> buscarTodos() {
-    return repository.findAllByOrderByIdAsc();
-  }
+  // ==========================================
+  // CONSULTAS DE CLIENTE
+  // ==========================================
 
-  /** {@inheritDoc} */
+  // Busca un cliente por id
   @Override
   public Cliente buscarPorId(Long id) {
     return repository.findById(id).orElseThrow(
         () -> new RecursoNoEncontradoException("No se encontró cliente con id " + id));
   }
 
-  /** {@inheritDoc} */
-  @Override
-  public Cliente buscarPorCedula(String cedula) {
-    return repository.findByCedula(cedula).orElseThrow(
-        () -> new RecursoNoEncontradoException("No se encontró cliente con esa cédula"));
-  }
+  // ==========================================
+  // PERSISTENCIA
+  // ==========================================
 
-  /** {@inheritDoc} */
+  // Guarda o actualiza un cliente en la base de datos
   @Override
   public Cliente guardar(Cliente cliente) {
     return repository.save(cliente);
   }
 
-  /** {@inheritDoc} */
+  /**
+   * Elimina un cliente y desvincula su usuario si no cuenta con reservas.
+   * Si registra historial o reservas activas, bloquea la operacion
+   * mediante PeticionImposible para proteger la integridad contable
+   */
   @Override
   public void eliminar(Long id) {
     Cliente cliente = repository.findById(id).orElse(null);
@@ -70,13 +64,11 @@ public class ClienteServiceImpl implements ClienteService {
       return;
     }
 
-    // no se permite el borrado fisico si registra reservas activas o historicas
     if (cliente.getReservas() != null && !cliente.getReservas().isEmpty()) {
       throw new PeticionImposible(
           "No se puede eliminar el cliente: registra reservas en su historial.");
     }
 
-    // si no tiene reservas se desvinculan y eliminan sus credenciales de acceso
     Usuario usuario = cliente.getUsuario();
     if (usuario != null) {
       cliente.setUsuario(null);
@@ -86,7 +78,11 @@ public class ClienteServiceImpl implements ClienteService {
     repository.delete(cliente);
   }
 
-  /** {@inheritDoc} */
+  // ==========================================
+  // RESERVAS VINCULADAS AL CLIENTE
+  // ==========================================
+
+  // Obtiene la primera reserva vigente del cliente para la fecha actual
   @Override
   public Reserva obtenerReservaActiva(Cliente cliente) {
     if (cliente == null) {
@@ -96,47 +92,12 @@ public class ClienteServiceImpl implements ClienteService {
     return activas.isEmpty() ? null : activas.get(0);
   }
 
-  /** {@inheritDoc} */
-  @Override
-  public Habitacion obtenerHabitacionActiva(Reserva reserva) {
-    return reserva == null ? null : reserva.getHabitacion();
-  }
-
-  /** {@inheritDoc} */
+  // Calcula la cantidad de noches de estancia entre fecha de inicio y fin
   @Override
   public long calcularNoches(Reserva reserva) {
-    if (reserva == null
-        || reserva.getFechaInicio() == null
-        || reserva.getFechaFin() == null) {
+    if (reserva == null) {
       return 0;
     }
-    return ChronoUnit.DAYS.between(reserva.getFechaInicio(), reserva.getFechaFin());
-  }
-
-  /** {@inheritDoc} */
-  @Override
-  public int contarReservasActivas(Cliente cliente) {
-    return cliente == null
-        ? 0
-        : Math.toIntExact(
-            reservaRepository.contarVigentesPorCliente(cliente, LocalDate.now()));
-  }
-
-  /** {@inheritDoc} */
-  @Override
-  public int contarHistorialReservas(Cliente cliente) {
-    return cliente == null
-        ? 0
-        : Math.toIntExact(
-            reservaRepository.contarHistoricasPorCliente(cliente, LocalDate.now()));
-  }
-
-  /** {@inheritDoc} */
-  @Override
-  public String obtenerFechaActualFormateada() {
-    String texto = FORMATO_FECHA.format(LocalDate.now());
-    return texto.isEmpty()
-        ? texto
-        : Character.toUpperCase(texto.charAt(0)) + texto.substring(1);
+    return FechaUtils.calcularNoches(reserva.getFechaInicio(), reserva.getFechaFin());
   }
 }

@@ -19,6 +19,11 @@ public class TestimonioRestController {
     @Autowired
     private TestimonioService testimonioService;
 
+    // ==========================================
+    // TESTIMONIOS DE LA LANDING PAGE
+    // ==========================================
+
+    // Retorna el listado completo de testimonios para la landing page
     @GetMapping
     public Collection<Testimonio> buscarTodos() {
         return testimonioService.buscarTodos();

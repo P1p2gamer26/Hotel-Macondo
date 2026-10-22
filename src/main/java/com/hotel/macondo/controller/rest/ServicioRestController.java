@@ -15,12 +15,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.hotel.macondo.entities.Servicio;
-import com.hotel.macondo.service.ServicioService;
 import com.hotel.macondo.errors.RecursoNoEncontradoException;
+import com.hotel.macondo.service.ServicioService;
 
-/**
- * Controlador REST para gestionar servicios.
- */
+// Controlador REST para catálogo y mantenimiento de servicios del hotel
 @RestController
 @RequestMapping("/api/servicio")
 @CrossOrigin(origins = "http://localhost:4200")
@@ -29,69 +27,59 @@ public class ServicioRestController {
     @Autowired
     private ServicioService servicioService;
 
-    /**
-     * Retorna todos los servicios.
-     *
-     * @return lista de todos los servicios
-     */
+    // ==========================================
+    // CATÁLOGO DE LANDING Y CLIENTE
+    // ==========================================
+
+    // Retorna únicamente los servicios con estado activo para el portal público
+    @GetMapping("/catalogo")
+    public List<Servicio> catalogoActivo() {
+        return servicioService.obtenerCatalogoActivo();
+    }
+
+    // Obtiene servicios destacados o recomendados para el dashboard del cliente
+    @GetMapping("/recomendaciones")
+    public List<Servicio> recomendaciones() {
+        return servicioService.obtenerRecomendaciones(3);
+    }
+
+    // Retorna servicios relacionados para la vista de detalle
+    @GetMapping("/relacionados/{id}")
+    public List<Servicio> relacionados(@PathVariable Long id) {
+        return servicioService.obtenerRelacionados(id, 2);
+    }
+
+    // ==========================================
+    // GESTIÓN ADMINISTRATIVA
+    // ==========================================
+
+    // Retorna todos los servicios sin importar su estado
     @GetMapping
     public List<Servicio> buscarTodos() {
         Collection<Servicio> servicios = servicioService.buscarTodos();
         return new ArrayList<>(servicios);
     }
 
-    /**
-     * Busca un servicio por su identificador.
-     *
-     * @param id identificador del servicio
-     * @return el servicio encontrado
-     *         Incluye los desactivados, porque el admin tambien los edita.
-     * @throws RecursoNoEncontradoException si no existe un servicio con ese id
-     */
+    // Busca un servicio por su identificador
+    // Incluye servicios inactivos para permitir LA edición del administrador
     @GetMapping("/find/{id}")
     public Servicio buscarPorId(@PathVariable Long id) {
         return servicioService.buscarPorIdIncluyendoInactivos(id);
     }
 
-    /**
-     * Retorna servicios recomendados (activos, límite 3).
-     *
-     * @return lista de servicios recomendados
-     */
-    @GetMapping("/recomendaciones")
-    public List<Servicio> recomendaciones() {
-        return servicioService.obtenerRecomendaciones(3);
-    }
-
-    /**
-     * Crea un nuevo servicio.
-     *
-     * @param servicio datos del servicio a crear
-     * @return el servicio creado
-     */
+    // Registra un nuevo servicio en el catálogo
     @PostMapping
     public Servicio crear(@RequestBody Servicio servicio) {
         return servicioService.guardar(servicio);
     }
 
-    /**
-     * Actualiza un servicio existente.
-     *
-     * @param servicio datos del servicio a actualizar
-     * @return el servicio actualizado
-     */
+    // Modifica los datos de un servicio existente
     @PutMapping
     public Servicio actualizar(@RequestBody Servicio servicio) {
         return servicioService.guardar(servicio);
     }
 
-    /**
-     * Cambia el estado de un servicio (activo/inactivo).
-     *
-     * @param id identificador del servicio
-     * @return el servicio con el estado cambiado
-     * @throws RecursoNoEncontradoException si no existe un servicio con ese id
-     */
+    // Alterna el estado activo o inactivo de un servicio
     @PutMapping("/estado/{id}")
     public Servicio cambiarEstado(@PathVariable Long id) {
         Servicio servicio = servicioService.cambiarEstado(id);
@@ -99,26 +87,5 @@ public class ServicioRestController {
             throw new RecursoNoEncontradoException("Servicio no encontrado");
         }
         return servicio;
-    }
-
-    /**
-     * Retorna solo los servicios que esten ACTIVOS para el landing
-     *
-     * @return lista de servicios activos
-     */
-    @GetMapping("/catalogo")
-    public List<Servicio> catalogoActivo() {
-        return servicioService.obtenerCatalogoActivo();
-    }
-
-    /**
-     * Retorna servicios relacionados para la ficha de detalle.
-     *
-     * @param id identificador del servicio actual
-     * @return lista de servicios relacionados
-     */
-    @GetMapping("/relacionados/{id}")
-    public List<Servicio> relacionados(@PathVariable Long id) {
-        return servicioService.obtenerRelacionados(id, 2);
     }
 }

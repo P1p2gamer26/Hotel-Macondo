@@ -1,6 +1,5 @@
 package com.hotel.macondo.service;
 
-import java.util.Collection;
 import java.util.Locale;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,9 +9,10 @@ import org.springframework.transaction.annotation.Transactional;
 import com.hotel.macondo.entities.Cliente;
 import com.hotel.macondo.entities.Rol;
 import com.hotel.macondo.entities.Usuario;
-import com.hotel.macondo.repository.UsuarioRepository;
 import com.hotel.macondo.errors.FormularioErroneoException;
+import com.hotel.macondo.repository.UsuarioRepository;
 
+// Servicio de autenticacion, credenciales y sincronizacion de usuarios
 @Service
 @Transactional
 public class UsuarioServiceImpl implements UsuarioService {
@@ -20,34 +20,11 @@ public class UsuarioServiceImpl implements UsuarioService {
   @Autowired
   private UsuarioRepository repository;
 
-  /** {@inheritDoc} */
-  @Override
-  public Collection<Usuario> buscarTodos() {
-    return repository.findAllByOrderByIdAsc();
-  }
+  // ==========================================
+  // AUTENTICACION Y CONSULTAS
+  // ==========================================
 
-  /** {@inheritDoc} */
-  @Override
-  public Usuario buscarPorCorreo(String correo) {
-    if (correo == null) {
-      return null;
-    }
-    return repository.findByCorreoIgnoreCase(normalizarCorreo(correo)).orElse(null);
-  }
-
-  /** {@inheritDoc} */
-  @Override
-  public boolean validarCorreo(String correo) {
-    return !repository.existsByCorreoIgnoreCase(normalizarCorreo(correo));
-  }
-
-  /** {@inheritDoc} */
-  @Override
-  public boolean validarContrasena(String contrasena) {
-    return contrasena != null && !contrasena.isBlank();
-  }
-
-  /** {@inheritDoc} */
+  // Valida credenciales contra la base de datos comparando correos normalizados
   @Override
   public Usuario autenticar(String correo, String contrasena) {
     if (correo == null) {
@@ -63,23 +40,32 @@ public class UsuarioServiceImpl implements UsuarioService {
     return usuario;
   }
 
-  /** {@inheritDoc} */
+  // Busca un usuario por su direccion de correo electronico
   @Override
-  public Usuario registrar(Usuario usuario) {
-    if (usuario == null || usuario.getCorreo() == null) {
+  public Usuario buscarPorCorreo(String correo) {
+    if (correo == null) {
       return null;
     }
-
-    String correoNormalizado = normalizarCorreo(usuario.getCorreo());
-    if (repository.existsByCorreoIgnoreCase(correoNormalizado)) {
-      return null;
-    }
-
-    usuario.setCorreo(correoNormalizado);
-    return repository.save(usuario);
+    return repository.findByCorreoIgnoreCase(normalizarCorreo(correo)).orElse(null);
   }
 
-  /** {@inheritDoc} */
+  // Comprueba que el correo electronico no este registrado previamente
+  @Override
+  public boolean validarCorreo(String correo) {
+    return !repository.existsByCorreoIgnoreCase(normalizarCorreo(correo));
+  }
+
+  // Valida que la contrasena cumpla con no ser nula ni estar en blanco
+  @Override
+  public boolean validarContrasena(String contrasena) {
+    return contrasena != null && !contrasena.isBlank();
+  }
+
+  // ==========================================
+  // GESTION DE ACCESOS Y CREDENCIALES
+  // ==========================================
+
+  // Crea y asocia un usuario con rol CLIENTE a la entidad cliente persistida
   @Override
   public Usuario registrarCliente(Cliente cliente, String contrasena) {
     if (cliente == null || cliente.getCorreo() == null || contrasena == null) {
@@ -96,7 +82,7 @@ public class UsuarioServiceImpl implements UsuarioService {
     return repository.save(usuario);
   }
 
-  /** {@inheritDoc} */
+  // Actualiza la clave de acceso para el correo especificado
   @Override
   public Usuario actualizarContrasena(String correo, String nuevaContrasena) {
     if (correo == null || nuevaContrasena == null || nuevaContrasena.isBlank()) {
@@ -114,7 +100,7 @@ public class UsuarioServiceImpl implements UsuarioService {
     return repository.save(usuario);
   }
 
-  /** {@inheritDoc} */
+  // Sincroniza el correo de acceso cuando el cliente actualiza su perfil
   @Override
   public Usuario actualizarCorreo(String correoPrevio, String correoNuevo) {
     if (correoPrevio == null || correoNuevo == null) {
@@ -132,20 +118,11 @@ public class UsuarioServiceImpl implements UsuarioService {
     return repository.save(usuario);
   }
 
-  /** {@inheritDoc} */
-  @Override
-  public boolean autorizar(Usuario usuario, Rol rol) {
-    return usuario != null && usuario.getRol() == rol;
-  }
+  // ==========================================
+  // METODOS AUXILIARES
+  // ==========================================
 
-  /** {@inheritDoc} */
-  @Override
-  public void eliminar(String correo) {
-    if (correo != null) {
-      repository.deleteByCorreoIgnoreCase(normalizarCorreo(correo));
-    }
-  }
-
+  // Estandariza la cadena eliminando espacios y transformando a minusculas
   private String normalizarCorreo(String correo) {
     return correo.trim().toLowerCase(Locale.ROOT);
   }

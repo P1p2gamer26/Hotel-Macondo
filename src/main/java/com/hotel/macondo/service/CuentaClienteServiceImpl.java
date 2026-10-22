@@ -16,12 +16,22 @@ public class CuentaClienteServiceImpl implements CuentaClienteService {
 
   @Autowired
   private ClienteService clienteService;
+
   @Autowired
   private UsuarioService usuarioService;
+
   @Autowired
   private ClienteRepository clienteRepository;
 
-  /** {@inheritDoc} */
+  // ==========================================
+  // REGISTRO Y CREACIÓN DE CUENTAS
+  // ==========================================
+
+  /**
+   * Registra un nuevo cliente y genera sus credenciales de usuario
+   * Valida unicidad de correo y cedula antes de persistir para evitar
+   * fallos a nivel de restriccion foranea en base de datos
+   */
   @Override
   public void crearCuenta(Cliente cliente, String contrasena) {
     String correo = cliente.getCorreo();
@@ -31,7 +41,7 @@ public class CuentaClienteServiceImpl implements CuentaClienteService {
     if (correo == null || correo.isBlank()) {
       throw new FormularioErroneoException("El correo no puede estar vacío.");
     }
-    // La cedula es unica: se valida antes de guardar para dar un mensaje claro y no un error de BD
+
     if (clienteRepository.findByCedula(cliente.getCedula()).isPresent()) {
       throw new FormularioErroneoException("Ya existe un cliente con esa cédula.");
     }
@@ -46,7 +56,12 @@ public class CuentaClienteServiceImpl implements CuentaClienteService {
     }
   }
 
-  /** {@inheritDoc} */
+  // ==========================================
+  // PERFIL Y CONTRASEÑA
+  // ==========================================
+
+  // Valida la clave actual del cliente y asigna la nueva clave si coincide
+  // con la confirmacion y cumple con las restricciones requeridas
   @Override
   public Boolean actualizarContrasena(
       Long id,
@@ -73,7 +88,8 @@ public class CuentaClienteServiceImpl implements CuentaClienteService {
     return true;
   }
 
-  /** {@inheritDoc} */
+  // Actualiza datos personales del cliente y sincroniza el correo en usuario
+  // verificando previamente que el nuevo correo no se encuentre tomado
   @Override
   public Boolean actualizarPerfil(Long id, Cliente cliente) {
     Cliente existente = clienteService.buscarPorId(id);
@@ -103,7 +119,11 @@ public class CuentaClienteServiceImpl implements CuentaClienteService {
     return clienteService.guardar(existente) != null;
   }
 
-  /** {@inheritDoc} */
+  // ==========================================
+  // BAJA DE CUENTA
+  // ==========================================
+
+  // Da de baja la cuenta del cliente
   @Override
   public Boolean eliminarCuenta(Long id) {
     Cliente cliente = clienteService.buscarPorId(id);
@@ -115,7 +135,6 @@ public class CuentaClienteServiceImpl implements CuentaClienteService {
       clienteService.eliminar(id);
       return true;
     } catch (PeticionImposible e) {
-      // Si tiene reservas asociadas no se permite eliminar y se retorna false
       return false;
     }
   }

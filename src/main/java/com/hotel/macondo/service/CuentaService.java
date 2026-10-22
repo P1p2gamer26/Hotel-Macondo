@@ -10,17 +10,8 @@ import com.hotel.macondo.entities.Servicio;
 
 public interface CuentaService {
 
-    /** Retorna todas las cuentas registradas. */
-    Collection<Cuenta> buscarTodas();
-
     /** Busca una cuenta por identificador. */
     Cuenta buscarPorId(Long id);
-
-    /** Crea o actualiza una cuenta. */
-    Cuenta guardar(Cuenta cuenta);
-
-    /** Elimina una cuenta por identificador. */
-    void eliminar(Long id);
 
     /** Agrega un servicio a una cuenta existente. */
     DetalleCuenta agregarServicio(Long cuentaId, Servicio servicio, int cantidad);

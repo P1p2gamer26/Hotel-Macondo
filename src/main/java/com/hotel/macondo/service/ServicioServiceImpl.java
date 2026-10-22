@@ -3,14 +3,14 @@ package com.hotel.macondo.service;
 import java.util.Collection;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.hotel.macondo.entities.Servicio;
-import com.hotel.macondo.repository.ServicioRepository;
 import com.hotel.macondo.errors.RecursoNoEncontradoException;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.hotel.macondo.repository.ServicioRepository;
 
 @Service
 @Transactional
@@ -19,54 +19,27 @@ public class ServicioServiceImpl implements ServicioService {
   @Autowired
   private ServicioRepository repository;
 
-  /** {@inheritDoc} */
-  @Override
-  public Collection<Servicio> buscarTodos() {
-    return repository.findAllByOrderByIdAsc();
-  }
+  // ==========================================
+  // CONSULTAS PÚBLICAS Y CLIENTE
+  // ==========================================
 
-  /** {@inheritDoc} */
-  @Override
-  public Servicio buscarPorId(Long id) {
-    Servicio servicio = repository.findById(id).orElseThrow(
-        () -> new RecursoNoEncontradoException("Servicio no encontrado"));
-
-    if (!servicio.isActivo()) {
-      throw new RecursoNoEncontradoException("Servicio no encontrado");
-    }
-
-    return servicio;
-  }
-
-  /** {@inheritDoc} */
-  @Override
-  public Servicio buscarPorIdIncluyendoInactivos(Long id) {
-    return repository.findById(id).orElseThrow(
-        () -> new RecursoNoEncontradoException("Servicio no encontrado"));
-  }
-
-  /** {@inheritDoc} */
-  @Override
-  public Servicio guardar(Servicio servicio) {
-    return repository.save(servicio);
-  }
-
-  /** {@inheritDoc} */
+  // Retorna unicamente los servicios activos para el portal publico y landing
   @Override
   public List<Servicio> obtenerCatalogoActivo() {
     return repository.findByActivoTrueOrderByIdAsc();
   }
 
-  /** {@inheritDoc} */
+  // Retorna una lista acotada de servicios activos recomendados para el cliente
   @Override
-  public List<String> obtenerCategoriasDisponibles() {
-    return obtenerCatalogoActivo().stream()
-        .map(Servicio::getCategoria)
-        .distinct()
-        .toList();
+  public List<Servicio> obtenerRecomendaciones(int limite) {
+    if (limite <= 0) {
+      return List.of();
+    }
+    return repository.findByActivoTrueOrderByIdAsc(PageRequest.of(0, limite));
   }
 
-  /** {@inheritDoc} */
+  // Retorna servicios relacionados excluyendo el servicio que se esta
+  // visualizando
   @Override
   public List<Servicio> obtenerRelacionados(Long servicioActualId, int limite) {
     if (limite <= 0) {
@@ -76,28 +49,32 @@ public class ServicioServiceImpl implements ServicioService {
         servicioActualId, PageRequest.of(0, limite));
   }
 
-  /** {@inheritDoc} */
+  // ==========================================
+  // ADMINISTRACIÓN Y MANTENIMIENTO (ADMIN)
+  // ==========================================
+
+  // Retorna la totalidad de servicios registrados ordenados por identificador
   @Override
-  public List<Servicio> obtenerRecomendaciones(int limite) {
-    if (limite <= 0) {
-      return List.of();
-    }
-    return repository.findByActivoTrueOrderByIdAsc(PageRequest.of(0, limite));
+  public Collection<Servicio> buscarTodos() {
+    return repository.findAllByOrderByIdAsc();
   }
 
-  /** {@inheritDoc} */
+  // Busca un servicio por su identificador unico sin filtrar por su estado
+  // activo, permitiendo al administrador editar elementos que esten temporalmente
+  // inactivos
   @Override
-  public long contarTodos() {
-    return repository.count();
+  public Servicio buscarPorIdIncluyendoInactivos(Long id) {
+    return repository.findById(id).orElseThrow(
+        () -> new RecursoNoEncontradoException("Servicio no encontrado"));
   }
 
-  /** {@inheritDoc} */
+  // Guarda o actualiza un servicio en la base de datos
   @Override
-  public long contarActivos() {
-    return repository.countByActivoTrue();
+  public Servicio guardar(Servicio servicio) {
+    return repository.save(servicio);
   }
 
-  /** {@inheritDoc} */
+  // Alterna el estado de activacion del servicio
   @Override
   public Servicio cambiarEstado(Long id) {
     Servicio servicio = repository.findById(id).orElse(null);

@@ -9,9 +9,6 @@ import com.hotel.macondo.errors.FormularioErroneoException;
 
 public interface UsuarioService {
 
-    /** Retorna todos los usuarios registrados. */
-    Collection<Usuario> buscarTodos();
-
     /** Busca un usuario por correo. */
     Usuario buscarPorCorreo(String correo);
 
@@ -21,14 +18,13 @@ public interface UsuarioService {
     /** Valida que una contraseña se pueda usar. */
     boolean validarContrasena(String contrasena);
 
-    /** Valida las credenciales y retorna el usuario autenticado. 
+    /**
+     * Valida las credenciales y retorna el usuario autenticado.
      *
-     * @throws FormularioErroneoException si el correo o la contraseña no son validos
+     * @throws FormularioErroneoException si el correo o la contraseña no son
+     *                                    validos
      */
     Usuario autenticar(String correo, String contrasena);
-
-    /** Registra un usuario cuando el correo no esta en uso. */
-    Usuario registrar(Usuario usuario);
 
     /** Registrar a un usuario con el rol de cliente. */
     Usuario registrarCliente(Cliente cliente, String contraseña);
@@ -39,9 +35,4 @@ public interface UsuarioService {
     /** Actualiza el correo tomando el correo previo */
     Usuario actualizarCorreo(String correoPrevio, String correoNuevo);
 
-    /** Verifica que el usuario tenga el rol solicitado. */
-    boolean autorizar(Usuario usuario, Rol rol);
-
-    /** Elimina un usuario por correo*/
-    void eliminar(String correo);
 }

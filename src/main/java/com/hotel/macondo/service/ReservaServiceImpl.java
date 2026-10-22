@@ -1,21 +1,5 @@
 package com.hotel.macondo.service;
 
-import com.hotel.macondo.entities.Cliente;
-import com.hotel.macondo.entities.Cuenta;
-import com.hotel.macondo.entities.DetalleCuenta;
-import com.hotel.macondo.entities.Habitacion;
-import com.hotel.macondo.entities.Reserva;
-import com.hotel.macondo.entities.TipoHabitacion;
-import com.hotel.macondo.dto.ReservaOperadorResponse;
-import com.hotel.macondo.dto.ReservaDetalleOperadorResponse;
-import com.hotel.macondo.errors.FormularioErroneoException;
-import com.hotel.macondo.errors.PeticionImposible;
-import com.hotel.macondo.errors.RecursoNoEncontradoException;
-import com.hotel.macondo.repository.ClienteRepository;
-import com.hotel.macondo.repository.CuentaRepository;
-import com.hotel.macondo.repository.HabitacionRepository;
-import com.hotel.macondo.repository.ReservaRepository;
-import com.hotel.macondo.repository.TipoHabitacionRepository;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -25,60 +9,250 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.AutoConfigureOrder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.hotel.macondo.dto.ReservaDetalleOperadorResponse;
+import com.hotel.macondo.dto.ReservaOperadorResponse;
+import com.hotel.macondo.entities.Cliente;
+import com.hotel.macondo.entities.Cuenta;
+import com.hotel.macondo.entities.DetalleCuenta;
+import com.hotel.macondo.entities.Habitacion;
+import com.hotel.macondo.entities.Reserva;
+import com.hotel.macondo.entities.TipoHabitacion;
+import com.hotel.macondo.errors.FormularioErroneoException;
+import com.hotel.macondo.errors.PeticionImposible;
+import com.hotel.macondo.errors.RecursoNoEncontradoException;
+import com.hotel.macondo.repository.ClienteRepository;
+import com.hotel.macondo.repository.CuentaRepository;
+import com.hotel.macondo.repository.HabitacionRepository;
+import com.hotel.macondo.repository.ReservaRepository;
+import com.hotel.macondo.repository.TipoHabitacionRepository;
+import com.hotel.macondo.utils.FechaUtils;
 
 @Service
 @Transactional
 public class ReservaServiceImpl implements ReservaService {
 
-  private static final List<String> ESTADOS_ACTIVOS = List.of("ACTIVA", "CONFIRMADA", "PENDIENTE");
-  private static final List<String> ESTADOS_HISTORICOS = List.of("FINALIZADA", "CANCELADA");
   private static final List<String> ESTADOS_QUE_OCUPAN_HABITACION = List.of("ACTIVA", "CONFIRMADA", "PENDIENTE");
 
   @Autowired
   private ReservaRepository reservaRepository;
+
   @Autowired
   private ClienteRepository clienteRepository;
+
   @Autowired
   private TipoHabitacionRepository tipoHabitacionRepository;
+
   @Autowired
   private HabitacionRepository habitacionRepository;
+
   @Autowired
   private CuentaRepository cuentaRepository;
 
-  /** {@inheritDoc} */
+  // ==========================================
+  // OPERACIONES DEL CLIENTE
+  // ==========================================
+
+  // Retorna las reservas vigentes asociadas a un cliente especifico
   @Override
-  @Transactional(readOnly = true)
-  public List<Reserva> buscarTodas() {
-    return reservaRepository.findAllByOrderByIdAsc();
+  public List<Reserva> buscarActivasDeCliente(Cliente cliente) {
+    return cliente == null
+        ? List.of()
+        : reservaRepository.buscarVigentesPorCliente(cliente, LocalDate.now());
   }
 
-  /** {@inheritDoc} */
+  // Retorna el historial de reservas finalizadas o canceladas de un cliente
+  @Override
+  public List<Reserva> buscarHistorialDeCliente(Cliente cliente) {
+    return cliente == null
+        ? List.of()
+        : reservaRepository.buscarHistoricasPorCliente(cliente, LocalDate.now());
+  }
+
+  // Consulta disponibilidad para una reserva nueva delegando con reserva nula -
+  // método de sobrecarga
+  @Override
+  public List<Habitacion> consultarDisponibilidad(
+      Long tipoId,
+      String fechaEntrada,
+      String fechaSalida,
+      Integer cantidadPersonas) {
+    return consultarDisponibilidad(null, tipoId, fechaEntrada, fechaSalida, cantidadPersonas);
+  }
+
+  /**
+   * Consulta las habitaciones libres de un tipo para un rango de fechas.
+   * Si se recibe una reserva existente, excluye su identificador para evitar
+   * falsos positivos de ocupacion al modificar fechas de esa misma reserva.
+   */
+  @Override
+  public List<Habitacion> consultarDisponibilidad(
+      Reserva reserva,
+      Long tipoId,
+      String fechaEntrada,
+      String fechaSalida,
+      Integer cantidadPersonas) {
+    LocalDate entrada = FechaUtils.convertirFecha(fechaEntrada, "entrada");
+    LocalDate salida = FechaUtils.convertirFecha(fechaSalida, "salida");
+    validarDatosReserva(tipoId, entrada, salida, cantidadPersonas);
+    TipoHabitacion tipo = buscarTipo(tipoId);
+    if (tipo.getCapacidadPersonas() < cantidadPersonas) {
+      return List.of();
+    }
+    return buscarHabitacionesDisponibles(
+        tipoId,
+        entrada,
+        salida,
+        cantidadPersonas,
+        reserva == null ? null : reserva.getId());
+  }
+
+  // Obtiene una reserva futura del cliente para precargar su formulario de
+  // edicion
   @Override
   @Transactional(readOnly = true)
+  public Reserva buscarParaModificar(Long clienteId, Long reservaId) {
+    Reserva reserva = buscarReservaDelCliente(clienteId, reservaId);
+    validarReservaFutura(reserva);
+    return reserva;
+  }
+
+  // Genera una nueva reserva confirmada asignando la primera habitacion
+  // disponible y abre su cuenta hotelera asociada dentro de la misma transaccion
+
+  @Override
+  public Reserva crear(
+      Long clienteId,
+      Long tipoId,
+      String fechaEntrada,
+      String fechaSalida,
+      Integer cantidadPersonas) {
+    LocalDate entrada = FechaUtils.convertirFecha(fechaEntrada, "entrada");
+    LocalDate salida = FechaUtils.convertirFecha(fechaSalida, "salida");
+    Cliente cliente = buscarCliente(clienteId);
+    validarDatosReserva(tipoId, entrada, salida, cantidadPersonas);
+    TipoHabitacion tipo = buscarTipo(tipoId);
+    validarCapacidad(tipo, cantidadPersonas);
+
+    Habitacion habitacion = obtenerPrimeraDisponible(tipoId, entrada, salida, cantidadPersonas, null);
+    BigDecimal precioNoche = tipo.getPrecioNoche();
+    BigDecimal total = calcularTotal(precioNoche, entrada, salida);
+
+    Reserva reserva = new Reserva(
+        generarNumeroReserva(),
+        entrada,
+        salida,
+        cantidadPersonas,
+        "CONFIRMADA",
+        precioNoche,
+        total);
+    reserva.asignarCliente(cliente);
+    reserva.asignarHabitacion(habitacion);
+    reservaRepository.save(reserva);
+
+    Cuenta cuenta = new Cuenta("ABIERTA", total, LocalDateTime.now());
+    cuenta.asignarReserva(reserva);
+    cuentaRepository.save(cuenta);
+
+    return reserva;
+  }
+
+  // Modifica fechas o capacidad de una reserva futura y actualiza el total
+  // de la cuenta abierta conservando los consumos de servicios previos
+  @Override
+  public Reserva modificar(
+      Long clienteId,
+      Long reservaId,
+      Long tipoId,
+      String fechaEntrada,
+      String fechaSalida,
+      Integer cantidadPersonas) {
+    LocalDate entrada = FechaUtils.convertirFecha(fechaEntrada, "entrada");
+    LocalDate salida = FechaUtils.convertirFecha(fechaSalida, "salida");
+    Reserva reserva = buscarReservaDelCliente(clienteId, reservaId);
+    validarReservaFutura(reserva);
+    validarDatosReserva(tipoId, entrada, salida, cantidadPersonas);
+    TipoHabitacion tipo = buscarTipo(tipoId);
+    validarCapacidad(tipo, cantidadPersonas);
+
+    Habitacion habitacion = obtenerPrimeraDisponible(
+        tipoId,
+        entrada,
+        salida,
+        cantidadPersonas,
+        reserva.getId());
+    BigDecimal precioNoche = tipo.getPrecioNoche();
+    BigDecimal total = calcularTotal(precioNoche, entrada, salida);
+
+    reserva.setFechaInicio(entrada);
+    reserva.setFechaFin(salida);
+    reserva.setCantidadPersonas(cantidadPersonas);
+    reserva.setPrecioNoche(precioNoche);
+    reserva.setTotal(total);
+    reserva.asignarHabitacion(habitacion);
+    actualizarCuentaAbierta(reserva);
+
+    return reservaRepository.save(reserva);
+  }
+
+  // Cancela una reserva futura perteneciente al cliente
+  @Override
+  public Reserva cancelar(Long clienteId, Long reservaId) {
+    Reserva reserva = buscarReservaDelCliente(clienteId, reservaId);
+    return cancelarReserva(reserva);
+  }
+
+  // ==========================================
+  // OPERACIONES DEL OPERADOR
+  // ==========================================
+
+  // Retorna todas las reservas proyectadas en DTO resumido para el operador
+  @Override
   public List<ReservaOperadorResponse> obtenerTodasParaOperador() {
     return reservaRepository.findAllByOrderByIdAsc().stream()
         .map(this::convertirARespuestaOperador)
         .toList();
   }
 
-  /** {@inheritDoc} */
+  // Cancela una reserva desde el panel del operador y devuelve el DTO resumido
   @Override
   public ReservaOperadorResponse cancelarParaOperador(String numeroReserva) {
     return convertirARespuestaOperador(cancelar(numeroReserva));
   }
 
-  /** {@inheritDoc} */
+  // Cancela una reserva buscada por su numero publico
+  @Override
+  public Reserva cancelar(String numeroReserva) {
+    Reserva reserva = reservaRepository
+        .findByNumeroReserva(numeroReserva)
+        .orElseThrow(() -> new RecursoNoEncontradoException("No se encontró la reserva " + numeroReserva));
+    return cancelarReserva(reserva);
+  }
+
+  // Obtiene la reserva con sus detalles
+  @Override
+  @Transactional(readOnly = true)
+  public Reserva obtenerDetalle(String numeroReserva) {
+    Reserva reserva = reservaRepository
+        .buscarDetalleCompleto(numeroReserva)
+        .orElseThrow(() -> new RecursoNoEncontradoException("No existe la reserva " + numeroReserva));
+
+    if (reserva.getCuenta() != null) {
+      reserva.getCuenta().getPagos().size();
+    }
+    return reserva;
+  }
+
+  // Retorna el desglose de una reserva en el apartado de detalle
   @Override
   @Transactional(readOnly = true)
   public ReservaDetalleOperadorResponse obtenerDetalleParaOperador(String numeroReserva) {
     Reserva reserva = obtenerDetalle(numeroReserva);
     Cliente cliente = reserva.getCliente();
     Habitacion habitacion = reserva.getHabitacion();
-    TipoHabitacion tipoHabitacion =
-        habitacion == null ? null : habitacion.getTipoHabitacion();
+    TipoHabitacion tipoHabitacion = habitacion == null ? null : habitacion.getTipoHabitacion();
     Cuenta cuenta = reserva.getCuenta();
 
     return new ReservaDetalleOperadorResponse(
@@ -144,11 +318,130 @@ public class ReservaServiceImpl implements ReservaService {
                     .toList()));
   }
 
+  // ==========================================
+  // DISPONIBILIDAD Y CONSULTAS INTERNAS
+  // ==========================================
+
+  // Consulta en repositorio las habitaciones que no presenten cruce de fechas
+  private List<Habitacion> buscarHabitacionesDisponibles(
+      Long tipoId,
+      LocalDate fechaEntrada,
+      LocalDate fechaSalida,
+      Integer cantidadPersonas,
+      Long reservaExcluidaId) {
+    return habitacionRepository.buscarDisponibles(
+        tipoId,
+        fechaEntrada,
+        fechaSalida,
+        cantidadPersonas,
+        ESTADOS_QUE_OCUPAN_HABITACION,
+        reservaExcluidaId);
+  }
+
+  // Retorna la primera habitacion disponible
+  private Habitacion obtenerPrimeraDisponible(
+      Long tipoId,
+      LocalDate fechaEntrada,
+      LocalDate fechaSalida,
+      Integer cantidadPersonas,
+      Long reservaExcluidaId) {
+    return buscarHabitacionesDisponibles(
+        tipoId,
+        fechaEntrada,
+        fechaSalida,
+        cantidadPersonas,
+        reservaExcluidaId)
+        .stream()
+        .findFirst()
+        .orElseThrow(() -> new PeticionImposible("No hay habitaciones disponibles para las fechas seleccionadas."));
+  }
+
+  // Busca el cliente por id
+  private Cliente buscarCliente(Long clienteId) {
+    return clienteRepository
+        .findById(clienteId)
+        .orElseThrow(() -> new RecursoNoEncontradoException("No se encontró cliente con id " + clienteId));
+  }
+
+  // Busca el tipo de habitacion por id
+  private TipoHabitacion buscarTipo(Long tipoId) {
+    return tipoHabitacionRepository
+        .findById(tipoId)
+        .orElseThrow(() -> new RecursoNoEncontradoException("No se encontró el tipo de habitación seleccionado."));
+  }
+
+  // Valida que la reserva exista y que pertenezca al cliente especificado
+  private Reserva buscarReservaDelCliente(Long clienteId, Long reservaId) {
+    Reserva reserva = reservaRepository
+        .findById(reservaId)
+        .orElseThrow(() -> new RecursoNoEncontradoException("No se encontró la reserva."));
+    if (reserva.getCliente() == null || !reserva.getCliente().getId().equals(clienteId)) {
+      throw new RecursoNoEncontradoException("La reserva no pertenece al cliente indicado.");
+    }
+    return reserva;
+  }
+
+  // ==========================================
+  // GESTIÓN DE CUENTA Y TOTALES
+  // ==========================================
+
+  // Cancela la reserva y anula el saldo de la cuenta si continua abierta
+  private Reserva cancelarReserva(Reserva reserva) {
+    validarReservaFutura(reserva);
+    reserva.setEstado("CANCELADA");
+    Cuenta cuenta = reserva.getCuenta();
+    if (cuenta != null && "ABIERTA".equalsIgnoreCase(cuenta.getEstado())) {
+      cuenta.setEstado("CANCELADA");
+      cuenta.setTotal(BigDecimal.ZERO);
+      cuentaRepository.save(cuenta);
+    }
+    return reservaRepository.save(reserva);
+  }
+
+  // Recalcula el total de la cuenta abierta sumando alojamiento y consumos
+  private void actualizarCuentaAbierta(Reserva reserva) {
+    Cuenta cuenta = reserva.getCuenta();
+    if (cuenta == null || !"ABIERTA".equalsIgnoreCase(cuenta.getEstado())) {
+      return;
+    }
+    BigDecimal totalServicios = cuenta.getDetalles().stream()
+        .map(this::calcularSubtotal)
+        .reduce(BigDecimal.ZERO, BigDecimal::add);
+    cuenta.setTotal(reserva.getTotal().add(totalServicios));
+    cuentaRepository.save(cuenta);
+  }
+
+  // Multiplica el precio por la cantidad de consumos del detalle
+  private BigDecimal calcularSubtotal(DetalleCuenta detalle) {
+    if (detalle == null
+        || detalle.getPrecio() == null
+        || detalle.getCantidad() == null
+        || detalle.getCantidad() <= 0) {
+      return BigDecimal.ZERO;
+    }
+    return detalle.getPrecio().multiply(BigDecimal.valueOf(detalle.getCantidad()));
+  }
+
+  // Multiplica el costo de la noche por la cantidad de dias de estadia
+  private BigDecimal calcularTotal(BigDecimal precioNoche, LocalDate fechaEntrada, LocalDate fechaSalida) {
+    long noches = ChronoUnit.DAYS.between(fechaEntrada, fechaSalida);
+    return precioNoche.multiply(BigDecimal.valueOf(noches));
+  }
+
+  // Genera un codigo unico de reserva con prefijo MCD
+  private String generarNumeroReserva() {
+    String numero;
+    do {
+      numero = "MCD-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+    } while (reservaRepository.existsByNumeroReserva(numero));
+    return numero;
+  }
+
+  // Mapea una entidad reserva de respuesta para operador
   private ReservaOperadorResponse convertirARespuestaOperador(Reserva reserva) {
     Cliente cliente = reserva.getCliente();
     Habitacion habitacion = reserva.getHabitacion();
-    TipoHabitacion tipoHabitacion =
-        habitacion == null ? null : habitacion.getTipoHabitacion();
+    TipoHabitacion tipoHabitacion = habitacion == null ? null : habitacion.getTipoHabitacion();
 
     return new ReservaOperadorResponse(
         reserva.getId(),
@@ -175,395 +468,47 @@ public class ReservaServiceImpl implements ReservaService {
                         tipoHabitacion.getId(), tipoHabitacion.getNombre())));
   }
 
-  /** {@inheritDoc} */
-  @Override
-  @Transactional(readOnly = true)
-  public List<Reserva> obtenerReservasActivas() {
-    return reservaRepository.findByEstadoInOrderByIdAsc(ESTADOS_ACTIVOS);
-  }
+  // ==========================================
+  // VALIDACIONES
+  // ==========================================
 
-  /** {@inheritDoc} */
-  @Override
-  public List<Reserva> obtenerHistorial() {
-    return reservaRepository.findByEstadoInOrderByIdAsc(ESTADOS_HISTORICOS);
-  }
-
-  /** {@inheritDoc} */
-  @Override
-  public Reserva buscarPorId(String numeroReserva) {
-    return reservaRepository.findByNumeroReserva(numeroReserva).orElse(null);
-  }
-
-  /** {@inheritDoc} */
-  @Override
-  public List<Reserva> buscarActivasDeCliente(Cliente cliente) {
-    return cliente == null
-        ? List.of()
-        : reservaRepository.buscarVigentesPorCliente(cliente, LocalDate.now());
-  }
-
-  /** {@inheritDoc} */
-  @Override
-  public List<Reserva> buscarHistorialDeCliente(Cliente cliente) {
-    return cliente == null
-        ? List.of()
-        : reservaRepository.buscarHistoricasPorCliente(cliente, LocalDate.now());
-  }
-
-  /** {@inheritDoc} */
-  @Override
-  @Transactional(readOnly = true)
-  public long contarPorEstado(List<Reserva> reservas, String estado) {
-    if (reservas == null || estado == null) {
-      return 0;
-    }
-    return reservas.stream()
-        .filter(reserva -> estado.equalsIgnoreCase(reserva.getEstado()))
-        .count();
-  }
-
-  /** {@inheritDoc} */
-  @Override
-  @Transactional(readOnly = true)
-  public Reserva obtenerDetalle(String numeroReserva) {
-    Reserva reserva = reservaRepository
-        .buscarDetalleCompleto(numeroReserva)
-        .orElseThrow(
-            () -> new RecursoNoEncontradoException("No existe la reserva " + numeroReserva));
-    // Los pagos no van en el JOIN FETCH (ver repositorio); se cargan aqui
-    // dentro de la transaccion para que la vista pueda recorrerlos.
-    if (reserva.getCuenta() != null) {
-      reserva.getCuenta().getPagos().size();
-    }
-    return reserva;
-  }
-
-  /** {@inheritDoc} */
-  @Override
-  @Transactional(readOnly = true)
-  public long calcularNoches(List<Reserva> reservas) {
-    if (reservas == null) {
-      return 0;
-    }
-    return reservas.stream()
-        .filter(
-            reserva -> reserva.getFechaInicio() != null && reserva.getFechaFin() != null)
-        .mapToLong(
-            reserva -> ChronoUnit.DAYS.between(
-                reserva.getFechaInicio(), reserva.getFechaFin()))
-        .sum();
-  }
-
-  /** {@inheritDoc} */
-  @Override
-  @Transactional(readOnly = true)
-  public List<Habitacion> consultarDisponibilidad(
-      Long tipoId,
-      String fechaEntrada,
-      String fechaSalida,
-      Integer cantidadPersonas) {
-    return consultarDisponibilidad(
-        null,
-        tipoId,
-        fechaEntrada,
-        fechaSalida,
-        cantidadPersonas);
-  }
-
-  /** {@inheritDoc} */
-  @Override
-  @Transactional(readOnly = true)
-  public List<Habitacion> consultarDisponibilidad(
-      Reserva reserva,
-      Long tipoId,
-      String fechaEntrada,
-      String fechaSalida,
-      Integer cantidadPersonas) {
-    LocalDate entrada = convertirFecha(fechaEntrada, "entrada");
-    LocalDate salida = convertirFecha(fechaSalida, "salida");
-    validarDatosReserva(tipoId, entrada, salida, cantidadPersonas);
-    TipoHabitacion tipo = buscarTipo(tipoId);
-    if (tipo.getCapacidadPersonas() < cantidadPersonas) {
-      return List.of();
-    }
-    return buscarHabitacionesDisponibles(
-        tipoId,
-        entrada,
-        salida,
-        cantidadPersonas,
-        reserva == null ? null : reserva.getId());
-  }
-
-  /** {@inheritDoc} */
-  @Override
-  @Transactional(readOnly = true)
-  public Reserva buscarParaModificar(Long clienteId, Long reservaId) {
-    Reserva reserva = buscarReservaDelCliente(clienteId, reservaId);
-    validarReservaFutura(reserva);
-    return reserva;
-  }
-
-  /** {@inheritDoc} */
-  @Override
-  public Reserva crear(
-      Long clienteId,
-      Long tipoId,
-      String fechaEntrada,
-      String fechaSalida,
-      Integer cantidadPersonas) {
-    LocalDate entrada = convertirFecha(fechaEntrada, "entrada");
-    LocalDate salida = convertirFecha(fechaSalida, "salida");
-    Cliente cliente = buscarCliente(clienteId);
-    validarDatosReserva(tipoId, entrada, salida, cantidadPersonas);
-    TipoHabitacion tipo = buscarTipo(tipoId);
-    validarCapacidad(tipo, cantidadPersonas);
-
-    Habitacion habitacion = obtenerPrimeraDisponible(
-      tipoId, entrada, salida, cantidadPersonas, null);
-    BigDecimal precioNoche = tipo.getPrecioNoche();
-    BigDecimal total = calcularTotal(precioNoche, entrada, salida);
-
-    Reserva reserva = new Reserva(
-        generarNumeroReserva(),
-        entrada,
-        salida,
-        cantidadPersonas,
-        "CONFIRMADA",
-        precioNoche,
-        total);
-    reserva.asignarCliente(cliente);
-    reserva.asignarHabitacion(habitacion);
-    reservaRepository.save(reserva);
-
-    Cuenta cuenta = new Cuenta("ABIERTA", total, LocalDateTime.now());
-    cuenta.asignarReserva(reserva);
-    cuentaRepository.save(cuenta);
-    return reserva;
-  }
-
-  /** {@inheritDoc} */
-  @Override
-  public Reserva modificar(
-      Long clienteId,
-      Long reservaId,
-      Long tipoId,
-      String fechaEntrada,
-      String fechaSalida,
-      Integer cantidadPersonas) {
-    LocalDate entrada = convertirFecha(fechaEntrada, "entrada");
-    LocalDate salida = convertirFecha(fechaSalida, "salida");
-    Reserva reserva = buscarReservaDelCliente(clienteId, reservaId);
-    validarReservaFutura(reserva);
-    validarDatosReserva(tipoId, entrada, salida, cantidadPersonas);
-    TipoHabitacion tipo = buscarTipo(tipoId);
-    validarCapacidad(tipo, cantidadPersonas);
-
-    Habitacion habitacion = obtenerPrimeraDisponible(
-        tipoId,
-        entrada,
-        salida,
-        cantidadPersonas,
-        reserva.getId());
-    BigDecimal precioNoche = tipo.getPrecioNoche();
-    BigDecimal total = calcularTotal(precioNoche, entrada, salida);
-
-    reserva.setFechaInicio(entrada);
-    reserva.setFechaFin(salida);
-    reserva.setCantidadPersonas(cantidadPersonas);
-    reserva.setPrecioNoche(precioNoche);
-    reserva.setTotal(total);
-    reserva.asignarHabitacion(habitacion);
-    actualizarCuentaAbierta(reserva);
-    return reservaRepository.save(reserva);
-  }
-
-  /** {@inheritDoc} */
-  @Override
-  public Reserva cancelar(Long clienteId, Long reservaId) {
-    Reserva reserva = buscarReservaDelCliente(clienteId, reservaId);
-    return cancelarReserva(reserva);
-  }
-
-  /** {@inheritDoc} */
-  @Override
-  public Reserva cancelar(String numeroReserva) {
-    Reserva reserva = reservaRepository
-        .findByNumeroReserva(numeroReserva)
-        .orElseThrow(
-            () -> new RecursoNoEncontradoException(
-                "No se encontró la reserva " + numeroReserva));
-    return cancelarReserva(reserva);
-  }
-
-  private List<Habitacion> buscarHabitacionesDisponibles(
-      Long tipoId,
-      LocalDate fechaEntrada,
-      LocalDate fechaSalida,
-      Integer cantidadPersonas,
-      Long reservaExcluidaId) {
-    return habitacionRepository.buscarDisponibles(
-        tipoId,
-        fechaEntrada,
-        fechaSalida,
-        cantidadPersonas,
-        ESTADOS_QUE_OCUPAN_HABITACION,
-        reservaExcluidaId);
-  }
-
-  private Habitacion obtenerPrimeraDisponible(
-      Long tipoId,
-      LocalDate fechaEntrada,
-      LocalDate fechaSalida,
-      Integer cantidadPersonas,
-      Long reservaExcluidaId) {
-    return buscarHabitacionesDisponibles(
-        tipoId,
-        fechaEntrada,
-        fechaSalida,
-        cantidadPersonas,
-        reservaExcluidaId)
-        .stream()
-        .findFirst()
-        .orElseThrow(
-            () -> new PeticionImposible(
-                "No hay habitaciones disponibles para las fechas seleccionadas."));
-  }
-
+  // Valida que los datos requeridos de reserva no sean nulos ni presenten fechas
+  // incoherentes
   private void validarDatosReserva(
       Long tipoId,
       LocalDate fechaEntrada,
       LocalDate fechaSalida,
       Integer cantidadPersonas) {
-    if (tipoId == null
-        || fechaEntrada == null
-        || fechaSalida == null
-        || cantidadPersonas == null) {
-      throw new FormularioErroneoException(
-          "Tipo, fechas y cantidad de personas son obligatorios.");
+    if (tipoId == null || fechaEntrada == null || fechaSalida == null || cantidadPersonas == null) {
+      throw new FormularioErroneoException("Tipo, fechas y cantidad de personas son obligatorios.");
     }
     if (fechaEntrada.isBefore(LocalDate.now())) {
-      throw new FormularioErroneoException(
-          "La fecha de entrada no puede estar en el pasado.");
+      throw new FormularioErroneoException("La fecha de entrada no puede estar en el pasado.");
     }
     if (!fechaSalida.isAfter(fechaEntrada)) {
-      throw new FormularioErroneoException(
-          "La fecha de salida debe ser posterior a la fecha de entrada.");
+      throw new FormularioErroneoException("La fecha de salida debe ser posterior a la fecha de entrada.");
     }
     if (cantidadPersonas <= 0) {
-      throw new FormularioErroneoException(
-          "La cantidad de personas debe ser mayor que cero.");
+      throw new FormularioErroneoException("La cantidad de personas debe ser mayor que cero.");
     }
   }
 
-  private LocalDate convertirFecha(String fecha, String nombreCampo) {
-    try {
-      if (fecha == null || fecha.isBlank()) {
-        throw new DateTimeParseException("Fecha vacía", fecha == null ? "" : fecha, 0);
-      }
-      return LocalDate.parse(fecha);
-    } catch (DateTimeParseException ex) {
-      throw new FormularioErroneoException(
-          "La fecha de " + nombreCampo + " no tiene un formato válido.");
-    }
-  }
-
+  // Comprueba que la capacidad maxima del tipo de habitacion admita a los
+  // huespedes
   private void validarCapacidad(TipoHabitacion tipo, Integer cantidadPersonas) {
     if (tipo.getCapacidadPersonas() < cantidadPersonas) {
-      throw new PeticionImposible(
-          "El tipo de habitación no admite la cantidad de personas indicada.");
+      throw new PeticionImposible("El tipo de habitación no admite la cantidad de personas indicada.");
     }
   }
 
+  // Valida que la reserva no haya iniciado y que su estado no sea finalizada ni
+  // cancelada
   private void validarReservaFutura(Reserva reserva) {
-    if (reserva.getFechaInicio() == null
-        || !reserva.getFechaInicio().isAfter(LocalDate.now())) {
-      throw new PeticionImposible(
-          "Solo se pueden modificar o cancelar reservas que aún no han iniciado.");
+    if (reserva.getFechaInicio() == null || !reserva.getFechaInicio().isAfter(LocalDate.now())) {
+      throw new PeticionImposible("Solo se pueden modificar o cancelar reservas que aún no han iniciado.");
     }
-    if ("CANCELADA".equalsIgnoreCase(reserva.getEstado())
-        || "FINALIZADA".equalsIgnoreCase(reserva.getEstado())) {
+    if ("CANCELADA".equalsIgnoreCase(reserva.getEstado()) || "FINALIZADA".equalsIgnoreCase(reserva.getEstado())) {
       throw new PeticionImposible("La reserva ya no se encuentra activa.");
     }
-  }
-
-  private Cliente buscarCliente(Long clienteId) {
-    return clienteRepository
-        .findById(clienteId)
-        .orElseThrow(
-            () -> new RecursoNoEncontradoException(
-                "No se encontró cliente con id " + clienteId));
-  }
-
-  private TipoHabitacion buscarTipo(Long tipoId) {
-    return tipoHabitacionRepository
-        .findById(tipoId)
-        .orElseThrow(
-            () -> new RecursoNoEncontradoException(
-                "No se encontró el tipo de habitación seleccionado."));
-  }
-
-  private Reserva buscarReservaDelCliente(Long clienteId, Long reservaId) {
-    Reserva reserva = reservaRepository
-        .findById(reservaId)
-        .orElseThrow(
-            () -> new RecursoNoEncontradoException("No se encontró la reserva."));
-    if (reserva.getCliente() == null
-        || !reserva.getCliente().getId().equals(clienteId)) {
-      throw new RecursoNoEncontradoException(
-          "La reserva no pertenece al cliente indicado.");
-    }
-    return reserva;
-  }
-
-  private Reserva cancelarReserva(Reserva reserva) {
-    validarReservaFutura(reserva);
-    reserva.setEstado("CANCELADA");
-    Cuenta cuenta = reserva.getCuenta();
-    if (cuenta != null && "ABIERTA".equalsIgnoreCase(cuenta.getEstado())) {
-      cuenta.setEstado("CANCELADA");
-      cuenta.setTotal(BigDecimal.ZERO);
-      cuentaRepository.save(cuenta);
-    }
-    return reservaRepository.save(reserva);
-  }
-
-  private void actualizarCuentaAbierta(Reserva reserva) {
-    Cuenta cuenta = reserva.getCuenta();
-    if (cuenta == null || !"ABIERTA".equalsIgnoreCase(cuenta.getEstado())) {
-      return;
-    }
-    BigDecimal totalServicios = cuenta.getDetalles().stream()
-        .map(this::calcularSubtotal)
-        .reduce(BigDecimal.ZERO, BigDecimal::add);
-    cuenta.setTotal(reserva.getTotal().add(totalServicios));
-    cuentaRepository.save(cuenta);
-  }
-
-  private BigDecimal calcularSubtotal(DetalleCuenta detalle) {
-    if (detalle == null
-        || detalle.getPrecio() == null
-        || detalle.getCantidad() == null
-        || detalle.getCantidad() <= 0) {
-      return BigDecimal.ZERO;
-    }
-    return detalle.getPrecio().multiply(BigDecimal.valueOf(detalle.getCantidad()));
-  }
-
-  private BigDecimal calcularTotal(
-      BigDecimal precioNoche, LocalDate fechaEntrada, LocalDate fechaSalida) {
-    long noches = ChronoUnit.DAYS.between(fechaEntrada, fechaSalida);
-    return precioNoche.multiply(BigDecimal.valueOf(noches));
-  }
-
-  private String generarNumeroReserva() {
-    String numero;
-    do {
-      numero = "MCD-"
-          + UUID.randomUUID()
-              .toString()
-              .substring(0, 8)
-              .toUpperCase();
-    } while (reservaRepository.existsByNumeroReserva(numero));
-    return numero;
   }
 }

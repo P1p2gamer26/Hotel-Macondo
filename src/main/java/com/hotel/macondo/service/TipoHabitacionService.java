@@ -9,13 +9,11 @@ public interface TipoHabitacionService {
     // Busca todos los tipos de habitacion ordenados por ID.
     Collection<TipoHabitacion> buscarTodos();
 
-    // Busca los tipos que admiten al menos la cantidad indicada de personas.
-    Collection<TipoHabitacion> buscarPorPersonas(int personas);
-
     /**
      * Busca un tipo de habitacion por su ID.
      *
-     * @throws RecursoNoEncontradoException si el tipo de habitacion no es encontrado
+     * @throws RecursoNoEncontradoException si el tipo de habitacion no es
+     *                                      encontrado
      */
     TipoHabitacion buscarPorId(Long id);
 
@@ -25,7 +23,8 @@ public interface TipoHabitacionService {
     /**
      * Elimina un tipo de habitacion solo si no hay habitaciones asignadas.
      * 
-     * @throws PeticionImposible si el tipo de habitacion tiene habitaciones asignadas
+     * @throws PeticionImposible si el tipo de habitacion tiene habitaciones
+     *                           asignadas
      */
     void eliminar(Long id);
 }

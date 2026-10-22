@@ -30,18 +30,6 @@ public interface HabitacionService {
     /** Busca una habitacion por su etiqueta operativa. */
     Habitacion buscarPorNombre(String nombre);
 
-    /** Filtra las habitaciones que admiten la cantidad de personas indicada. */
-    Collection<Habitacion> buscarPorPersonas(int personas);
-
-    /** Cuenta todas las habitaciones registradas. */
-    long contarTodas();
-
-    /** Cuenta las habitaciones que estan disponibles para reservar. */
-    long contarDisponibles();
-
-    /** Localiza la primera unidad fisica disponible del tipo solicitado. */
-    Habitacion buscarDisponiblePorTipo(Long idTipo);
-
     /**
      * Crea o actualiza una habitacion asignandole un tipo de habitacion por
      * su identificador. El tipo es la fuente de verdad: de el se derivan el
@@ -50,7 +38,8 @@ public interface HabitacionService {
      * Toda habitacion debe tener un tipo valido: si el identificador es nulo
      * o no corresponde a ningun tipo, no se guarda nada y retorna null.
      * 
-     * @throws FormularioErroneoException si el tipo es nulo o no existe, o si el nombre de la habitacion es invalido
+     * @throws FormularioErroneoException si el tipo es nulo o no existe, o si el
+     *                                    nombre de la habitacion es invalido
      */
     Habitacion guardar(Habitacion habitacion, Long idTipo);
 
@@ -83,7 +72,8 @@ public interface HabitacionService {
      * habitacion. Retorna false cuando el borrado se rechaza.
      * 
      * @throws RecursoNoEncontradoException si no existe una habitacion con ese id
-     * @throws PeticionImposible si la habitacion tiene reservas asociadas
+     * @throws PeticionImposible            si la habitacion tiene reservas
+     *                                      asociadas
      */
     void eliminar(Long id);
 }
