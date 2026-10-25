@@ -17,10 +17,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.hotel.macondo.dto.ConsumoServicioSolicitud;
 import com.hotel.macondo.dto.PagoSolicitud;
-import com.hotel.macondo.entities.Cuenta;
 import com.hotel.macondo.entities.Operador;
 import com.hotel.macondo.entities.Pago;
-import com.hotel.macondo.errors.FormularioErroneoException;
 import com.hotel.macondo.errors.RecursoNoEncontradoException;
 import com.hotel.macondo.service.OperadorService;
 import com.hotel.macondo.service.ReservaService;
@@ -91,15 +89,6 @@ public class OperadorRestController {
     // Paga el total de la cuenta asociada al número público de reserva.
     @PostMapping("/cuenta/reserva/{numeroReserva}/pago")
     public Pago pagarCuenta(@PathVariable String numeroReserva, @RequestBody PagoSolicitud solicitud) {
-        Long cuentaId = reservaService.obtenerCuentaId(numeroReserva);
-        Cuenta cuenta = cuentaService.buscarPorId(cuentaId);
-        Pago pago = (solicitud == null || cuenta == null)
-                ? null
-                : cuentaService.pagar(cuentaId, cuenta.getTotal(), solicitud.metodoPago());
-        if (pago == null) {
-            throw new FormularioErroneoException(
-                    "La cuenta no se puede pagar: debe estar abierta, tener saldo y un método de pago.");
-        }
-        return pago;
+        return reservaService.pagarCuentaParaOperador(numeroReserva, solicitud == null ? null : solicitud.metodoPago());
     }
 }

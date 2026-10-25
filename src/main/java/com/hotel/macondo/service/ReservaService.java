@@ -6,6 +6,7 @@ import com.hotel.macondo.dto.ReservaOperadorResponse;
 import com.hotel.macondo.dto.ReservaDetalleOperadorResponse;
 import com.hotel.macondo.entities.Cliente;
 import com.hotel.macondo.entities.Habitacion;
+import com.hotel.macondo.entities.Pago;
 import com.hotel.macondo.entities.Reserva;
 
 public interface ReservaService {
@@ -94,4 +95,10 @@ public interface ReservaService {
 
         /** Finaliza una reserva activa cuya cuenta ya fue pagada. */
         ReservaOperadorResponse finalizarParaOperador(String numeroReserva);
+
+        /** Paga la cuenta de una reserva activa desde el panel del operador. */
+        Pago pagarCuentaParaOperador(String numeroReserva, String metodoPago);
+
+        /** Busca el identificador de la reserva activa de la habitación, sin importar el estado de la cuenta (check-out). */
+        Long obtenerIdReservaEnCheckout(String numeroHabitacion);
 }

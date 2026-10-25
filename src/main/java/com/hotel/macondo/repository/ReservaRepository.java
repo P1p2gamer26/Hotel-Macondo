@@ -112,6 +112,17 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
   List<Long> buscarIdsActivosConCuentaAbiertaPorNumeroHabitacion(
       @Param("numeroHabitacion") String numeroHabitacion);
 
+  @Query(
+      """
+      SELECT r.id
+      FROM Reserva r
+      JOIN r.habitacion h
+      WHERE h.numero = :numeroHabitacion
+        AND UPPER(r.estado) = 'ACTIVA'
+      """)
+  List<Long> buscarIdsActivosPorNumeroHabitacion(
+      @Param("numeroHabitacion") String numeroHabitacion);
+
   /**
    * Detalle completo de una reserva para el panel del operador: cliente,
    * habitacion con su tipo y la cuenta con sus consumos (servicios). Los pagos

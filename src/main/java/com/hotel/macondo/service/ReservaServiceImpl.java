@@ -18,6 +18,7 @@ import com.hotel.macondo.entities.Cliente;
 import com.hotel.macondo.entities.Cuenta;
 import com.hotel.macondo.entities.DetalleCuenta;
 import com.hotel.macondo.entities.Habitacion;
+import com.hotel.macondo.entities.Pago;
 import com.hotel.macondo.entities.Reserva;
 import com.hotel.macondo.entities.TipoHabitacion;
 import com.hotel.macondo.errors.FormularioErroneoException;
@@ -50,6 +51,9 @@ public class ReservaServiceImpl implements ReservaService {
 
   @Autowired
   private CuentaRepository cuentaRepository;
+
+  @Autowired
+  private CuentaService cuentaService;
 
   // ==========================================
   // OPERACIONES DEL CLIENTE
@@ -259,6 +263,27 @@ public class ReservaServiceImpl implements ReservaService {
     return convertirARespuestaOperador(reservaRepository.save(reserva));
   }
 
+  // Paga la cuenta de una reserva activa desde el panel del operador.
+  @Override
+  public Pago pagarCuentaParaOperador(String numeroReserva, String metodoPago) {
+    Reserva reserva = buscarReservaPorNumero(numeroReserva);
+    if (reserva.getEstado() == null || !reserva.getEstado().equalsIgnoreCase("ACTIVA")) {
+      throw new PeticionImposible("Solo se puede pagar la cuenta de una reserva activa.");
+    }
+    if (metodoPago == null || !List.of("EFECTIVO", "TARJETA", "TRANSFERENCIA").contains(metodoPago.trim().toUpperCase())) {
+      throw new FormularioErroneoException("Método de pago inválido.");
+    }
+    Cuenta cuenta = reserva.getCuenta();
+    if (cuenta == null) {
+      throw new RecursoNoEncontradoException("La reserva no tiene una cuenta asociada.");
+    }
+    Pago pago = cuentaService.pagar(cuenta.getId(), cuenta.getTotal(), metodoPago.trim().toUpperCase());
+    if (pago == null) {
+      throw new PeticionImposible("La cuenta no se puede pagar: debe estar abierta y tener saldo.");
+    }
+    return pago;
+  }
+
   // Cancela una reserva buscada por su numero publico
   @Override
   public Reserva cancelar(String numeroReserva) {
@@ -406,6 +431,24 @@ public class ReservaServiceImpl implements ReservaService {
     if (idsReserva.size() > 1) {
       throw new FormularioErroneoException(
           "Hay más de una reserva activa con cuenta abierta en la habitación " + numeroHabitacion);
+    }
+
+    return idsReserva.get(0);
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  public Long obtenerIdReservaEnCheckout(String numeroHabitacion) {
+    List<Long> idsReserva =
+        reservaRepository.buscarIdsActivosPorNumeroHabitacion(numeroHabitacion);
+
+    if (idsReserva.isEmpty()) {
+      throw new RecursoNoEncontradoException(
+          "No hay una reserva activa en la habitación " + numeroHabitacion);
+    }
+    if (idsReserva.size() > 1) {
+      throw new FormularioErroneoException(
+          "Hay más de una reserva activa en la habitación " + numeroHabitacion);
     }
 
     return idsReserva.get(0);
