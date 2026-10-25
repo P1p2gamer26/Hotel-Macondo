@@ -2,6 +2,8 @@ package com.hotel.macondo.service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,9 +14,13 @@ import com.hotel.macondo.entities.Cuenta;
 import com.hotel.macondo.entities.DetalleCuenta;
 import com.hotel.macondo.entities.Pago;
 import com.hotel.macondo.entities.Servicio;
+import com.hotel.macondo.dto.ConsumoServicioSolicitud;
+import com.hotel.macondo.errors.FormularioErroneoException;
+import com.hotel.macondo.errors.RecursoNoEncontradoException;
 import com.hotel.macondo.repository.CuentaRepository;
 import com.hotel.macondo.repository.DetalleCuentaRepository;
 import com.hotel.macondo.repository.PagoRepository;
+import com.hotel.macondo.service.ServicioService;
 
 @Service
 @Transactional
@@ -28,6 +34,9 @@ public class CuentaServiceImpl implements CuentaService {
 
   @Autowired
   private PagoRepository pagoRepository;
+
+  @Autowired
+  private ServicioService servicioService;
 
   // ==========================================
   // CONSULTAS DE CUENTA
@@ -66,6 +75,46 @@ public class CuentaServiceImpl implements CuentaService {
     cuenta.setTotal(calcularTotal(cuenta));
     repository.save(cuenta);
     return detalle;
+  }
+
+  @Override
+  public void agregarServicios(Long cuentaId, List<ConsumoServicioSolicitud> solicitudes) {
+    if (solicitudes == null || solicitudes.isEmpty()) {
+      throw new FormularioErroneoException("Debes enviar al menos un servicio.");
+    }
+
+    Cuenta cuenta = repository.findById(cuentaId)
+        .orElseThrow(() -> new RecursoNoEncontradoException("Cuenta no encontrada"));
+    if (!"ABIERTA".equals(cuenta.getEstado())) {
+      throw new FormularioErroneoException("La cuenta no está abierta.");
+    }
+
+    List<Servicio> servicios = new ArrayList<>();
+    for (ConsumoServicioSolicitud solicitud : solicitudes) {
+      if (solicitud == null
+          || solicitud.servicioId() == null
+          || solicitud.cantidad() == null
+          || solicitud.cantidad() <= 0) {
+        throw new FormularioErroneoException(
+            "Cada servicio debe tener un identificador y una cantidad mayor que cero.");
+      }
+
+      Servicio servicio = servicioService.buscarPorIdIncluyendoInactivos(solicitud.servicioId());
+      if (!servicio.isActivo()) {
+        throw new FormularioErroneoException(
+            "El servicio " + solicitud.servicioId() + " no está activo.");
+      }
+      servicios.add(servicio);
+    }
+
+    for (int i = 0; i < solicitudes.size(); i++) {
+      ConsumoServicioSolicitud solicitud = solicitudes.get(i);
+      DetalleCuenta detalle = agregarServicio(cuentaId, servicios.get(i), solicitud.cantidad());
+      if (detalle == null) {
+        throw new FormularioErroneoException(
+            "No fue posible agregar el servicio " + solicitud.servicioId() + " a la cuenta.");
+      }
+    }
   }
 
   // Retira un consumo de servicio de una cuenta abierta

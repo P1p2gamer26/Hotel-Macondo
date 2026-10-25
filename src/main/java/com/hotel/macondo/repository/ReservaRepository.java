@@ -24,6 +24,18 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
 
   @Query(
       """
+      SELECT COUNT(r)
+      FROM Reserva r
+      WHERE r.habitacion.id = :habitacionId
+        AND r.id <> :reservaId
+        AND UPPER(r.estado) = 'ACTIVA'
+      """)
+  long contarOtrasReservasActivasPorHabitacion(
+      @Param("habitacionId") Long habitacionId,
+      @Param("reservaId") Long reservaId);
+
+  @Query(
+      """
       SELECT r
       FROM Reserva r
       LEFT JOIN FETCH r.habitacion h
@@ -87,6 +99,19 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
       """)
   List<Reserva> buscarPorHabitacion(@Param("idHabitacion") Long idHabitacion);
 
+  @Query(
+      """
+      SELECT r.id
+      FROM Reserva r
+      JOIN r.habitacion h
+      JOIN r.cuenta c
+      WHERE h.numero = :numeroHabitacion
+        AND UPPER(r.estado) = 'ACTIVA'
+        AND UPPER(c.estado) = 'ABIERTA'
+      """)
+  List<Long> buscarIdsActivosConCuentaAbiertaPorNumeroHabitacion(
+      @Param("numeroHabitacion") String numeroHabitacion);
+
   /**
    * Detalle completo de una reserva para el panel del operador: cliente,
    * habitacion con su tipo y la cuenta con sus consumos (servicios). Los pagos
@@ -106,4 +131,18 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
       WHERE r.numeroReserva = :numeroReserva
       """)
   Optional<Reserva> buscarDetalleCompleto(@Param("numeroReserva") String numeroReserva);
+
+  @Query(
+      """
+      SELECT DISTINCT r
+      FROM Reserva r
+      LEFT JOIN FETCH r.cliente
+      LEFT JOIN FETCH r.habitacion h
+      LEFT JOIN FETCH h.tipoHabitacion
+      LEFT JOIN FETCH r.cuenta c
+      LEFT JOIN FETCH c.detalles d
+      LEFT JOIN FETCH d.servicio
+      WHERE r.id = :reservaId
+      """)
+  Optional<Reserva> buscarDetalleCompletoPorId(@Param("reservaId") Long reservaId);
 }
