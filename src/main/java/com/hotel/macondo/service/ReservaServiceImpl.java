@@ -241,6 +241,24 @@ public class ReservaServiceImpl implements ReservaService {
     return convertirARespuestaOperador(reservaRepository.save(reserva));
   }
 
+  // Finaliza una reserva activa cuya cuenta ya fue pagada.
+  @Override
+  public ReservaOperadorResponse finalizarParaOperador(String numeroReserva) {
+    Reserva reserva = buscarReservaPorNumero(numeroReserva);
+    if (reserva.getEstado() == null || !reserva.getEstado().equalsIgnoreCase("ACTIVA")) {
+      throw new PeticionImposible("Solo se pueden finalizar reservas activas.");
+    }
+    Cuenta cuenta = reserva.getCuenta();
+    if (cuenta != null
+        && !"PAGADA".equalsIgnoreCase(cuenta.getEstado())
+        && cuenta.getTotal() != null
+        && cuenta.getTotal().compareTo(BigDecimal.ZERO) != 0) {
+      throw new PeticionImposible("La cuenta debe estar pagada para finalizar la estadía.");
+    }
+    reserva.setEstado("FINALIZADA");
+    return convertirARespuestaOperador(reservaRepository.save(reserva));
+  }
+
   // Cancela una reserva buscada por su numero publico
   @Override
   public Reserva cancelar(String numeroReserva) {

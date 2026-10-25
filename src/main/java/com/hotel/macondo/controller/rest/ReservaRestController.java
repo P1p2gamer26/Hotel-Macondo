@@ -86,6 +86,12 @@ public class ReservaRestController {
         return reservaService.activarParaOperador(numeroReserva);
     }
 
+    // Permite al operador finalizar una estadía con la cuenta pagada
+    @PutMapping("/{numeroReserva}/finalizar")
+    public ReservaOperadorResponse finalizar(@PathVariable String numeroReserva) {
+        return reservaService.finalizarParaOperador(numeroReserva);
+    }
+
     // ==========================================
     // PANEL DEL CLIENTE
     // ==========================================

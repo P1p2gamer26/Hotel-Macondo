@@ -91,4 +91,7 @@ public interface ReservaService {
 
         /** Busca el identificador de la reserva con cuenta abierta de la habitación. */
         Long obtenerIdReservaActivaPorNumeroHabitacion(String numeroHabitacion);
+
+        /** Finaliza una reserva activa cuya cuenta ya fue pagada. */
+        ReservaOperadorResponse finalizarParaOperador(String numeroReserva);
 }
