@@ -21,8 +21,14 @@ public interface ReservaService {
          */
         ReservaOperadorResponse cancelarParaOperador(String numeroReserva);
 
+        /** Activa una reserva confirmada desde el panel del operador. */
+        ReservaOperadorResponse activarParaOperador(String numeroReserva);
+
         /** Obtiene el detalle completo de una reserva para el panel del operador. */
         ReservaDetalleOperadorResponse obtenerDetalleParaOperador(String numeroReserva);
+
+        /** Obtiene el detalle completo de una reserva por su identificador interno. */
+        ReservaDetalleOperadorResponse obtenerDetalleParaOperador(Long reservaId);
 
         /** Reservas vigentes o futuras que pertenecen al cliente indicado. */
         List<Reserva> buscarActivasDeCliente(Cliente cliente);
@@ -79,4 +85,10 @@ public interface ReservaService {
 
         /** Cancela una reserva futura buscándola por su número público. */
         Reserva cancelar(String numeroReserva);
+
+        /** Busca la cuenta asociada a la reserva. */
+        Long obtenerCuentaId(String numeroReserva);
+
+        /** Busca el identificador de la reserva con cuenta abierta de la habitación. */
+        Long obtenerIdReservaActivaPorNumeroHabitacion(String numeroHabitacion);
 }

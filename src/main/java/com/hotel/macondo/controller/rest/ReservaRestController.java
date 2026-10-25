@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.hotel.macondo.dto.ReservaDetalleOperadorResponse;
+import com.hotel.macondo.dto.ReservaIdentificadorResponse;
 import com.hotel.macondo.dto.ReservaOperadorResponse;
 import com.hotel.macondo.entities.Cliente;
 import com.hotel.macondo.entities.Habitacion;
@@ -61,10 +62,28 @@ public class ReservaRestController {
         return reservaService.obtenerDetalleParaOperador(numeroReserva);
     }
 
+    // Busca el ID de la reserva con cuenta abierta para el número visible de habitación.
+    @GetMapping("/habitacion/{numeroHabitacion}/actual")
+    public ReservaIdentificadorResponse obtenerReservaActualPorHabitacion(
+            @PathVariable String numeroHabitacion) {
+        return new ReservaIdentificadorResponse(
+                reservaService.obtenerIdReservaActivaPorNumeroHabitacion(numeroHabitacion));
+    }
+
+    @GetMapping("/id/{reservaId}")
+    public ReservaDetalleOperadorResponse obtenerDetallePorId(@PathVariable Long reservaId) {
+        return reservaService.obtenerDetalleParaOperador(reservaId);
+    }
+
     // Permite al operador cancelar una reserva
     @PutMapping("/{numeroReserva}/cancelar")
     public ReservaOperadorResponse cancelar(@PathVariable String numeroReserva) {
         return reservaService.cancelarParaOperador(numeroReserva);
+    }
+
+    @PutMapping("/{numeroReserva}/activar")
+    public ReservaOperadorResponse activar(@PathVariable String numeroReserva) {
+        return reservaService.activarParaOperador(numeroReserva);
     }
 
     // ==========================================

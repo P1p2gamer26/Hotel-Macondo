@@ -219,16 +219,45 @@ public class ReservaServiceImpl implements ReservaService {
   // Cancela una reserva desde el panel del operador y devuelve el DTO resumido
   @Override
   public ReservaOperadorResponse cancelarParaOperador(String numeroReserva) {
-    return convertirARespuestaOperador(cancelar(numeroReserva));
+    Reserva reserva = buscarReservaPorNumero(numeroReserva);
+    validarEstadoConfirmado(reserva, "cancelar");
+    return convertirARespuestaOperador(marcarReservaCancelada(reserva));
+  }
+
+  @Override
+  public ReservaOperadorResponse activarParaOperador(String numeroReserva) {
+    Reserva reserva = buscarReservaPorNumero(numeroReserva);
+    validarEstadoConfirmado(reserva, "activar");
+    Habitacion habitacion = reserva.getHabitacion();
+    if (habitacion != null
+        && reservaRepository.contarOtrasReservasActivasPorHabitacion(
+            habitacion.getId(), reserva.getId()) > 0) {
+      throw new PeticionImposible(
+          "No se puede activar la reserva porque la habitación "
+              + habitacion.getNumero()
+              + " ya tiene otra reserva activa.");
+    }
+    reserva.setEstado("ACTIVA");
+    return convertirARespuestaOperador(reservaRepository.save(reserva));
   }
 
   // Cancela una reserva buscada por su numero publico
   @Override
   public Reserva cancelar(String numeroReserva) {
-    Reserva reserva = reservaRepository
+    Reserva reserva = buscarReservaPorNumero(numeroReserva);
+    return cancelarReserva(reserva);
+  }
+
+  private Reserva buscarReservaPorNumero(String numeroReserva) {
+    return reservaRepository
         .findByNumeroReserva(numeroReserva)
         .orElseThrow(() -> new RecursoNoEncontradoException("No se encontró la reserva " + numeroReserva));
-    return cancelarReserva(reserva);
+  }
+
+  private void validarEstadoConfirmado(Reserva reserva, String accion) {
+    if (!"CONFIRMADA".equalsIgnoreCase(reserva.getEstado())) {
+      throw new PeticionImposible("Solo se pueden " + accion + " reservas confirmadas.");
+    }
   }
 
   // Obtiene la reserva con sus detalles
@@ -249,7 +278,23 @@ public class ReservaServiceImpl implements ReservaService {
   @Override
   @Transactional(readOnly = true)
   public ReservaDetalleOperadorResponse obtenerDetalleParaOperador(String numeroReserva) {
-    Reserva reserva = obtenerDetalle(numeroReserva);
+    return convertirDetalleOperador(obtenerDetalle(numeroReserva));
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  public ReservaDetalleOperadorResponse obtenerDetalleParaOperador(Long reservaId) {
+    Reserva reserva = reservaRepository
+        .buscarDetalleCompletoPorId(reservaId)
+        .orElseThrow(() -> new RecursoNoEncontradoException("No existe la reserva " + reservaId));
+
+    if (reserva.getCuenta() != null) {
+      reserva.getCuenta().getPagos().size();
+    }
+    return convertirDetalleOperador(reserva);
+  }
+
+  private ReservaDetalleOperadorResponse convertirDetalleOperador(Reserva reserva) {
     Cliente cliente = reserva.getCliente();
     Habitacion habitacion = reserva.getHabitacion();
     TipoHabitacion tipoHabitacion = habitacion == null ? null : habitacion.getTipoHabitacion();
@@ -316,6 +361,36 @@ public class ReservaServiceImpl implements ReservaService {
                         pago.getFechaPago(),
                         pago.getEstado()))
                     .toList()));
+  }
+
+  @Override
+  public Long obtenerCuentaId(String numeroReserva){
+    Reserva reserva = reservaRepository
+        .findByNumeroReserva(numeroReserva)
+        .orElseThrow(() -> new RecursoNoEncontradoException("No se encontró la reserva " + numeroReserva));
+    Cuenta cuenta = reserva.getCuenta();
+    if (cuenta == null) {
+      throw new RecursoNoEncontradoException("La reserva no tiene una cuenta asociada.");
+    }
+    return cuenta.getId();
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  public Long obtenerIdReservaActivaPorNumeroHabitacion(String numeroHabitacion) {
+    List<Long> idsReserva =
+        reservaRepository.buscarIdsActivosConCuentaAbiertaPorNumeroHabitacion(numeroHabitacion);
+
+    if (idsReserva.isEmpty()) {
+      throw new RecursoNoEncontradoException(
+          "No hay una reserva activa con cuenta abierta en la habitación " + numeroHabitacion);
+    }
+    if (idsReserva.size() > 1) {
+      throw new FormularioErroneoException(
+          "Hay más de una reserva activa con cuenta abierta en la habitación " + numeroHabitacion);
+    }
+
+    return idsReserva.get(0);
   }
 
   // ==========================================
@@ -388,6 +463,10 @@ public class ReservaServiceImpl implements ReservaService {
   // Cancela la reserva y anula el saldo de la cuenta si continua abierta
   private Reserva cancelarReserva(Reserva reserva) {
     validarReservaFutura(reserva);
+    return marcarReservaCancelada(reserva);
+  }
+
+  private Reserva marcarReservaCancelada(Reserva reserva) {
     reserva.setEstado("CANCELADA");
     Cuenta cuenta = reserva.getCuenta();
     if (cuenta != null && "ABIERTA".equalsIgnoreCase(cuenta.getEstado())) {
@@ -511,4 +590,6 @@ public class ReservaServiceImpl implements ReservaService {
       throw new PeticionImposible("La reserva ya no se encuentra activa.");
     }
   }
+
+
 }

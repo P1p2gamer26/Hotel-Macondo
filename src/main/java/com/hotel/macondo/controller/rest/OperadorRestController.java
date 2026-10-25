@@ -15,9 +15,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.hotel.macondo.dto.ConsumoServicioSolicitud;
 import com.hotel.macondo.entities.Operador;
 import com.hotel.macondo.errors.RecursoNoEncontradoException;
 import com.hotel.macondo.service.OperadorService;
+import com.hotel.macondo.service.ReservaService;
+import com.hotel.macondo.service.CuentaService;
 
 // Controlador REST para la gestión y administración del personal operador
 @RestController
@@ -27,6 +30,10 @@ public class OperadorRestController {
 
     @Autowired
     private OperadorService operadorService;
+    @Autowired
+    private CuentaService cuentaService;
+    @Autowired
+    private ReservaService reservaService;
 
     // ==========================================
     // GESTION DE OPERADORES
@@ -66,5 +73,14 @@ public class OperadorRestController {
             throw new RecursoNoEncontradoException("Operador no encontrado");
         }
         operadorService.eliminar(id);
+    }
+
+    // Añade servicios a la cuenta asociada al número público de reserva.
+    @PostMapping("/cuenta/reserva/{numeroReserva}/servicios")
+    public void añadirServicios(
+            @PathVariable String numeroReserva,
+            @RequestBody List<ConsumoServicioSolicitud> servicios) {
+        Long cuentaId = reservaService.obtenerCuentaId(numeroReserva);
+        cuentaService.agregarServicios(cuentaId, servicios);
     }
 }
