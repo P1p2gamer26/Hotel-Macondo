@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.hotel.macondo.dto.PagoClienteResponse;
 import com.hotel.macondo.dto.ReservaDetalleOperadorResponse;
 import com.hotel.macondo.dto.ReservaIdentificadorResponse;
 import com.hotel.macondo.dto.ReservaOperadorResponse;
@@ -70,6 +71,14 @@ public class ReservaRestController {
                 reservaService.obtenerIdReservaActivaPorNumeroHabitacion(numeroHabitacion));
     }
 
+    // Busca la reserva activa de la habitación para el check-out, aunque la cuenta ya esté pagada
+    @GetMapping("/habitacion/{numeroHabitacion}/checkout")
+    public ReservaIdentificadorResponse obtenerReservaCheckout(@PathVariable String numeroHabitacion) {
+        return new ReservaIdentificadorResponse(
+                reservaService.obtenerIdReservaEnCheckout(numeroHabitacion));
+    }
+
+    // Obtiene el detalle completo de una reserva por su identificador interno
     @GetMapping("/id/{reservaId}")
     public ReservaDetalleOperadorResponse obtenerDetallePorId(@PathVariable Long reservaId) {
         return reservaService.obtenerDetalleParaOperador(reservaId);
@@ -81,9 +90,16 @@ public class ReservaRestController {
         return reservaService.cancelarParaOperador(numeroReserva);
     }
 
+    // Activa una reserva confirmada desde el panel del operador
     @PutMapping("/{numeroReserva}/activar")
     public ReservaOperadorResponse activar(@PathVariable String numeroReserva) {
         return reservaService.activarParaOperador(numeroReserva);
+    }
+
+    // Permite al operador finalizar una estadía con la cuenta pagada
+    @PutMapping("/{numeroReserva}/finalizar")
+    public ReservaOperadorResponse finalizar(@PathVariable String numeroReserva) {
+        return reservaService.finalizarParaOperador(numeroReserva);
     }
 
     // ==========================================
@@ -102,6 +118,12 @@ public class ReservaRestController {
     public List<Reserva> historialDeCliente(@PathVariable Long id) {
         Cliente cliente = clienteService.buscarPorId(id);
         return reservaService.buscarHistorialDeCliente(cliente);
+    }
+
+    // Obtiene el historial de pagos de todas las reservas del cliente
+    @GetMapping("/cliente/{id}/pagos")
+    public List<PagoClienteResponse> pagosDeCliente(@PathVariable Long id) {
+        return reservaService.historialPagosDeCliente(id);
     }
 
     // Consulta disponibilidad de habitaciones para crear o editar una reserva del

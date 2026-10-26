@@ -22,6 +22,7 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
 
   List<Reserva> findByEstadoInOrderByIdAsc(Collection<String> estados);
 
+  // Cuenta las otras reservas activas de la habitación, para no activar dos a la vez
   @Query(
       """
       SELECT COUNT(r)
@@ -99,6 +100,7 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
       """)
   List<Reserva> buscarPorHabitacion(@Param("idHabitacion") Long idHabitacion);
 
+  // Ids de reservas activas con cuenta abierta de una habitación por su número
   @Query(
       """
       SELECT r.id
@@ -110,6 +112,18 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
         AND UPPER(c.estado) = 'ABIERTA'
       """)
   List<Long> buscarIdsActivosConCuentaAbiertaPorNumeroHabitacion(
+      @Param("numeroHabitacion") String numeroHabitacion);
+
+  // Ids de reservas activas de una habitación por su número (check-out)
+  @Query(
+      """
+      SELECT r.id
+      FROM Reserva r
+      JOIN r.habitacion h
+      WHERE h.numero = :numeroHabitacion
+        AND UPPER(r.estado) = 'ACTIVA'
+      """)
+  List<Long> buscarIdsActivosPorNumeroHabitacion(
       @Param("numeroHabitacion") String numeroHabitacion);
 
   /**
@@ -132,6 +146,7 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
       """)
   Optional<Reserva> buscarDetalleCompleto(@Param("numeroReserva") String numeroReserva);
 
+  // Carga el detalle completo de la reserva por su id (cliente, habitación, cuenta y consumos)
   @Query(
       """
       SELECT DISTINCT r
