@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.hotel.macondo.dto.PagoClienteResponse;
 import com.hotel.macondo.dto.ReservaDetalleOperadorResponse;
 import com.hotel.macondo.dto.ReservaIdentificadorResponse;
 import com.hotel.macondo.dto.ReservaOperadorResponse;
@@ -117,6 +118,12 @@ public class ReservaRestController {
     public List<Reserva> historialDeCliente(@PathVariable Long id) {
         Cliente cliente = clienteService.buscarPorId(id);
         return reservaService.buscarHistorialDeCliente(cliente);
+    }
+
+    // Obtiene el historial de pagos de todas las reservas del cliente
+    @GetMapping("/cliente/{id}/pagos")
+    public List<PagoClienteResponse> pagosDeCliente(@PathVariable Long id) {
+        return reservaService.historialPagosDeCliente(id);
     }
 
     // Consulta disponibilidad de habitaciones para crear o editar una reserva del

@@ -22,7 +22,6 @@ import com.hotel.macondo.entities.Pago;
 import com.hotel.macondo.errors.RecursoNoEncontradoException;
 import com.hotel.macondo.service.OperadorService;
 import com.hotel.macondo.service.ReservaService;
-import com.hotel.macondo.service.CuentaService;
 
 // Controlador REST para la gestión y administración del personal operador
 @RestController
@@ -32,8 +31,6 @@ public class OperadorRestController {
 
     @Autowired
     private OperadorService operadorService;
-    @Autowired
-    private CuentaService cuentaService;
     @Autowired
     private ReservaService reservaService;
 
@@ -82,8 +79,15 @@ public class OperadorRestController {
     public void añadirServicios(
             @PathVariable String numeroReserva,
             @RequestBody List<ConsumoServicioSolicitud> servicios) {
-        Long cuentaId = reservaService.obtenerCuentaId(numeroReserva);
-        cuentaService.agregarServicios(cuentaId, servicios);
+        reservaService.agregarServiciosParaOperador(numeroReserva, servicios);
+    }
+
+    // Elimina un consumo de la cuenta asociada al número público de reserva.
+    @DeleteMapping("/cuenta/reserva/{numeroReserva}/servicios/{detalleId}")
+    public void eliminarServicio(
+            @PathVariable String numeroReserva,
+            @PathVariable Long detalleId) {
+        reservaService.eliminarServicioParaOperador(numeroReserva, detalleId);
     }
 
     // Paga el total de la cuenta asociada al número público de reserva.

@@ -77,6 +77,7 @@ public class CuentaServiceImpl implements CuentaService {
     return detalle;
   }
 
+  // Valida todos los servicios solicitados antes de guardar alguno y luego los agrega a la cuenta
   @Override
   public void agregarServicios(Long cuentaId, List<ConsumoServicioSolicitud> solicitudes) {
     if (solicitudes == null || solicitudes.isEmpty()) {

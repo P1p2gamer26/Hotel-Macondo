@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.hotel.macondo.dto.ConsumoServicioSolicitud;
+import com.hotel.macondo.dto.PagoClienteResponse;
 import com.hotel.macondo.dto.ReservaDetalleOperadorResponse;
 import com.hotel.macondo.dto.ReservaOperadorResponse;
 import com.hotel.macondo.entities.Cliente;
@@ -27,6 +29,7 @@ import com.hotel.macondo.errors.RecursoNoEncontradoException;
 import com.hotel.macondo.repository.ClienteRepository;
 import com.hotel.macondo.repository.CuentaRepository;
 import com.hotel.macondo.repository.HabitacionRepository;
+import com.hotel.macondo.repository.PagoRepository;
 import com.hotel.macondo.repository.ReservaRepository;
 import com.hotel.macondo.repository.TipoHabitacionRepository;
 import com.hotel.macondo.utils.FechaUtils;
@@ -54,6 +57,9 @@ public class ReservaServiceImpl implements ReservaService {
 
   @Autowired
   private CuentaService cuentaService;
+
+  @Autowired
+  private PagoRepository pagoRepository;
 
   // ==========================================
   // OPERACIONES DEL CLIENTE
@@ -228,6 +234,7 @@ public class ReservaServiceImpl implements ReservaService {
     return convertirARespuestaOperador(marcarReservaCancelada(reserva));
   }
 
+  // Activa una reserva confirmada si su habitación no tiene otra estadía activa
   @Override
   public ReservaOperadorResponse activarParaOperador(String numeroReserva) {
     Reserva reserva = buscarReservaPorNumero(numeroReserva);
@@ -282,6 +289,49 @@ public class ReservaServiceImpl implements ReservaService {
       throw new PeticionImposible("La cuenta no se puede pagar: debe estar abierta y tener saldo.");
     }
     return pago;
+  }
+
+  // Agrega servicios a la cuenta de una reserva activa desde el panel del operador
+  @Override
+  public void agregarServiciosParaOperador(String numeroReserva, List<ConsumoServicioSolicitud> servicios) {
+    Reserva reserva = reservaRepository
+        .findByNumeroReserva(numeroReserva)
+        .orElseThrow(() -> new RecursoNoEncontradoException("No se encontró la reserva " + numeroReserva));
+    if (reserva.getEstado() == null || !reserva.getEstado().equalsIgnoreCase("ACTIVA")) {
+      throw new PeticionImposible("Solo se pueden agregar servicios a una reserva activa.");
+    }
+    cuentaService.agregarServicios(obtenerCuentaId(numeroReserva), servicios);
+  }
+
+  // Elimina un consumo de la cuenta de una reserva activa desde el panel del operador
+  @Override
+  public void eliminarServicioParaOperador(String numeroReserva, Long detalleId) {
+    Reserva reserva = reservaRepository
+        .findByNumeroReserva(numeroReserva)
+        .orElseThrow(() -> new RecursoNoEncontradoException("No se encontró la reserva " + numeroReserva));
+    if (reserva.getEstado() == null || !reserva.getEstado().equalsIgnoreCase("ACTIVA")) {
+      throw new PeticionImposible("Solo se pueden eliminar servicios de una reserva activa.");
+    }
+    if (!cuentaService.eliminarDetalle(obtenerCuentaId(numeroReserva), detalleId)) {
+      throw new RecursoNoEncontradoException("El consumo no existe en la cuenta abierta de la reserva.");
+    }
+  }
+
+  // Retorna el historial de pagos de todas las reservas del cliente
+  @Override
+  @Transactional(readOnly = true)
+  public List<PagoClienteResponse> historialPagosDeCliente(Long clienteId) {
+    return pagoRepository.buscarPorClienteId(clienteId).stream()
+        .map(pago -> new PagoClienteResponse(
+            pago.getId(),
+            pago.getCuenta() == null || pago.getCuenta().getReserva() == null
+                ? null
+                : pago.getCuenta().getReserva().getNumeroReserva(),
+            pago.getMonto(),
+            pago.getMetodoPago(),
+            pago.getFechaPago(),
+            pago.getEstado()))
+        .toList();
   }
 
   // Cancela una reserva buscada por su numero publico
@@ -406,6 +456,7 @@ public class ReservaServiceImpl implements ReservaService {
                     .toList()));
   }
 
+  // Retorna el identificador de la cuenta asociada al número público de reserva
   @Override
   public Long obtenerCuentaId(String numeroReserva){
     Reserva reserva = reservaRepository
@@ -418,6 +469,7 @@ public class ReservaServiceImpl implements ReservaService {
     return cuenta.getId();
   }
 
+  // Busca la reserva activa con cuenta abierta de la habitación para cargarle servicios
   @Override
   @Transactional(readOnly = true)
   public Long obtenerIdReservaActivaPorNumeroHabitacion(String numeroHabitacion) {
@@ -436,6 +488,7 @@ public class ReservaServiceImpl implements ReservaService {
     return idsReserva.get(0);
   }
 
+  // Busca la reserva activa de la habitación para el check-out, sin importar el estado de la cuenta
   @Override
   @Transactional(readOnly = true)
   public Long obtenerIdReservaEnCheckout(String numeroHabitacion) {

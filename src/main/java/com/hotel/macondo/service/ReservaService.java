@@ -2,6 +2,8 @@ package com.hotel.macondo.service;
 
 import java.util.List;
 
+import com.hotel.macondo.dto.ConsumoServicioSolicitud;
+import com.hotel.macondo.dto.PagoClienteResponse;
 import com.hotel.macondo.dto.ReservaOperadorResponse;
 import com.hotel.macondo.dto.ReservaDetalleOperadorResponse;
 import com.hotel.macondo.entities.Cliente;
@@ -101,4 +103,13 @@ public interface ReservaService {
 
         /** Busca el identificador de la reserva activa de la habitación, sin importar el estado de la cuenta (check-out). */
         Long obtenerIdReservaEnCheckout(String numeroHabitacion);
+
+        // Agrega servicios a la cuenta de una reserva activa desde el panel del operador
+        void agregarServiciosParaOperador(String numeroReserva, List<ConsumoServicioSolicitud> servicios);
+
+        // Elimina un consumo de la cuenta de una reserva activa desde el panel del operador
+        void eliminarServicioParaOperador(String numeroReserva, Long detalleId);
+
+        // Retorna el historial de pagos de todas las reservas del cliente
+        List<PagoClienteResponse> historialPagosDeCliente(Long clienteId);
 }
