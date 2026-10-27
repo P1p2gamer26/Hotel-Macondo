@@ -13,5 +13,4 @@ public interface DetalleCuentaRepository extends JpaRepository<DetalleCuenta, Lo
 
   Optional<DetalleCuenta> findByIdAndCuentaId(Long id, Long cuentaId);
 
-  void deleteAllByCuentaId(Long cuentaId);
 }

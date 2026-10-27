@@ -143,8 +143,8 @@ public class CuentaServiceImpl implements CuentaService {
   // PAGOS Y LIQUIDACIÓN (OPERADOR)
   // ==========================================
 
-  // Registra el pago exacto de la cuenta, elimina los consumos individuales,
-  // actualiza el estado a PAGADA y reinicia el saldo pendiente a cero.
+  // Registra el pago exacto de la cuenta y la deja PAGADA, conservando
+  // los consumos y el total para el historial de la reserva.
   @Override
   public Pago pagar(Long cuentaId, BigDecimal monto, String metodoPago) {
     Cuenta cuenta = repository.findById(cuentaId).orElse(null);
@@ -162,9 +162,6 @@ public class CuentaServiceImpl implements CuentaService {
     Pago pago = new Pago(monto, metodoPago, LocalDateTime.now(), "CONFIRMADO");
     cuenta.agregarPago(pago);
 
-    detalleCuentaRepository.deleteAllByCuentaId(cuentaId);
-    cuenta.getDetalles().clear();
-    cuenta.setTotal(BigDecimal.ZERO);
     cuenta.setEstado("PAGADA");
     pagoRepository.save(pago);
     repository.save(cuenta);
