@@ -56,7 +56,7 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
       LEFT JOIN FETCH r.habitacion h
       LEFT JOIN FETCH h.tipoHabitacion
       WHERE r.cliente = :cliente
-        AND (UPPER(r.estado) = 'CANCELADA' OR r.fechaFin < :fechaActual)
+        AND (UPPER(r.estado) = 'CANCELADA' OR UPPER(r.estado) = 'FINALIZADA' OR r.fechaFin < :fechaActual)
       ORDER BY r.fechaInicio DESC
       """)
   List<Reserva> buscarHistoricasPorCliente(
@@ -78,7 +78,7 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
       SELECT COUNT(r)
       FROM Reserva r
       WHERE r.cliente = :cliente
-        AND (UPPER(r.estado) = 'CANCELADA' OR r.fechaFin < :fechaActual)
+        AND (UPPER(r.estado) = 'CANCELADA' OR UPPER(r.estado) = 'FINALIZADA' OR r.fechaFin < :fechaActual)
       """)
   long contarHistoricasPorCliente(
       @Param("cliente") Cliente cliente, @Param("fechaActual") LocalDate fechaActual);
