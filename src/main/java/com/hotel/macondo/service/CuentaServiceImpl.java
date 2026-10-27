@@ -143,17 +143,16 @@ public class CuentaServiceImpl implements CuentaService {
   // PAGOS Y LIQUIDACIÓN (OPERADOR)
   // ==========================================
 
-  // Registra el pago exacto de la cuenta, elimina los consumos individuales,
-  // actualiza el estado a PAGADA y reinicia el saldo pendiente a cero.
+  // Registra el pago exacto de la cuenta y la deja PAGADA, conservando
+  // los consumos y el total para el historial de la reserva.
   @Override
   public Pago pagar(Long cuentaId, BigDecimal monto, String metodoPago) {
     Cuenta cuenta = repository.findById(cuentaId).orElse(null);
     if (cuenta == null
         || !"ABIERTA".equals(cuenta.getEstado())
-        || cuenta.getTotal() == null
-        || cuenta.getTotal().compareTo(BigDecimal.ZERO) <= 0
+        || calcularSaldo(cuenta).compareTo(BigDecimal.ZERO) <= 0
         || monto == null
-        || monto.compareTo(cuenta.getTotal()) != 0
+        || monto.compareTo(calcularSaldo(cuenta)) != 0
         || metodoPago == null
         || metodoPago.isBlank()) {
       return null;
@@ -162,9 +161,6 @@ public class CuentaServiceImpl implements CuentaService {
     Pago pago = new Pago(monto, metodoPago, LocalDateTime.now(), "CONFIRMADO");
     cuenta.agregarPago(pago);
 
-    detalleCuentaRepository.deleteAllByCuentaId(cuentaId);
-    cuenta.getDetalles().clear();
-    cuenta.setTotal(BigDecimal.ZERO);
     cuenta.setEstado("PAGADA");
     pagoRepository.save(pago);
     repository.save(cuenta);
@@ -174,6 +170,17 @@ public class CuentaServiceImpl implements CuentaService {
   // ==========================================
   // CÁLCULOS DE COSTOS Y SUBTOTALES (OPERADOR)
   // ==========================================
+
+  // Calcula lo que falta por pagar: total de la cuenta menos los pagos ya registrados (anticipos)
+  @Override
+  public BigDecimal calcularSaldo(Cuenta cuenta) {
+    BigDecimal total = cuenta.getTotal() == null ? BigDecimal.ZERO : cuenta.getTotal();
+    BigDecimal pagado = cuenta.getPagos().stream()
+        .map(Pago::getMonto)
+        .filter(Objects::nonNull)
+        .reduce(BigDecimal.ZERO, BigDecimal::add);
+    return total.subtract(pagado);
+  }
 
   // Calcula la sumatoria del costo de alojamiento mas los consumos de servicios
   private BigDecimal calcularTotal(Cuenta cuenta) {

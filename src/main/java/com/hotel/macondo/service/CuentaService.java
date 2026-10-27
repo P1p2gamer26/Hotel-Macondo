@@ -24,6 +24,9 @@ public interface CuentaService {
     /** Elimina un consumo de una cuenta abierta. */
     boolean eliminarDetalle(Long cuentaId, Long detalleId);
 
-    /** Registra el pago total de una cuenta. */
+    /** Registra el pago del saldo pendiente de una cuenta. */
     Pago pagar(Long cuentaId, BigDecimal monto, String metodoPago);
+
+    /** Total de la cuenta menos los pagos ya registrados. */
+    BigDecimal calcularSaldo(Cuenta cuenta);
 }
