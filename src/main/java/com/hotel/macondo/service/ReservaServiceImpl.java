@@ -262,8 +262,7 @@ public class ReservaServiceImpl implements ReservaService {
     Cuenta cuenta = reserva.getCuenta();
     if (cuenta != null
         && !"PAGADA".equalsIgnoreCase(cuenta.getEstado())
-        && cuenta.getTotal() != null
-        && cuenta.getTotal().compareTo(BigDecimal.ZERO) != 0) {
+        && cuentaService.calcularSaldo(cuenta).compareTo(BigDecimal.ZERO) > 0) {
       throw new PeticionImposible("La cuenta debe estar pagada para finalizar la estadía.");
     }
     reserva.setEstado("FINALIZADA");
@@ -284,7 +283,7 @@ public class ReservaServiceImpl implements ReservaService {
     if (cuenta == null) {
       throw new RecursoNoEncontradoException("La reserva no tiene una cuenta asociada.");
     }
-    Pago pago = cuentaService.pagar(cuenta.getId(), cuenta.getTotal(), metodoPago.trim().toUpperCase());
+    Pago pago = cuentaService.pagar(cuenta.getId(), cuentaService.calcularSaldo(cuenta), metodoPago.trim().toUpperCase());
     if (pago == null) {
       throw new PeticionImposible("La cuenta no se puede pagar: debe estar abierta y tener saldo.");
     }

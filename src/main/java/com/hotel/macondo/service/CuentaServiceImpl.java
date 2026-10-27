@@ -150,10 +150,9 @@ public class CuentaServiceImpl implements CuentaService {
     Cuenta cuenta = repository.findById(cuentaId).orElse(null);
     if (cuenta == null
         || !"ABIERTA".equals(cuenta.getEstado())
-        || cuenta.getTotal() == null
-        || cuenta.getTotal().compareTo(BigDecimal.ZERO) <= 0
+        || calcularSaldo(cuenta).compareTo(BigDecimal.ZERO) <= 0
         || monto == null
-        || monto.compareTo(cuenta.getTotal()) != 0
+        || monto.compareTo(calcularSaldo(cuenta)) != 0
         || metodoPago == null
         || metodoPago.isBlank()) {
       return null;
@@ -171,6 +170,17 @@ public class CuentaServiceImpl implements CuentaService {
   // ==========================================
   // CÁLCULOS DE COSTOS Y SUBTOTALES (OPERADOR)
   // ==========================================
+
+  // Calcula lo que falta por pagar: total de la cuenta menos los pagos ya registrados (anticipos)
+  @Override
+  public BigDecimal calcularSaldo(Cuenta cuenta) {
+    BigDecimal total = cuenta.getTotal() == null ? BigDecimal.ZERO : cuenta.getTotal();
+    BigDecimal pagado = cuenta.getPagos().stream()
+        .map(Pago::getMonto)
+        .filter(Objects::nonNull)
+        .reduce(BigDecimal.ZERO, BigDecimal::add);
+    return total.subtract(pagado);
+  }
 
   // Calcula la sumatoria del costo de alojamiento mas los consumos de servicios
   private BigDecimal calcularTotal(Cuenta cuenta) {
