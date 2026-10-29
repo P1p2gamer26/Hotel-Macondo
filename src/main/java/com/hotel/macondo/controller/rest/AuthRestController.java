@@ -30,7 +30,7 @@ public class AuthRestController {
     // ==========================================
 
     // Valida credenciales de acceso para cualquier rol (Cliente, Operador, Admin)
-
+    // http://localhost:8080/api/auth/login
     @PostMapping("/login")
     public Map<String, Object> login(@RequestBody Map<String, String> credenciales) {
         String correo = credenciales.get("correo");

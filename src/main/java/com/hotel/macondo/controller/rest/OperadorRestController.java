@@ -39,6 +39,7 @@ public class OperadorRestController {
     // ==========================================
 
     // Retorna todos los operadores registrados en el sistema
+    // http://localhost:8080/api/operador
     @GetMapping
     public List<Operador> buscarTodos() {
         Collection<Operador> operadores = operadorService.buscarTodos();
@@ -46,6 +47,7 @@ public class OperadorRestController {
     }
 
     // Registra un nuevo operador asignándolo como activo si el valor viene nulo
+    // http://localhost:8080/api/operador
     @PostMapping
     public Operador crear(@RequestBody Operador operador) {
         if (operador.getActivo() == null) {
@@ -55,6 +57,7 @@ public class OperadorRestController {
     }
 
     // Alterna el estado de activación del operador
+    // http://localhost:8080/api/operador/estado/{id}
     @PutMapping("/estado/{id}")
     public Operador cambiarEstado(@PathVariable Long id) {
         Operador operador = operadorService.cambiarEstado(id);
@@ -65,6 +68,7 @@ public class OperadorRestController {
     }
 
     // Elimina un operador por su identificador
+    // http://localhost:8080/api/operador/delete/{id}
     @DeleteMapping("/delete/{id}")
     public void eliminar(@PathVariable Long id) {
         Operador operador = operadorService.buscarPorId(id);
@@ -75,6 +79,7 @@ public class OperadorRestController {
     }
 
     // Añade servicios a la cuenta asociada al número público de reserva.
+    // http://localhost:8080/api/operador/cuenta/reserva/{numeroReserva}/servicios
     @PostMapping("/cuenta/reserva/{numeroReserva}/servicios")
     public void añadirServicios(
             @PathVariable String numeroReserva,
@@ -83,6 +88,7 @@ public class OperadorRestController {
     }
 
     // Elimina un consumo de la cuenta asociada al número público de reserva.
+    // http://localhost:8080/api/operador/cuenta/reserva/{numeroReserva}/servicios/{detalleId}
     @DeleteMapping("/cuenta/reserva/{numeroReserva}/servicios/{detalleId}")
     public void eliminarServicio(
             @PathVariable String numeroReserva,
@@ -91,6 +97,7 @@ public class OperadorRestController {
     }
 
     // Paga el total de la cuenta asociada al número público de reserva.
+    // http://localhost:8080/api/operador/cuenta/reserva/{numeroReserva}/pago
     @PostMapping("/cuenta/reserva/{numeroReserva}/pago")
     public Pago pagarCuenta(@PathVariable String numeroReserva, @RequestBody PagoSolicitud solicitud) {
         return reservaService.pagarCuentaParaOperador(numeroReserva, solicitud == null ? null : solicitud.metodoPago());

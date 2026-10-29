@@ -37,6 +37,7 @@ public class ClienteRestController {
     // ==========================================
 
     // Registra un nuevo cliente y genera su cuenta de usuario asociada
+    // http://localhost:8080/api/cliente/registro
     @PostMapping("/registro")
     public Cliente registrar(@RequestBody RegistroCliente registro) {
         if (registro.getCliente() == null) {
@@ -50,6 +51,7 @@ public class ClienteRestController {
     }
 
     // Busca un cliente por su identificador único
+    // http://localhost:8080/api/cliente/find/{id}
     @GetMapping("/find/{id}")
     public Cliente findById(@PathVariable Long id) {
         return clienteService.buscarPorId(id);
@@ -60,6 +62,7 @@ public class ClienteRestController {
     // ==========================================
 
     // Actualiza la información personal de contacto del cliente
+    // http://localhost:8080/api/cliente/{id}/perfil
     @PostMapping("/{id}/perfil")
     public Cliente actualizarPerfil(@PathVariable Long id, @RequestBody Cliente cliente) {
         if (!Boolean.TRUE.equals(cuentaClienteService.actualizarPerfil(id, cliente))) {
@@ -70,6 +73,7 @@ public class ClienteRestController {
     }
 
     // Valida y actualiza la contraseña de acceso del cliente
+    // http://localhost:8080/api/cliente/{id}/password
     @PostMapping("/{id}/password")
     public ResponseEntity<Void> actualizarContrasena(
             @PathVariable Long id,
@@ -90,7 +94,7 @@ public class ClienteRestController {
 
     // Da de baja la cuenta del cliente siempre que NO registre historial de
     // reservas
-
+    // http://localhost:8080/api/cliente/delete/{id}
     @PostMapping("/delete/{id}")
     public ResponseEntity<Void> eliminarCuenta(@PathVariable Long id) {
         if (!Boolean.TRUE.equals(cuentaClienteService.eliminarCuenta(id))) {
