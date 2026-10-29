@@ -50,6 +50,7 @@ public class ReservaRestController {
 
     // Retorna el listado resumido de todas las reservas para la bandeja del
     // operador
+    // http://localhost:8080/api/reserva/
     @GetMapping
     public List<ReservaOperadorResponse> obtenerTodas() {
         return reservaService.obtenerTodasParaOperador();
@@ -57,6 +58,7 @@ public class ReservaRestController {
 
     // Obtiene el desglose general (huésped, habitación, cuenta, consumos y pagos)
     // por código público
+    // http://localhost:8080/api/reserva/{numeroReserva}
     @GetMapping("/{numeroReserva}")
     public ReservaDetalleOperadorResponse obtenerDetalle(
             @PathVariable String numeroReserva) {
@@ -64,6 +66,7 @@ public class ReservaRestController {
     }
 
     // Busca el ID de la reserva con cuenta abierta para el número visible de habitación.
+    // http://localhost:8080/api/reserva/habitacion/{numeroHabitacion}/actual
     @GetMapping("/habitacion/{numeroHabitacion}/actual")
     public ReservaIdentificadorResponse obtenerReservaActualPorHabitacion(
             @PathVariable String numeroHabitacion) {
@@ -72,6 +75,7 @@ public class ReservaRestController {
     }
 
     // Busca la reserva activa de la habitación para el check-out, aunque la cuenta ya esté pagada
+    // http://localhost:8080/api/reserva/habitacion/{numeroHabitacion}/checkout
     @GetMapping("/habitacion/{numeroHabitacion}/checkout")
     public ReservaIdentificadorResponse obtenerReservaCheckout(@PathVariable String numeroHabitacion) {
         return new ReservaIdentificadorResponse(
@@ -79,24 +83,28 @@ public class ReservaRestController {
     }
 
     // Obtiene el detalle completo de una reserva por su identificador interno
+    // http://localhost:8080/api/reserva/id/{reservaId}
     @GetMapping("/id/{reservaId}")
     public ReservaDetalleOperadorResponse obtenerDetallePorId(@PathVariable Long reservaId) {
         return reservaService.obtenerDetalleParaOperador(reservaId);
     }
 
     // Permite al operador cancelar una reserva
+    // http://localhost:8080/api/reserva/{numeroReserva}/cancelar
     @PutMapping("/{numeroReserva}/cancelar")
     public ReservaOperadorResponse cancelar(@PathVariable String numeroReserva) {
         return reservaService.cancelarParaOperador(numeroReserva);
     }
 
     // Activa una reserva confirmada desde el panel del operador
+    // http://localhost:8080/api/reserva/{numeroReserva}/activar
     @PutMapping("/{numeroReserva}/activar")
     public ReservaOperadorResponse activar(@PathVariable String numeroReserva) {
         return reservaService.activarParaOperador(numeroReserva);
     }
 
     // Permite al operador finalizar una estadía con la cuenta pagada
+    // http://localhost:8080/api/reserva/{numeroReserva}/finalizar
     @PutMapping("/{numeroReserva}/finalizar")
     public ReservaOperadorResponse finalizar(@PathVariable String numeroReserva) {
         return reservaService.finalizarParaOperador(numeroReserva);
@@ -107,6 +115,7 @@ public class ReservaRestController {
     // ==========================================
 
     // Obtiene las reservas activas (CONFIRMADA - EN CURSO) del cliente autenticado
+    // http://localhost:8080/api/reserva/cliente/{id}/activas
     @GetMapping("/cliente/{id}/activas")
     public List<Reserva> activasDeCliente(@PathVariable Long id) {
         Cliente cliente = clienteService.buscarPorId(id);
@@ -114,6 +123,7 @@ public class ReservaRestController {
     }
 
     // Obtiene el historial de reservas (FINALIZADAS - CANCELADAS) del cliente
+    // http://localhost:8080/api/reserva/cliente/{id}/historial
     @GetMapping("/cliente/{id}/historial")
     public List<Reserva> historialDeCliente(@PathVariable Long id) {
         Cliente cliente = clienteService.buscarPorId(id);
@@ -121,6 +131,7 @@ public class ReservaRestController {
     }
 
     // Obtiene el historial de pagos de todas las reservas del cliente
+    // http://localhost:8080/api/reserva/cliente/{id}/pagos
     @GetMapping("/cliente/{id}/pagos")
     public List<PagoClienteResponse> pagosDeCliente(@PathVariable Long id) {
         return reservaService.historialPagosDeCliente(id);
@@ -128,6 +139,7 @@ public class ReservaRestController {
 
     // Consulta disponibilidad de habitaciones para crear o editar una reserva del
     // cliente
+    // http://localhost:8080/api/reserva/cliente/{id}/disponibilidad
     @GetMapping("/cliente/{id}/disponibilidad")
     @Operation(summary = "Consulta disponibilidad real para crear o modificar una reserva del cliente")
     public List<Habitacion> disponibilidadDeCliente(
@@ -149,6 +161,7 @@ public class ReservaRestController {
 
     // Obtiene los datos de una reserva editable del cliente para precargar el
     // formulario
+    // http://localhost:8080/api/reserva/cliente/{id}/find/{reservaId}
     @GetMapping("/cliente/{id}/find/{reservaId}")
     @Operation(summary = "Obtiene una reserva futura que pertenece al cliente para precargar su edición")
     public Reserva reservaParaEditar(@PathVariable Long id, @PathVariable Long reservaId) {
@@ -156,6 +169,7 @@ public class ReservaRestController {
     }
 
     // Registra una nueva reserva asignando habitación y abriendo cuenta hotelera.
+    // http://localhost:8080/api/reserva/cliente/{id}
     @PostMapping("/cliente/{id}")
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Crea una reserva, asigna una habitación disponible y abre su cuenta")
@@ -173,6 +187,7 @@ public class ReservaRestController {
     }
 
     // Modifica las fechas o personas de una reserva futura del cliente.
+    // http://localhost:8080/api/reserva/cliente/{id}/{reservaId}
     @PutMapping("/cliente/{id}/{reservaId}")
     @Operation(summary = "Modifica una reserva futura del cliente y vuelve a validar su disponibilidad")
     public Reserva modificarReservaDeCliente(
@@ -188,6 +203,7 @@ public class ReservaRestController {
     }
 
     // Cancela una reserva desde el portal del cliente
+    // http://localhost:8080/api/reserva/cliente/{id}/{reservaId}/cancelar
     @PutMapping("/cliente/{id}/{reservaId}/cancelar")
     @Operation(summary = "Cancela una reserva futura del cliente conservando su historial")
     public Reserva cancelarReservaDeCliente(@PathVariable Long id, @PathVariable Long reservaId) {

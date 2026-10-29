@@ -35,6 +35,7 @@ public class HabitacionRestController {
     // ==========================================
 
     // Retorna la totalidad de habitaciones del hotel
+    // http://localhost:8080/api/habitacion
     @GetMapping
     public List<Habitacion> buscarTodas() {
         Collection<Habitacion> habitaciones = habitacionService.buscarTodas();
@@ -42,6 +43,7 @@ public class HabitacionRestController {
     }
 
     // Busca una habitación por su identificador
+    // http://localhost:8080/api/habitacion/find/{id}
     @GetMapping("/find/{id}")
     public Habitacion buscarPorId(@PathVariable Long id) {
         return habitacionService.buscarPorId(id);
@@ -49,6 +51,7 @@ public class HabitacionRestController {
 
     // Busca la habitación asignada a una reserva en particular
     // Retorna null si la reserva aún no tiene una habitación vinculada
+    // http://localhost:8080/api/habitacion/reserva/{reservaId}
     @GetMapping("/reserva/{reservaId}")
     public Habitacion buscarPorReserva(@PathVariable Long reservaId) {
         return habitacionService.buscarPorReserva(reservaId);
@@ -59,6 +62,7 @@ public class HabitacionRestController {
     // ==========================================
 
     // Crea una nueva habitación validando su categoría asociada
+    // http://localhost:8080/api/habitacion
     @PostMapping
     public Habitacion crear(@RequestBody Habitacion habitacion) {
         validarTipoHabitacion(habitacion);
@@ -67,6 +71,7 @@ public class HabitacionRestController {
     }
 
     // Actualiza los datos de una habitación existente
+    // http://localhost:8080/api/habitacion
     @PutMapping
     public Habitacion actualizar(@RequestBody Habitacion habitacion) {
         validarTipoHabitacion(habitacion);
@@ -75,6 +80,7 @@ public class HabitacionRestController {
     }
 
     // Cambia el estado operativo de la habitación entre disponible y no disponible
+    // http://localhost:8080/api/habitacion/estado/{id}
     @PutMapping("/estado/{id}")
     public Habitacion cambiarEstado(@PathVariable Long id) {
         Habitacion habitacion = habitacionService.cambiarEstado(id);
@@ -86,6 +92,7 @@ public class HabitacionRestController {
 
     // Elimina una habitación del sistema si NO TIENE reservas asociadas
     // Pasa a inactiva si registra reservas
+    // http://localhost:8080/api/habitacion/delete/{id}
     @DeleteMapping("/delete/{id}")
     public void eliminar(@PathVariable Long id) {
         habitacionService.eliminar(id);

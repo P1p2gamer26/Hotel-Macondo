@@ -24,6 +24,7 @@ public class TestimonioRestController {
     // ==========================================
 
     // Retorna el listado completo de testimonios para la landing page
+    // http://localhost:8080/api/testimonio
     @GetMapping
     public Collection<Testimonio> buscarTodos() {
         return testimonioService.buscarTodos();

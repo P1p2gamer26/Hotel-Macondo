@@ -32,18 +32,21 @@ public class ServicioRestController {
     // ==========================================
 
     // Retorna únicamente los servicios con estado activo para el portal público
+    // http://localhost:8080/api/servicio/catalogo
     @GetMapping("/catalogo")
     public List<Servicio> catalogoActivo() {
         return servicioService.obtenerCatalogoActivo();
     }
 
     // Obtiene servicios destacados o recomendados para el dashboard del cliente
+    // http://localhost:8080/api/servicio/recomendaciones
     @GetMapping("/recomendaciones")
     public List<Servicio> recomendaciones() {
         return servicioService.obtenerRecomendaciones(3);
     }
 
     // Retorna servicios relacionados para la vista de detalle
+    // http://localhost:8080/api/servicio/relacionados/{id}
     @GetMapping("/relacionados/{id}")
     public List<Servicio> relacionados(@PathVariable Long id) {
         return servicioService.obtenerRelacionados(id, 2);
@@ -54,6 +57,7 @@ public class ServicioRestController {
     // ==========================================
 
     // Retorna todos los servicios sin importar su estado
+    // http://localhost:8080/api/servicio
     @GetMapping
     public List<Servicio> buscarTodos() {
         Collection<Servicio> servicios = servicioService.buscarTodos();
@@ -62,24 +66,28 @@ public class ServicioRestController {
 
     // Busca un servicio por su identificador
     // Incluye servicios inactivos para permitir LA edición del administrador
+    // http://localhost:8080/api/servicio/find/{id}
     @GetMapping("/find/{id}")
     public Servicio buscarPorId(@PathVariable Long id) {
         return servicioService.buscarPorIdIncluyendoInactivos(id);
     }
 
     // Registra un nuevo servicio en el catálogo
+    // http://localhost:8080/api/servicio
     @PostMapping
     public Servicio crear(@RequestBody Servicio servicio) {
         return servicioService.guardar(servicio);
     }
 
     // Modifica los datos de un servicio existente
+    // http://localhost:8080/api/servicio
     @PutMapping
     public Servicio actualizar(@RequestBody Servicio servicio) {
         return servicioService.guardar(servicio);
     }
 
     // Alterna el estado activo o inactivo de un servicio
+    // http://localhost:8080/api/servicio/estado/{id}
     @PutMapping("/estado/{id}")
     public Servicio cambiarEstado(@PathVariable Long id) {
         Servicio servicio = servicioService.cambiarEstado(id);

@@ -37,6 +37,7 @@ public class TipoHabitacionRestController {
     // ==========================================
 
     // Retorna todos los tipos de habitación registrados
+    // http://localhost:8080/api/tipo-habitacion
     @GetMapping
     public List<TipoHabitacion> buscarTodos() {
         Collection<TipoHabitacion> tipos = tipoHabitacionService.buscarTodos();
@@ -44,6 +45,7 @@ public class TipoHabitacionRestController {
     }
 
     // Busca un tipo de habitación por su identificador
+    // http://localhost:8080/api/tipo-habitacion/find/{id}
     @GetMapping("/find/{id}")
     public TipoHabitacion buscarPorId(@PathVariable Long id) {
         return tipoHabitacionService.buscarPorId(id);
@@ -54,12 +56,14 @@ public class TipoHabitacionRestController {
     // ==========================================
 
     // Crea un nuevo tipo o categoría de habitación
+    // http://localhost:8080/api/tipo-habitacion
     @PostMapping
     public TipoHabitacion crear(@RequestBody TipoHabitacion tipo) {
         return tipoHabitacionService.guardar(tipo);
     }
 
     // Actualiza la configuración y datos de un tipo de habitación existente
+    // http://localhost:8080/api/tipo-habitacion
     @PutMapping
     public TipoHabitacion actualizar(@RequestBody TipoHabitacion tipo) {
         return tipoHabitacionService.guardar(tipo);
@@ -67,7 +71,7 @@ public class TipoHabitacionRestController {
 
     // Elimina una categoría si no tiene habitaciones asociadas
     // Si existen habitaciones ligadas a esta categoría, bloquea la acción
-
+    // http://localhost:8080/api/tipo-habitacion/delete/{id}
     @DeleteMapping("/delete/{id}")
     public void eliminar(@PathVariable Long id) {
         if (habitacionService.existeHabitacionConTipo(id)) {
