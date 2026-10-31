@@ -9,6 +9,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import com.hotel.macondo.entities.Admin;
@@ -40,6 +41,7 @@ import jakarta.transaction.Transactional;
 
 @Component
 @Transactional
+@Profile("default")
 public class DataLoader implements CommandLineRunner {
 
         @Autowired
