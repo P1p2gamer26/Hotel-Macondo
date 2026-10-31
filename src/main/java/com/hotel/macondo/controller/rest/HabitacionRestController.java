@@ -5,6 +5,8 @@ import java.util.Collection;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -64,10 +66,11 @@ public class HabitacionRestController {
     // Crea una nueva habitación validando su categoría asociada
     // http://localhost:8080/api/habitacion
     @PostMapping
-    public Habitacion crear(@RequestBody Habitacion habitacion) {
+    public ResponseEntity<Habitacion> crear(@RequestBody Habitacion habitacion) {
         validarTipoHabitacion(habitacion);
         Long idTipo = habitacion.getTipoHabitacion().getId();
-        return habitacionService.guardar(habitacion, idTipo);
+        Habitacion guardada = habitacionService.guardar(habitacion, idTipo);
+        return new ResponseEntity<>(guardada, HttpStatus.CREATED);
     }
 
     // Actualiza los datos de una habitación existente
