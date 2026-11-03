@@ -5,12 +5,10 @@ import java.time.LocalDate;
 import java.util.List;
 
 import org.assertj.core.api.Assertions;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import com.hotel.macondo.entities.Cliente;
 import com.hotel.macondo.entities.Habitacion;
@@ -18,7 +16,6 @@ import com.hotel.macondo.entities.Reserva;
 import com.hotel.macondo.entities.TipoHabitacion;
 
 @DataJpaTest
-@RunWith(SpringRunner.class)
 public class ReservaRepositoryTest {
 
     @Autowired
@@ -35,7 +32,7 @@ public class ReservaRepositoryTest {
 
     private Cliente clienteDePrueba;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         // Para las pruebas se necesita tipo, habitación, cliente y reservas
 
