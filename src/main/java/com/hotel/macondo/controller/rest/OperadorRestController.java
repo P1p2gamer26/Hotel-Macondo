@@ -5,6 +5,8 @@ import java.util.Collection;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -41,41 +43,44 @@ public class OperadorRestController {
     // Retorna todos los operadores registrados en el sistema
     // http://localhost:8080/api/operador
     @GetMapping
-    public List<Operador> buscarTodos() {
+    public ResponseEntity<List<Operador>> buscarTodos() {
         Collection<Operador> operadores = operadorService.buscarTodos();
-        return new ArrayList<>(operadores);
+        List<Operador> lista = new ArrayList<>(operadores);
+        return new ResponseEntity<>(lista, HttpStatus.OK);
     }
 
     // Registra un nuevo operador asignándolo como activo si el valor viene nulo
     // http://localhost:8080/api/operador
     @PostMapping
-    public Operador crear(@RequestBody Operador operador) {
+    public ResponseEntity<Operador> crear(@RequestBody Operador operador) {
         if (operador.getActivo() == null) {
             operador.setActivo(true);
         }
-        return operadorService.guardar(operador);
+        Operador guardado = operadorService.guardar(operador);
+        return new ResponseEntity<>(guardado, HttpStatus.CREATED);
     }
 
     // Alterna el estado de activación del operador
     // http://localhost:8080/api/operador/estado/{id}
     @PutMapping("/estado/{id}")
-    public Operador cambiarEstado(@PathVariable Long id) {
+    public ResponseEntity<Operador> cambiarEstado(@PathVariable Long id) {
         Operador operador = operadorService.cambiarEstado(id);
         if (operador == null) {
             throw new RecursoNoEncontradoException("Operador no encontrado");
         }
-        return operador;
+        return new ResponseEntity<>(operador, HttpStatus.OK);
     }
 
     // Elimina un operador por su identificador
     // http://localhost:8080/api/operador/delete/{id}
     @DeleteMapping("/delete/{id}")
-    public void eliminar(@PathVariable Long id) {
+    public ResponseEntity<Void> eliminar(@PathVariable Long id) {
         Operador operador = operadorService.buscarPorId(id);
         if (operador == null) {
             throw new RecursoNoEncontradoException("Operador no encontrado");
         }
         operadorService.eliminar(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     // Añade servicios a la cuenta asociada al número público de reserva.
@@ -99,7 +104,9 @@ public class OperadorRestController {
     // Paga el total de la cuenta asociada al número público de reserva.
     // http://localhost:8080/api/operador/cuenta/reserva/{numeroReserva}/pago
     @PostMapping("/cuenta/reserva/{numeroReserva}/pago")
-    public Pago pagarCuenta(@PathVariable String numeroReserva, @RequestBody PagoSolicitud solicitud) {
-        return reservaService.pagarCuentaParaOperador(numeroReserva, solicitud == null ? null : solicitud.metodoPago());
+    public ResponseEntity<Pago> pagarCuenta(@PathVariable String numeroReserva, @RequestBody PagoSolicitud solicitud) {
+        Pago pago = reservaService.pagarCuentaParaOperador(
+                numeroReserva, solicitud == null ? null : solicitud.metodoPago());
+        return new ResponseEntity<>(pago, HttpStatus.OK);
     }
 }
