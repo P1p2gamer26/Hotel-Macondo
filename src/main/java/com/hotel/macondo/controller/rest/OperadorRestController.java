@@ -45,7 +45,8 @@ public class OperadorRestController {
     @GetMapping
     public ResponseEntity<List<Operador>> buscarTodos() {
         Collection<Operador> operadores = operadorService.buscarTodos();
-        return ResponseEntity.ok(new ArrayList<>(operadores));
+        List<Operador> lista = new ArrayList<>(operadores);
+        return new ResponseEntity<>(lista, HttpStatus.OK);
     }
 
     // Registra un nuevo operador asignándolo como activo si el valor viene nulo
@@ -55,7 +56,8 @@ public class OperadorRestController {
         if (operador.getActivo() == null) {
             operador.setActivo(true);
         }
-        return ResponseEntity.status(HttpStatus.CREATED).body(operadorService.guardar(operador));
+        Operador guardado = operadorService.guardar(operador);
+        return new ResponseEntity<>(guardado, HttpStatus.CREATED);
     }
 
     // Alterna el estado de activación del operador
@@ -66,7 +68,7 @@ public class OperadorRestController {
         if (operador == null) {
             throw new RecursoNoEncontradoException("Operador no encontrado");
         }
-        return ResponseEntity.ok(operador);
+        return new ResponseEntity<>(operador, HttpStatus.OK);
     }
 
     // Elimina un operador por su identificador
@@ -78,7 +80,7 @@ public class OperadorRestController {
             throw new RecursoNoEncontradoException("Operador no encontrado");
         }
         operadorService.eliminar(id);
-        return ResponseEntity.noContent().build();
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     // Añade servicios a la cuenta asociada al número público de reserva.
@@ -105,6 +107,6 @@ public class OperadorRestController {
     public ResponseEntity<Pago> pagarCuenta(@PathVariable String numeroReserva, @RequestBody PagoSolicitud solicitud) {
         Pago pago = reservaService.pagarCuentaParaOperador(
                 numeroReserva, solicitud == null ? null : solicitud.metodoPago());
-        return ResponseEntity.ok(pago);
+        return new ResponseEntity<>(pago, HttpStatus.OK);
     }
 }
