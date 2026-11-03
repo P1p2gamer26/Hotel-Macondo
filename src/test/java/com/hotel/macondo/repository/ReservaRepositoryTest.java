@@ -1,24 +1,29 @@
 package com.hotel.macondo.repository;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.List;
-
-import org.assertj.core.api.Assertions;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.test.context.junit4.SpringRunner;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import com.hotel.macondo.entities.Cliente;
+import com.hotel.macondo.entities.Cuenta;
+import com.hotel.macondo.entities.DetalleCuenta;
 import com.hotel.macondo.entities.Habitacion;
 import com.hotel.macondo.entities.Reserva;
 import com.hotel.macondo.entities.TipoHabitacion;
+import jakarta.persistence.EntityManager;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit4.SpringRunner;
 
 @DataJpaTest
 @RunWith(SpringRunner.class)
+@ActiveProfiles("test")
 public class ReservaRepositoryTest {
 
     @Autowired
@@ -33,88 +38,170 @@ public class ReservaRepositoryTest {
     @Autowired
     private TipoHabitacionRepository tipoHabitacionRepository;
 
-    private Cliente clienteDePrueba;
+    @Autowired
+    private CuentaRepository cuentaRepository;
 
-    @Before
+    @Autowired
+    private EntityManager entityManager;
+
+    private Cliente cliente;
+    private Habitacion habitacion101;
+    private Habitacion habitacion102;
+    private LocalDate hoy;
+
+    @BeforeEach
     public void setUp() {
-        // Para las pruebas se necesita tipo, habitación, cliente y reservas
-
-        // Guardar tipo de habitacion
+        hoy = LocalDate.now();
         TipoHabitacion tipo = tipoHabitacionRepository.save(
-                TipoHabitacion.builder()
-                        .nombre("Castaño Fundacional")
-                        .descripcion("Habitación doble estándar")
-                        .precioNoche(new BigDecimal("280000"))
-                        .capacidadPersonas(2)
-                        .imagen("habitacion1.jpg")
-                        .build());
-
-        // Guardar habitacion asociada al tipo
-        Habitacion habitacion = Habitacion.builder()
-                .numero("101")
-                .nombre("Sombra del Castaño 101")
-                .piso(1)
-                .capacidad(2)
-                .precio(new BigDecimal("280000"))
-                .estado("DISPONIBLE")
-                .build();
-        habitacion.aplicarTipo(tipo);
-        habitacion = habitacionRepository.save(habitacion);
-
-        // Guardar Cliente
-        clienteDePrueba = clienteRepository.save(
-                Cliente.builder()
-                        .nombre("Úrsula")
-                        .apellido("Iguarán")
-                        .cedula("101")
-                        .telefono("300101")
-                        .correo("ursula@macondo.com")
-                        .build());
-
-        // Guardar una Reserva ACTIVA y futura para este cliente
-        Reserva reservaActiva = new Reserva(
-                "MCD-TEST-VIGENTE",
-                LocalDate.now().plusDays(2),
-                LocalDate.now().plusDays(5),
-                2,
-                "ACTIVA",
-                new BigDecimal("280000"),
-                new BigDecimal("840000"));
-        reservaActiva.asignarCliente(clienteDePrueba);
-        reservaActiva.asignarHabitacion(habitacion);
-        reservaRepository.save(reservaActiva);
-
-        // Guardar una Reserva CANCELADA para ver que el filtro la ignore (
-        // buscarVigentesPorCliente)
-        Reserva reservaCancelada = new Reserva(
-                "MCD-TEST-CANCELADA",
-                LocalDate.now().plusDays(6),
-                LocalDate.now().plusDays(8),
-                2,
-                "CANCELADA",
-                new BigDecimal("280000"),
-                new BigDecimal("560000"));
-        reservaCancelada.asignarCliente(clienteDePrueba);
-        reservaCancelada.asignarHabitacion(habitacion);
-        reservaRepository.save(reservaCancelada);
+                new TipoHabitacion("Suite de prueba", "Suite", "suite.jpg",
+                        new BigDecimal("120"), 4));
+        habitacion101 = new Habitacion("Habitacion 101", "Suite",
+                tipo.getPrecioNoche(), 4, "101", "DISPONIBLE", 1);
+        habitacion101.aplicarTipo(tipo);
+        habitacion101 = habitacionRepository.save(habitacion101);
+        habitacion102 = new Habitacion("Habitacion 102", "Suite",
+                tipo.getPrecioNoche(), 4, "102", "DISPONIBLE", 1);
+        habitacion102.aplicarTipo(tipo);
+        habitacion102 = habitacionRepository.save(habitacion102);
+        cliente = clienteRepository.save(new Cliente("Cliente", "Prueba", "123456789",
+                "3001234567", "cliente@macondo.test"));
     }
 
     @Test
-    public void ReservaRepository_buscarVigentesPorCliente_retornaListaConReservasActivas() {
+    public void ReservaRepository_buscarVigentesPorCliente_ReservasVigentesOrdenadas() {
+        // Arrange
+        guardarReserva("RES-ACTIVA", "ACTIVA", cliente, habitacion101,
+                hoy.plusDays(5), hoy.plusDays(7));
+        guardarReserva("RES-CONFIRMADA", "CONFIRMADA", cliente, habitacion101,
+                hoy.plusDays(1), hoy.plusDays(3));
+        guardarReserva("RES-PENDIENTE", "PENDIENTE", cliente, habitacion102,
+                hoy.plusDays(3), hoy.plusDays(5));
+        guardarReserva("RES-CANCELADA", "CANCELADA", habitacion101);
+        guardarReserva("RES-FINALIZADA", "FINALIZADA", habitacion102);
+        guardarReserva("RES-VENCIDA", "ACTIVA", cliente, habitacion101,
+                hoy.minusDays(4), hoy.minusDays(2));
+        Cliente otroCliente = clienteRepository.save(new Cliente("Otro", "Cliente",
+                "987654321", "3009876543", "otro@macondo.test"));
+        guardarReserva("RES-AJENA", "ACTIVA", otroCliente, habitacion102,
+                hoy.plusDays(1), hoy.plusDays(3));
+        entityManager.clear();
 
-        // Arrange: Se define la fecha actual para evaluar la vigencia
-        LocalDate fechaActual = LocalDate.now();
+        // Act
+        var vigentes = reservaRepository.buscarVigentesPorCliente(cliente, hoy);
 
-        // Act: Se invoca el metodo buscarVigentesPorCliente para obtener las reservas
-        // vigentes del cliente de prueba
-        List<Reserva> vigentes = reservaRepository.buscarVigentesPorCliente(clienteDePrueba, fechaActual);
+        // Assert
+        assertThat(vigentes).extracting(Reserva::getNumeroReserva)
+                .containsExactly("RES-CONFIRMADA", "RES-PENDIENTE", "RES-ACTIVA");
+    }
 
-        // Assert: Se valida que la lista no sea nula, no esté vacia, contenga
-        // exactamente 1 elemento (omitiendo la cancelada) y traiga el código correcto
-        Assertions.assertThat(vigentes).isNotNull();
-        Assertions.assertThat(vigentes).isNotEmpty();
-        Assertions.assertThat(vigentes.size()).isEqualTo(1);
-        Assertions.assertThat(vigentes.get(0).getNumeroReserva()).isEqualTo("MCD-TEST-VIGENTE");
-        Assertions.assertThat(vigentes.get(0).getEstado()).isEqualTo("ACTIVA");
+    @Test
+    public void ReservaRepository_buscarHistoricasPorCliente_ReservasHistoricasOrdenadas() {
+        // Arrange
+        guardarReserva("RES-CANCELADA", "CANCELADA", cliente, habitacion101,
+                hoy.plusDays(5), hoy.plusDays(7));
+        guardarReserva("RES-FINALIZADA", "FINALIZADA", cliente, habitacion101,
+                hoy.minusDays(3), hoy.minusDays(1));
+        guardarReserva("RES-VENCIDA", "ACTIVA", cliente, habitacion102,
+                hoy.minusDays(7), hoy.minusDays(4));
+        guardarReserva("RES-ACTIVA-FUTURA", "ACTIVA", habitacion102);
+        Cliente sinReservas = clienteRepository.save(new Cliente("Sin", "Reservas",
+                "987654321", "3009876543", "sin@macondo.test"));
+        entityManager.clear();
+
+        // Act
+        var historicas = reservaRepository.buscarHistoricasPorCliente(cliente, hoy);
+        var vacias = reservaRepository.buscarHistoricasPorCliente(sinReservas, hoy);
+
+        // Assert
+        assertThat(historicas).extracting(Reserva::getNumeroReserva)
+                .containsExactly("RES-CANCELADA", "RES-FINALIZADA", "RES-VENCIDA");
+        assertThat(vacias).isEmpty();
+    }
+
+    @Test
+    public void ReservaRepository_buscarPorHabitacion_ReservasDeLaHabitacionOrdenadas() {
+        // Arrange
+        Reserva posterior = guardarReserva("RES-101-POSTERIOR", "CONFIRMADA",
+                cliente, habitacion101, hoy.plusDays(5), hoy.plusDays(7));
+        Reserva anterior = guardarReserva("RES-101-ANTERIOR", "ACTIVA",
+                cliente, habitacion101, hoy.plusDays(1), hoy.plusDays(3));
+        guardarReserva("RES-102", "ACTIVA", habitacion102);
+        Long idHabitacion = habitacion101.getId();
+        entityManager.clear();
+
+        // Act
+        var reservas = reservaRepository.buscarPorHabitacion(idHabitacion);
+        var inexistentes = reservaRepository.buscarPorHabitacion(Long.MAX_VALUE);
+
+        // Assert
+        assertThat(reservas).extracting(Reserva::getId)
+                .containsExactly(anterior.getId(), posterior.getId());
+        assertThat(inexistentes).isEmpty();
+    }
+
+    @Test
+    public void ReservaRepository_buscarIdsActivosPorNumeroHabitacion_IdDeReservaActiva() {
+        // Arrange
+        Reserva activa = guardarReserva("RES-ACTIVA-101", "ACTIVA", habitacion101);
+        guardarReserva("RES-CANCELADA-101", "CANCELADA", habitacion101);
+        guardarReserva("RES-CONFIRMADA-101", "CONFIRMADA", habitacion101);
+        guardarReserva("RES-ACTIVA-102", "ACTIVA", habitacion102);
+        entityManager.clear();
+
+        // Act
+        var ids = reservaRepository.buscarIdsActivosPorNumeroHabitacion("101");
+        var inexistentes = reservaRepository.buscarIdsActivosPorNumeroHabitacion("999");
+
+        // Assert
+        assertThat(ids).containsExactly(activa.getId());
+        assertThat(inexistentes).isEmpty();
+    }
+
+    @Test
+    public void ReservaRepository_buscarDetalleCompleto_ReservaConRelaciones() {
+        // Arrange
+        Reserva reserva = guardarReserva("RES-DETALLE", "ACTIVA", habitacion101);
+        Cuenta cuenta = new Cuenta("ABIERTA", new BigDecimal("240"), LocalDateTime.now());
+        cuenta.asignarReserva(reserva);
+        cuenta.agregarDetalle(new DetalleCuenta(1, new BigDecimal("25"), LocalDateTime.now()));
+        cuentaRepository.saveAndFlush(cuenta);
+        Long reservaId = reserva.getId();
+        Long clienteId = cliente.getId();
+        Long habitacionId = habitacion101.getId();
+        Long tipoId = habitacion101.getTipoHabitacion().getId();
+        Long cuentaId = cuenta.getId();
+        entityManager.clear();
+
+        // Act
+        var encontrada = reservaRepository.buscarDetalleCompleto("RES-DETALLE");
+        var inexistente = reservaRepository.buscarDetalleCompleto("RES-INEXISTENTE");
+
+        // Assert
+        assertThat(encontrada).isPresent();
+        Reserva detalle = encontrada.orElseThrow();
+        assertThat(detalle.getId()).isEqualTo(reservaId);
+        assertThat(detalle.getCliente().getId()).isEqualTo(clienteId);
+        assertThat(detalle.getHabitacion().getId()).isEqualTo(habitacionId);
+        assertThat(detalle.getHabitacion().getTipoHabitacion().getId()).isEqualTo(tipoId);
+        assertThat(detalle.getCuenta().getId()).isEqualTo(cuentaId);
+        assertThat(detalle.getCuenta().getDetalles()).hasSize(1);
+        assertThat(detalle.getCuenta().getDetalles().get(0).getPrecio())
+                .isEqualByComparingTo("25");
+        assertThat(inexistente).isEmpty();
+    }
+
+    private Reserva guardarReserva(String numero, String estado, Habitacion habitacion) {
+        return guardarReserva(numero, estado, cliente, habitacion,
+                hoy.plusDays(1), hoy.plusDays(3));
+    }
+
+    private Reserva guardarReserva(String numero, String estado, Cliente titular,
+            Habitacion habitacion, LocalDate entrada, LocalDate salida) {
+        BigDecimal precio = habitacion.getPrecio();
+        BigDecimal total = precio.multiply(BigDecimal.valueOf(ChronoUnit.DAYS.between(entrada, salida)));
+        Reserva reserva = new Reserva(numero, entrada, salida, 2, estado, precio, total);
+        reserva.asignarCliente(titular);
+        reserva.asignarHabitacion(habitacion);
+        return reservaRepository.saveAndFlush(reserva);
     }
 }
