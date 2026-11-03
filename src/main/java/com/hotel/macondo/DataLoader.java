@@ -9,6 +9,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import com.hotel.macondo.entities.Admin;
@@ -40,6 +41,7 @@ import jakarta.transaction.Transactional;
 
 @Component
 @Transactional
+@Profile("default")
 public class DataLoader implements CommandLineRunner {
 
         @Autowired
@@ -78,18 +80,16 @@ public class DataLoader implements CommandLineRunner {
         @Override
         public void run(String... args) {
                 List<TipoHabitacion> tipos = cargarTiposHabitacion();
-                
+
                 // List<Habitacion> habitaciones = cargarHabitaciones(tipos);
                 List<Habitacion> habitaciones = cargarHabitacionesPrueba(tipos);
                 List<Servicio> servicios = cargarServicios();
-
 
                 cargarTestimonios();
 
                 List<Cliente> clientes = cargarClientes();
                 cargarUsuariosYPerfiles(clientes);
 
-                
                 // cargarReservas(clientes, habitaciones, servicios);
                 cargarReservasPrueba(clientes, habitaciones, servicios);
         }
@@ -178,21 +178,32 @@ public class DataLoader implements CommandLineRunner {
 
         private List<Habitacion> cargarHabitacionesPrueba(List<TipoHabitacion> tipos) {
                 List<Habitacion> habitaciones = new ArrayList<>();
-                TipoHabitacion tipo = tipos.get(1); // Superior: máximo 3 personas, $450.000 por noche.
+                int numeroActual = 201;
 
-                // Solo 201, 202, 203, 204 y 205. La 205 no tendrá reservas precargadas.
-                for (int numero = 201; numero <= 205; numero++) {
-                        Habitacion habitacion = Habitacion.builder()
-                                        .nombre("Habitación " + numero)
-                                        .etiqueta("POPULAR")
-                                        .precio(tipo.getPrecioNoche())
-                                        .capacidad(tipo.getCapacidadPersonas())
-                                        .numero(String.valueOf(numero))
-                                        .estado("DISPONIBLE")
-                                        .piso(2)
-                                        .build();
-                        habitacion.aplicarTipo(tipo);
-                        habitaciones.add(habitacionRepository.save(habitacion));
+                // Recorremos cada tipo de habitación
+                for (int i = 0; i < tipos.size(); i++) {
+                        TipoHabitacion tipo = tipos.get(i);
+                        int piso = 2;
+
+                        // 5 habitaciones para cada tipo
+                        for (int j = 0; j < 5; j++) {
+                                String numeroStr = String.valueOf(numeroActual);
+
+                                Habitacion habitacion = Habitacion.builder()
+                                                .nombre("Habitación " + numeroStr)
+                                                .etiqueta("ESTÁNDAR")
+                                                .precio(tipo.getPrecioNoche())
+                                                .capacidad(tipo.getCapacidadPersonas())
+                                                .numero(numeroStr)
+                                                .estado("DISPONIBLE")
+                                                .piso(piso)
+                                                .build();
+
+                                habitacion.aplicarTipo(tipo);
+                                habitaciones.add(habitacionRepository.save(habitacion));
+
+                                numeroActual++;
+                        }
                 }
 
                 return habitaciones;
@@ -563,7 +574,8 @@ public class DataLoader implements CommandLineRunner {
 
                 // Resultados iniciales para Superior, sin haber creado nuevas reservas:
                 // - De hoy+5 a hoy+8, con 2 o 3 personas: 3 disponibles (203, 204 y 205).
-                // - De hoy+5 a hoy+6: 4 disponibles; la 202 empieza justo al finalizar ese rango.
+                // - De hoy+5 a hoy+6: 4 disponibles; la 202 empieza justo al finalizar ese
+                // rango.
                 // - De hoy+9 a hoy+11: 5 disponibles; la salida no bloquea ese mismo día.
                 // - Con 4 personas: no hay disponibilidad por superar la capacidad del tipo.
         }
