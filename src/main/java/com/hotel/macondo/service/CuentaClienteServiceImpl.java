@@ -10,9 +10,14 @@ import com.hotel.macondo.errors.FormularioErroneoException;
 import com.hotel.macondo.errors.PeticionImposible;
 import com.hotel.macondo.repository.ClienteRepository;
 
+import java.util.regex.Pattern;
+
 @Service
 @Transactional
 public class CuentaClienteServiceImpl implements CuentaClienteService {
+
+  private static final Pattern EMAIL_PATTERN = Pattern.compile(
+      "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
 
   @Autowired
   private ClienteService clienteService;
@@ -35,11 +40,17 @@ public class CuentaClienteServiceImpl implements CuentaClienteService {
   @Override
   public void crearCuenta(Cliente cliente, String contrasena) {
     String correo = cliente.getCorreo();
-    if (!usuarioService.validarCorreo(correo)) {
-      throw new FormularioErroneoException("Correo electrónico ya en uso.");
-    }
+
     if (correo == null || correo.isBlank()) {
       throw new FormularioErroneoException("El correo no puede estar vacío.");
+    }
+
+    if (!EMAIL_PATTERN.matcher(correo.trim()).matches()) {
+      throw new FormularioErroneoException("El formato del correo electrónico no es válido.");
+    }
+
+    if (!usuarioService.validarCorreo(correo)) {
+      throw new FormularioErroneoException("Correo electrónico ya en uso.");
     }
 
     if (clienteRepository.findByCedula(cliente.getCedula()).isPresent()) {

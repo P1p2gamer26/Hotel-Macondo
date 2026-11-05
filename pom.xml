@@ -77,6 +77,34 @@
     		<artifactId>junit</artifactId>
     		<scope>test</scope>
 		</dependency>
+
+		<!-- Selenium -->
+		<dependency>
+    		<groupId>org.seleniumhq.selenium</groupId>
+    		<artifactId>selenium-java</artifactId>
+    		<version>4.11.0</version>
+   			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+   			<groupId>org.seleniumhq.selenium</groupId>
+  			<artifactId>selenium-api</artifactId>
+    		<scope>test</scope>
+		</dependency>
+
+		<dependency>
+   			<groupId>org.seleniumhq.selenium</groupId>
+    		<artifactId>selenium-chrome-driver</artifactId>
+    		<scope>test</scope>
+		</dependency>
+
+		<!-- WebDriverManager para manejar las versiones del driver de Chrome :c -->
+		<dependency>
+    		<groupId>io.github.bonigarcia</groupId>
+    		<artifactId>webdrivermanager</artifactId>
+    		<version>5.4.1</version>
+    		<scope>test</scope>
+		</dependency>
 	</dependencies>
 
 	<build>
