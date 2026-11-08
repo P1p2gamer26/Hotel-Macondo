@@ -6,7 +6,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import org.assertj.core.api.Assertions;
-import org.h2.tools.Console;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -85,7 +84,6 @@ public class Caso1E2ETest {
         // ========================================================================
         // Arrage - Todas las variables que se usan
         // ========================================================================
-        long timestamp = System.currentTimeMillis();
 
         String correoInvalido = "prueba@gmail"; // Falta el dominio completo
         String correoValido = "prueba@macondo.com";
