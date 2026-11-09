@@ -551,7 +551,7 @@ public class DataLoaderTest implements CommandLineRunner {
                                 "MCD-PRUEBA-001",
                                 hoy.plusDays(5), hoy.plusDays(8), 2, "CONFIRMADA",
                                 clientes.get(0), habitaciones.get(0), true,
-                                List.of(servicios.get(0)));
+                                List.of());
 
                 // 202: reserva futura de otro cliente, con el máximo de 3 personas.
                 guardarReserva(
