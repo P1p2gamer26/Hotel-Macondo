@@ -82,7 +82,9 @@ public class Caso2E2ETest {
 
         // Envia el formulario, clic en el boton de submit
         wait.until(ExpectedConditions.elementToBeClickable(By.id("loginBtnSubmit")));
-        driver.findElement(By.id("loginBtnSubmit")).click();
+
+        WebElement loginButton = driver.findElement(By.id("loginBtnSubmit"));
+        hacerClickVisible(loginButton);
     }    
 
     public void hacerClickVisible(WebElement elemento) {
