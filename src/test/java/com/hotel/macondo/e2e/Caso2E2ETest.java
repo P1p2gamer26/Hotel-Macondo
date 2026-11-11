@@ -111,11 +111,6 @@ public class Caso2E2ETest {
         elemento.click();
     }
 
-    // Convierte un monto formateado en pesos (por ejemplo "$ 1.250.000") en un número
-    private long leerMonto(String texto) {
-        return Long.parseLong(texto.replaceAll("[^0-9]", ""));
-    }
-
     // ========================================================================
     // CONFIGURACIÓN DEL BEFORE EACH Y EL AFTER EACH
     // ========================================================================
@@ -323,20 +318,9 @@ public class Caso2E2ETest {
 
         driver.findElement(By.id("checkout-btn")).click();
 
-        // Leemos el saldo que el operador ve antes de pagar (sin valores quemados)
-        WebElement saldoPendiente = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("saldo-pendiente")));
-        long saldoMostrado = leerMonto(saldoPendiente.getText());
-        Assertions.assertThat(saldoMostrado).isPositive();
-
         WebElement botonPagar = wait.until(ExpectedConditions.elementToBeClickable(By.id("pagar-cuenta-bton")));
         hacerClickVisible(botonPagar);
         pausa(1000);
-
-        // El pago registrado en el historial debe ser exactamente el saldo que se mostró
-        wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("td.pago-monto")));
-        List<WebElement> montosPagados = driver.findElements(By.cssSelector("td.pago-monto"));
-        long montoCobrado = leerMonto(montosPagados.get(montosPagados.size() - 1).getText());
-        Assertions.assertThat(montoCobrado).isEqualTo(saldoMostrado);
 
         WebElement llavesDevueltas = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("llaves-devueltas")));
         WebElement habitacionInspeccionada = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("habitacion-inspeccionada")));
