@@ -1,6 +1,7 @@
 package com.hotel.macondo.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -31,15 +32,15 @@ public class Admin {
 
   // El perfil de admin muere con su usuario.
   @JsonIgnore
-  @OneToOne
+  @OneToOne(cascade = CascadeType.ALL)
   @OnDelete(action = OnDeleteAction.CASCADE)
-  private Usuario usuario;
+  private UserEntity usuario;
 
   public Admin(String nombre) {
     this.nombre = nombre;
   }
 
-  public void asignarUsuario(Usuario usuario) {
+  public void asignarUsuario(UserEntity usuario) {
     this.usuario = usuario;
     if (usuario != null && usuario.getAdmin() != this) {
       usuario.asignarAdmin(this);

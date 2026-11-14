@@ -1,6 +1,7 @@
 package com.hotel.macondo.controller.rest;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,10 +13,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.hotel.macondo.entities.Usuario;
+import com.hotel.macondo.entities.Rol;
+import com.hotel.macondo.entities.UserEntity;
 import com.hotel.macondo.service.UsuarioService;
-
-// Controlador REST para la autenticación y control de acceso.
 
 @RestController
 @RequestMapping("/api/auth")
@@ -41,12 +41,17 @@ public class AuthRestController {
         }
 
         try {
-            Usuario usuario = usuarioService.autenticar(correo, contrasena);
+            UserEntity usuario = usuarioService.autenticar(correo, contrasena);
+
+            List<String> nombresRoles = usuario.getRoles().stream()
+                    .map(Rol::getName)
+                    .toList();
 
             Map<String, Object> respuesta = new HashMap<>();
             respuesta.put("id", usuario.getId());
             respuesta.put("correo", usuario.getCorreo());
-            respuesta.put("rol", usuario.getRol().name());
+            respuesta.put("roles", nombresRoles);
+            respuesta.put("rol", nombresRoles.isEmpty() ? null : nombresRoles.get(0));
 
             // Se envía el perfil básico. Cliente ignora usuario y reservas para evitar
             // ciclos en JSON
