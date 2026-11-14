@@ -1,17 +1,17 @@
 package com.hotel.macondo.repository;
 
-import com.hotel.macondo.entities.Usuario;
+import com.hotel.macondo.entities.UserEntity;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
+public interface UsuarioRepository extends JpaRepository<UserEntity, Long> {
 
-  List<Usuario> findAllByOrderByIdAsc();
+  List<UserEntity> findAllByOrderByIdAsc();
 
-  Optional<Usuario> findByCorreoIgnoreCase(String correo);
+  Optional<UserEntity> findByCorreoIgnoreCase(String correo);
 
   boolean existsByCorreoIgnoreCase(String correo);
 

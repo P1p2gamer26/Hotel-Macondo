@@ -10,7 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.hotel.macondo.entities.Cliente;
 import com.hotel.macondo.entities.Reserva;
-import com.hotel.macondo.entities.Usuario;
+import com.hotel.macondo.entities.UserEntity;
 import com.hotel.macondo.errors.PeticionImposible;
 import com.hotel.macondo.errors.RecursoNoEncontradoException;
 import com.hotel.macondo.repository.ClienteRepository;
@@ -69,7 +69,7 @@ public class ClienteServiceImpl implements ClienteService {
           "No se puede eliminar el cliente: registra reservas en su historial.");
     }
 
-    Usuario usuario = cliente.getUsuario();
+    UserEntity usuario = cliente.getUsuario();
     if (usuario != null) {
       cliente.setUsuario(null);
       usuarioRepository.delete(usuario);

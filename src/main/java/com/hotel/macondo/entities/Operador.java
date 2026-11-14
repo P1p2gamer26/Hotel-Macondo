@@ -1,6 +1,7 @@
 package com.hotel.macondo.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -34,16 +35,16 @@ public class Operador {
 
   // El perfil de operador muere con su usuario.
   @JsonIgnore
-  @OneToOne
+  @OneToOne(cascade = CascadeType.ALL)
   @OnDelete(action = OnDeleteAction.CASCADE)
-  private Usuario usuario;
+  private UserEntity usuario;
 
   public Operador(String nombre, Boolean activo) {
     this.nombre = nombre;
     this.activo = activo;
   }
 
-  public void asignarUsuario(Usuario usuario) {
+  public void asignarUsuario(UserEntity usuario) {
     this.usuario = usuario;
     if (usuario != null && usuario.getOperador() != this) {
       usuario.asignarOperador(this);

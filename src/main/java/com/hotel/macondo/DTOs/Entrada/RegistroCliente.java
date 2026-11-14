@@ -1,4 +1,4 @@
-package com.hotel.macondo.dto;
+package com.hotel.macondo.DTOs.Entrada;
 
 import com.hotel.macondo.entities.Cliente;
 import lombok.Data;
