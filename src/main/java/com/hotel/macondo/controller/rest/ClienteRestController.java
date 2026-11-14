@@ -1,6 +1,7 @@
 package com.hotel.macondo.controller.rest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,12 +11,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.hotel.macondo.dto.CambioContrasenaRequest;
-import com.hotel.macondo.dto.RegistroCliente;
+import com.hotel.macondo.DTOs.Mapper.ClienteMapper;
+import com.hotel.macondo.DTOs.Salida.ClienteDTO;
+import com.hotel.macondo.DTOs.Entrada.CambioContrasenaRequest;
+import com.hotel.macondo.DTOs.Entrada.RegistroCliente;
 import com.hotel.macondo.entities.Cliente;
 import com.hotel.macondo.errors.FormularioErroneoException;
 import com.hotel.macondo.errors.PeticionImposible;
-import com.hotel.macondo.errors.RecursoNoEncontradoException;
 import com.hotel.macondo.service.ClienteService;
 import com.hotel.macondo.service.CuentaClienteService;
 
@@ -39,7 +41,7 @@ public class ClienteRestController {
     // Registra un nuevo cliente y genera su cuenta de usuario asociada
     // http://localhost:8080/api/cliente/registro
     @PostMapping("/registro")
-    public Cliente registrar(@RequestBody RegistroCliente registro) {
+    public ResponseEntity<ClienteDTO> registrar(@RequestBody RegistroCliente registro) {
         if (registro.getCliente() == null) {
             throw new FormularioErroneoException("Faltan los datos del cliente.");
         }
@@ -47,14 +49,17 @@ public class ClienteRestController {
         // cliente
         registro.getCliente().setId(null);
         cuentaClienteService.crearCuenta(registro.getCliente(), registro.getContrasena());
-        return registro.getCliente();
+        ClienteDTO clienteDTO = ClienteMapper.INSTANCE.convert(registro.getCliente());
+        return new ResponseEntity<>(clienteDTO, HttpStatus.OK);
     }
 
     // Busca un cliente por su identificador único
     // http://localhost:8080/api/cliente/find/{id}
     @GetMapping("/find/{id}")
-    public Cliente findById(@PathVariable Long id) {
-        return clienteService.buscarPorId(id);
+    public ResponseEntity<ClienteDTO> findById(@PathVariable Long id) {
+        Cliente cliente = clienteService.buscarPorId(id);
+        ClienteDTO clienteDTO = ClienteMapper.INSTANCE.convert(cliente);
+        return new ResponseEntity<>(clienteDTO, HttpStatus.OK);
     }
 
     // ==========================================
@@ -64,12 +69,14 @@ public class ClienteRestController {
     // Actualiza la información personal de contacto del cliente
     // http://localhost:8080/api/cliente/{id}/perfil
     @PostMapping("/{id}/perfil")
-    public Cliente actualizarPerfil(@PathVariable Long id, @RequestBody Cliente cliente) {
+    public ResponseEntity<ClienteDTO> actualizarPerfil(@PathVariable Long id, @RequestBody Cliente cliente) {
         if (!Boolean.TRUE.equals(cuentaClienteService.actualizarPerfil(id, cliente))) {
             throw new FormularioErroneoException(
                     "No fue posible actualizar el perfil. Verifica que el correo no esté en uso.");
         }
-        return clienteService.buscarPorId(id);
+        Cliente actualizado = clienteService.buscarPorId(id);
+        ClienteDTO clienteDTO = ClienteMapper.INSTANCE.convert(actualizado);
+        return new ResponseEntity<>(clienteDTO, HttpStatus.OK);
     }
 
     // Valida y actualiza la contraseña de acceso del cliente

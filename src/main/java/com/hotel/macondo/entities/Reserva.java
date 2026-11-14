@@ -11,11 +11,11 @@ import jakarta.persistence.OneToOne;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import lombok.Builder;
 
 @Builder
 @Getter
@@ -54,6 +54,7 @@ public class Reserva {
   @ManyToOne
   private Cliente cliente;
 
+  @JsonIgnore
   @ManyToOne
   private Habitacion habitacion;
 

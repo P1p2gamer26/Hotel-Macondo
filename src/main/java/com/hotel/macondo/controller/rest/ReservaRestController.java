@@ -15,14 +15,17 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.hotel.macondo.dto.PagoClienteResponse;
-import com.hotel.macondo.dto.ReservaDetalleOperadorResponse;
-import com.hotel.macondo.dto.ReservaIdentificadorResponse;
-import com.hotel.macondo.dto.ReservaOperadorResponse;
+import com.hotel.macondo.DTOs.Mapper.HabitacionMapper;
+import com.hotel.macondo.DTOs.Mapper.ReservaMapper;
+import com.hotel.macondo.DTOs.Salida.HabitacionDTO;
+import com.hotel.macondo.DTOs.Salida.PagoClienteResponse;
+import com.hotel.macondo.DTOs.Salida.ReservaClienteDTO;
+import com.hotel.macondo.DTOs.Salida.ReservaDetalleOperadorResponse;
+import com.hotel.macondo.DTOs.Salida.ReservaOperadorResponse;
+import com.hotel.macondo.DTOs.Entrada.ReservaIdentificadorResponse;
 import com.hotel.macondo.entities.Cliente;
 import com.hotel.macondo.entities.Habitacion;
 import com.hotel.macondo.entities.Reserva;
-import com.hotel.macondo.errors.RecursoNoEncontradoException;
 import com.hotel.macondo.service.ClienteService;
 import com.hotel.macondo.service.ReservaService;
 import com.hotel.macondo.utils.FechaUtils;
@@ -65,7 +68,8 @@ public class ReservaRestController {
         return reservaService.obtenerDetalleParaOperador(numeroReserva);
     }
 
-    // Busca el ID de la reserva con cuenta abierta para el número visible de habitación.
+    // Busca el ID de la reserva con cuenta abierta para el número visible de
+    // habitación.
     // http://localhost:8080/api/reserva/habitacion/{numeroHabitacion}/actual
     @GetMapping("/habitacion/{numeroHabitacion}/actual")
     public ReservaIdentificadorResponse obtenerReservaActualPorHabitacion(
@@ -74,7 +78,8 @@ public class ReservaRestController {
                 reservaService.obtenerIdReservaActivaPorNumeroHabitacion(numeroHabitacion));
     }
 
-    // Busca la reserva activa de la habitación para el check-out, aunque la cuenta ya esté pagada
+    // Busca la reserva activa de la habitación para el check-out, aunque la cuenta
+    // ya esté pagada
     // http://localhost:8080/api/reserva/habitacion/{numeroHabitacion}/checkout
     @GetMapping("/habitacion/{numeroHabitacion}/checkout")
     public ReservaIdentificadorResponse obtenerReservaCheckout(@PathVariable String numeroHabitacion) {
@@ -117,17 +122,21 @@ public class ReservaRestController {
     // Obtiene las reservas activas (CONFIRMADA - EN CURSO) del cliente autenticado
     // http://localhost:8080/api/reserva/cliente/{id}/activas
     @GetMapping("/cliente/{id}/activas")
-    public List<Reserva> activasDeCliente(@PathVariable Long id) {
+    public List<ReservaClienteDTO> activasDeCliente(@PathVariable Long id) {
         Cliente cliente = clienteService.buscarPorId(id);
-        return reservaService.buscarActivasDeCliente(cliente);
+        return reservaService.buscarActivasDeCliente(cliente).stream()
+                .map(ReservaMapper.INSTANCE::convertToClienteDTO)
+                .toList();
     }
 
     // Obtiene el historial de reservas (FINALIZADAS - CANCELADAS) del cliente
     // http://localhost:8080/api/reserva/cliente/{id}/historial
     @GetMapping("/cliente/{id}/historial")
-    public List<Reserva> historialDeCliente(@PathVariable Long id) {
+    public List<ReservaClienteDTO> historialDeCliente(@PathVariable Long id) {
         Cliente cliente = clienteService.buscarPorId(id);
-        return reservaService.buscarHistorialDeCliente(cliente);
+        return reservaService.buscarHistorialDeCliente(cliente).stream()
+                .map(ReservaMapper.INSTANCE::convertToClienteDTO)
+                .toList();
     }
 
     // Obtiene el historial de pagos de todas las reservas del cliente
@@ -142,7 +151,7 @@ public class ReservaRestController {
     // http://localhost:8080/api/reserva/cliente/{id}/disponibilidad
     @GetMapping("/cliente/{id}/disponibilidad")
     @Operation(summary = "Consulta disponibilidad real para crear o modificar una reserva del cliente")
-    public List<Habitacion> disponibilidadDeCliente(
+    public List<HabitacionDTO> disponibilidadDeCliente(
             @PathVariable Long id,
             @RequestParam Long tipoId,
             @RequestParam(required = false) String fechaEntrada,
@@ -150,13 +159,18 @@ public class ReservaRestController {
             @RequestParam Integer cantidadPersonas,
             @RequestParam(required = false) Long reservaId) {
         clienteService.buscarPorId(id);
+        List<Habitacion> disponibles;
         if (reservaId != null) {
             Reserva reserva = reservaService.buscarParaModificar(id, reservaId);
-            return reservaService.consultarDisponibilidad(
+            disponibles = reservaService.consultarDisponibilidad(
                     reserva, tipoId, fechaEntrada, fechaSalida, cantidadPersonas);
+        } else {
+            disponibles = reservaService.consultarDisponibilidad(
+                    tipoId, fechaEntrada, fechaSalida, cantidadPersonas);
         }
-        return reservaService.consultarDisponibilidad(
-                tipoId, fechaEntrada, fechaSalida, cantidadPersonas);
+        return disponibles.stream()
+                .map(HabitacionMapper.INSTANCE::convert)
+                .toList();
     }
 
     // Obtiene los datos de una reserva editable del cliente para precargar el
@@ -164,8 +178,9 @@ public class ReservaRestController {
     // http://localhost:8080/api/reserva/cliente/{id}/find/{reservaId}
     @GetMapping("/cliente/{id}/find/{reservaId}")
     @Operation(summary = "Obtiene una reserva futura que pertenece al cliente para precargar su edición")
-    public Reserva reservaParaEditar(@PathVariable Long id, @PathVariable Long reservaId) {
-        return reservaService.buscarParaModificar(id, reservaId);
+    public ReservaClienteDTO reservaParaEditar(@PathVariable Long id, @PathVariable Long reservaId) {
+        Reserva reserva = reservaService.buscarParaModificar(id, reservaId);
+        return ReservaMapper.INSTANCE.convertToClienteDTO(reserva);
     }
 
     // Registra una nueva reserva asignando habitación y abriendo cuenta hotelera.
@@ -173,40 +188,43 @@ public class ReservaRestController {
     @PostMapping("/cliente/{id}")
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Crea una reserva, asigna una habitación disponible y abre su cuenta")
-    public Reserva crearReservaDeCliente(
+    public ReservaClienteDTO crearReservaDeCliente(
             @PathVariable Long id,
             @RequestParam Long tipoId,
             @RequestBody Reserva datos) {
         // Solo se utilizan los campos editables. El servicio genera identidad, estado y
         // precios.
-        return reservaService.crear(
+        Reserva creada = reservaService.crear(
                 id, tipoId,
                 FechaUtils.toIsoString(datos.getFechaInicio()),
                 FechaUtils.toIsoString(datos.getFechaFin()),
                 datos.getCantidadPersonas());
+        return ReservaMapper.INSTANCE.convertToClienteDTO(creada);
     }
 
     // Modifica las fechas o personas de una reserva futura del cliente.
     // http://localhost:8080/api/reserva/cliente/{id}/{reservaId}
     @PutMapping("/cliente/{id}/{reservaId}")
     @Operation(summary = "Modifica una reserva futura del cliente y vuelve a validar su disponibilidad")
-    public Reserva modificarReservaDeCliente(
+    public ReservaClienteDTO modificarReservaDeCliente(
             @PathVariable Long id,
             @PathVariable Long reservaId,
             @RequestParam Long tipoId,
             @RequestBody Reserva datos) {
-        return reservaService.modificar(
+        Reserva modificada = reservaService.modificar(
                 id, reservaId, tipoId,
                 FechaUtils.toIsoString(datos.getFechaInicio()),
                 FechaUtils.toIsoString(datos.getFechaFin()),
                 datos.getCantidadPersonas());
+        return ReservaMapper.INSTANCE.convertToClienteDTO(modificada);
     }
 
     // Cancela una reserva desde el portal del cliente
     // http://localhost:8080/api/reserva/cliente/{id}/{reservaId}/cancelar
     @PutMapping("/cliente/{id}/{reservaId}/cancelar")
     @Operation(summary = "Cancela una reserva futura del cliente conservando su historial")
-    public Reserva cancelarReservaDeCliente(@PathVariable Long id, @PathVariable Long reservaId) {
-        return reservaService.cancelar(id, reservaId);
+    public ReservaClienteDTO cancelarReservaDeCliente(@PathVariable Long id, @PathVariable Long reservaId) {
+        Reserva cancelada = reservaService.cancelar(id, reservaId);
+        return ReservaMapper.INSTANCE.convertToClienteDTO(cancelada);
     }
 }

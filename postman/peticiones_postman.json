@@ -1,0 +1,469 @@
+{
+  "info": {
+    "name": "Hotel Macondo",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Auth",
+      "item": [
+        {
+          "name": "Login (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"correo\": \"admin@macondo.com\",\n  \"contrasena\": \"admin\"\n}" },
+            "url": { "raw": "{{baseUrl}}/api/auth/login", "host": ["{{baseUrl}}"], "path": ["api", "auth", "login"] }
+          }
+        },
+        {
+          "name": "Login (Cliente)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"correo\": \"ursula@macondo.com\",\n  \"contrasena\": \"123\"\n}" },
+            "url": { "raw": "{{baseUrl}}/api/auth/login", "host": ["{{baseUrl}}"], "path": ["api", "auth", "login"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Cliente",
+      "item": [
+        {
+          "name": "Registrar Cliente",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"cliente\": {\n    \"nombre\": \"Gabriel\",\n    \"apellido\": \"García\",\n    \"cedula\": \"999999\",\n    \"telefono\": \"3009998877\",\n    \"correo\": \"gabo@macondo.com\"\n  },\n  \"contrasena\": \"123\"\n}" },
+            "url": { "raw": "{{baseUrl}}/api/cliente/registro", "host": ["{{baseUrl}}"], "path": ["api", "cliente", "registro"] }
+          }
+        },
+        {
+          "name": "Buscar Cliente por ID",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/cliente/find/1", "host": ["{{baseUrl}}"], "path": ["api", "cliente", "find", "1"] }
+          }
+        },
+        {
+          "name": "Actualizar Perfil",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"nombre\": \"Úrsula\",\n  \"apellido\": \"Iguarán\",\n  \"cedula\": \"101\",\n  \"telefono\": \"300101\",\n  \"correo\": \"ursula@macondo.com\"\n}" },
+            "url": { "raw": "{{baseUrl}}/api/cliente/1/perfil", "host": ["{{baseUrl}}"], "path": ["api", "cliente", "1", "perfil"] }
+          }
+        },
+        {
+          "name": "Actualizar Contraseña",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"contrasenaActual\": \"123\",\n  \"nuevaContrasena\": \"1234\",\n  \"confirmarContrasena\": \"1234\"\n}" },
+            "url": { "raw": "{{baseUrl}}/api/cliente/1/password", "host": ["{{baseUrl}}"], "path": ["api", "cliente", "1", "password"] }
+          }
+        },
+        {
+          "name": "Eliminar Cuenta",
+          "request": {
+            "method": "POST",
+            "url": { "raw": "{{baseUrl}}/api/cliente/delete/11", "host": ["{{baseUrl}}"], "path": ["api", "cliente", "delete", "11"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Habitaciones",
+      "item": [
+        {
+          "name": "Listar Todas",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/habitacion", "host": ["{{baseUrl}}"], "path": ["api", "habitacion"] }
+          }
+        },
+        {
+          "name": "Buscar por ID",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/habitacion/find/1", "host": ["{{baseUrl}}"], "path": ["api", "habitacion", "find", "1"] }
+          }
+        },
+        {
+          "name": "Buscar por Reserva",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/habitacion/reserva/1", "host": ["{{baseUrl}}"], "path": ["api", "habitacion", "reserva", "1"] }
+          }
+        },
+        {
+          "name": "Crear Habitación",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"nombre\": \"Habitación 226\",\n  \"etiqueta\": \"ESTÁNDAR\",\n  \"precio\": 280000,\n  \"capacidad\": 2,\n  \"numero\": \"226\",\n  \"estado\": \"DISPONIBLE\",\n  \"piso\": 2,\n  \"tipoHabitacion\": {\n    \"id\": 1\n  }\n}" },
+            "url": { "raw": "{{baseUrl}}/api/habitacion", "host": ["{{baseUrl}}"], "path": ["api", "habitacion"] }
+          }
+        },
+        {
+          "name": "Actualizar Habitación",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"id\": 1,\n  \"nombre\": \"Habitación 201 Modificada\",\n  \"etiqueta\": \"ESTÁNDAR\",\n  \"precio\": 290000,\n  \"capacidad\": 2,\n  \"numero\": \"201\",\n  \"estado\": \"DISPONIBLE\",\n  \"piso\": 2,\n  \"tipoHabitacion\": {\n    \"id\": 1\n  }\n}" },
+            "url": { "raw": "{{baseUrl}}/api/habitacion", "host": ["{{baseUrl}}"], "path": ["api", "habitacion"] }
+          }
+        },
+        {
+          "name": "Cambiar Estado",
+          "request": {
+            "method": "PUT",
+            "url": { "raw": "{{baseUrl}}/api/habitacion/estado/1", "host": ["{{baseUrl}}"], "path": ["api", "habitacion", "estado", "1"] }
+          }
+        },
+        {
+          "name": "Eliminar Habitación",
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{baseUrl}}/api/habitacion/delete/26", "host": ["{{baseUrl}}"], "path": ["api", "habitacion", "delete", "26"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Tipos de Habitación",
+      "item": [
+        {
+          "name": "Listar Todos",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/tipo-habitacion", "host": ["{{baseUrl}}"], "path": ["api", "tipo-habitacion"] }
+          }
+        },
+        {
+          "name": "Buscar por ID",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/tipo-habitacion/find/1", "host": ["{{baseUrl}}"], "path": ["api", "tipo-habitacion", "find", "1"] }
+          }
+        },
+        {
+          "name": "Crear Tipo",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"nombre\": \"Penthouse\",\n  \"descripcion\": \"Vista 360\",\n  \"imagen\": \"/images/penthouse.avif\",\n  \"precioNoche\": 2500000,\n  \"capacidadPersonas\": 4\n}" },
+            "url": { "raw": "{{baseUrl}}/api/tipo-habitacion", "host": ["{{baseUrl}}"], "path": ["api", "tipo-habitacion"] }
+          }
+        },
+        {
+          "name": "Actualizar Tipo",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"id\": 1,\n  \"nombre\": \"Estándar Modificado\",\n  \"descripcion\": \"Nueva descripción\",\n  \"imagen\": \"/images/HabitacionNormal.avif\",\n  \"precioNoche\": 290000,\n  \"capacidadPersonas\": 2\n}" },
+            "url": { "raw": "{{baseUrl}}/api/tipo-habitacion", "host": ["{{baseUrl}}"], "path": ["api", "tipo-habitacion"] }
+          }
+        },
+        {
+          "name": "Eliminar Tipo",
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{baseUrl}}/api/tipo-habitacion/delete/1", "host": ["{{baseUrl}}"], "path": ["api", "tipo-habitacion", "delete", "1"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Operadores",
+      "item": [
+        {
+          "name": "Listar Todos",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/operador", "host": ["{{baseUrl}}"], "path": ["api", "operador"] }
+          }
+        },
+        {
+          "name": "Crear Operador",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"nombre\": \"Nuevo Operador\",\n  \"activo\": true\n}" },
+            "url": { "raw": "{{baseUrl}}/api/operador", "host": ["{{baseUrl}}"], "path": ["api", "operador"] }
+          }
+        },
+        {
+          "name": "Cambiar Estado",
+          "request": {
+            "method": "PUT",
+            "url": { "raw": "{{baseUrl}}/api/operador/estado/1", "host": ["{{baseUrl}}"], "path": ["api", "operador", "estado", "1"] }
+          }
+        },
+        {
+          "name": "Eliminar Operador",
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{baseUrl}}/api/operador/delete/1", "host": ["{{baseUrl}}"], "path": ["api", "operador", "delete", "1"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "6. Servicios",
+      "item": [
+        {
+          "name": "Catálogo Activo",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/servicio/catalogo", "host": ["{{baseUrl}}"], "path": ["api", "servicio", "catalogo"] }
+          }
+        },
+        {
+          "name": "Recomendaciones",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/servicio/recomendaciones", "host": ["{{baseUrl}}"], "path": ["api", "servicio", "recomendaciones"] }
+          }
+        },
+        {
+          "name": "Relacionados",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/servicio/relacionados/1", "host": ["{{baseUrl}}"], "path": ["api", "servicio", "relacionados", "1"] }
+          }
+        },
+        {
+          "name": "Listar Todos (Admin)",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/servicio", "host": ["{{baseUrl}}"], "path": ["api", "servicio"] }
+          }
+        },
+        {
+          "name": "Buscar por ID",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/servicio/find/1", "host": ["{{baseUrl}}"], "path": ["api", "servicio", "find", "1"] }
+          }
+        },
+        {
+          "name": "Crear Servicio",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"nombre\": \"Tour en Bote\",\n  \"descripcion\": \"Paseo por la ciénaga\",\n  \"categoria\": \"Aventura\",\n  \"precio\": 150000,\n  \"activo\": true,\n  \"destacado\": false\n}" },
+            "url": { "raw": "{{baseUrl}}/api/servicio", "host": ["{{baseUrl}}"], "path": ["api", "servicio"] }
+          }
+        },
+        {
+          "name": "Actualizar Servicio",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"id\": 1,\n  \"nombre\": \"Tour en Bote Modificado\",\n  \"descripcion\": \"Paseo por la ciénaga\",\n  \"categoria\": \"Aventura\",\n  \"precio\": 160000,\n  \"activo\": true,\n  \"destacado\": true\n}" },
+            "url": { "raw": "{{baseUrl}}/api/servicio", "host": ["{{baseUrl}}"], "path": ["api", "servicio"] }
+          }
+        },
+        {
+          "name": "Cambiar Estado",
+          "request": {
+            "method": "PUT",
+            "url": { "raw": "{{baseUrl}}/api/servicio/estado/1", "host": ["{{baseUrl}}"], "path": ["api", "servicio", "estado", "1"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "7. Reservas (Operador)",
+      "item": [
+        {
+          "name": "Listar Todas",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/reserva", "host": ["{{baseUrl}}"], "path": ["api", "reserva"] }
+          }
+        },
+        {
+          "name": "Obtener Detalle",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/reserva/MCD-PRUEBA-001", "host": ["{{baseUrl}}"], "path": ["api", "reserva", "MCD-PRUEBA-001"] }
+          }
+        },
+        {
+          "name": "Obtener Reserva Actual por Habitación",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/reserva/habitacion/201/actual", "host": ["{{baseUrl}}"], "path": ["api", "reserva", "habitacion", "201", "actual"] }
+          }
+        },
+        {
+          "name": "Obtener Reserva Checkout por Habitación",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/reserva/habitacion/201/checkout", "host": ["{{baseUrl}}"], "path": ["api", "reserva", "habitacion", "201", "checkout"] }
+          }
+        },
+        {
+          "name": "Obtener Detalle por ID Interno",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/reserva/id/1", "host": ["{{baseUrl}}"], "path": ["api", "reserva", "id", "1"] }
+          }
+        },
+        {
+          "name": "Cancelar Reserva",
+          "request": {
+            "method": "PUT",
+            "url": { "raw": "{{baseUrl}}/api/reserva/MCD-PRUEBA-001/cancelar", "host": ["{{baseUrl}}"], "path": ["api", "reserva", "MCD-PRUEBA-001", "cancelar"] }
+          }
+        },
+        {
+          "name": "Activar Reserva",
+          "request": {
+            "method": "PUT",
+            "url": { "raw": "{{baseUrl}}/api/reserva/MCD-PRUEBA-001/activar", "host": ["{{baseUrl}}"], "path": ["api", "reserva", "MCD-PRUEBA-001", "activar"] }
+          }
+        },
+        {
+          "name": "Finalizar Reserva",
+          "request": {
+            "method": "PUT",
+            "url": { "raw": "{{baseUrl}}/api/reserva/MCD-PRUEBA-001/finalizar", "host": ["{{baseUrl}}"], "path": ["api", "reserva", "MCD-PRUEBA-001", "finalizar"] }
+          }
+        },
+        {
+          "name": "Añadir Servicios a Reserva",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "[\n  {\n    \"servicioId\": 1,\n    \"cantidad\": 2\n  }\n]" },
+            "url": { "raw": "{{baseUrl}}/api/operador/cuenta/reserva/MCD-PRUEBA-001/servicios", "host": ["{{baseUrl}}"], "path": ["api", "operador", "cuenta", "reserva", "MCD-PRUEBA-001", "servicios"] }
+          }
+        },
+        {
+          "name": "Pagar Cuenta de Reserva",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"metodoPago\": \"TARJETA\"\n}" },
+            "url": { "raw": "{{baseUrl}}/api/operador/cuenta/reserva/MCD-PRUEBA-001/pago", "host": ["{{baseUrl}}"], "path": ["api", "operador", "cuenta", "reserva", "MCD-PRUEBA-001", "pago"] }
+          }
+        },
+        {
+          "name": "Eliminar Servicio de Reserva",
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{baseUrl}}/api/operador/cuenta/reserva/MCD-PRUEBA-001/servicios/1", "host": ["{{baseUrl}}"], "path": ["api", "operador", "cuenta", "reserva", "MCD-PRUEBA-001", "servicios", "1"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "8. Reservas (Cliente)",
+      "item": [
+        {
+          "name": "Activas del Cliente",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/reserva/cliente/1/activas", "host": ["{{baseUrl}}"], "path": ["api", "reserva", "cliente", "1", "activas"] }
+          }
+        },
+        {
+          "name": "Historial del Cliente",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/reserva/cliente/1/historial", "host": ["{{baseUrl}}"], "path": ["api", "reserva", "cliente", "1", "historial"] }
+          }
+        },
+        {
+          "name": "Pagos del Cliente",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/reserva/cliente/1/pagos", "host": ["{{baseUrl}}"], "path": ["api", "reserva", "cliente", "1", "pagos"] }
+          }
+        },
+        {
+          "name": "Consultar Disponibilidad",
+          "request": {
+            "method": "GET",
+            "url": { 
+              "raw": "{{baseUrl}}/api/reserva/cliente/1/disponibilidad?tipoId=1&fechaEntrada=2026-12-01&fechaSalida=2026-12-05&cantidadPersonas=2", 
+              "host": ["{{baseUrl}}"], 
+              "path": ["api", "reserva", "cliente", "1", "disponibilidad"],
+              "query": [
+                { "key": "tipoId", "value": "1" },
+                { "key": "fechaEntrada", "value": "2026-12-01" },
+                { "key": "fechaSalida", "value": "2026-12-05" },
+                { "key": "cantidadPersonas", "value": "2" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Reserva para Editar",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/reserva/cliente/1/find/1", "host": ["{{baseUrl}}"], "path": ["api", "reserva", "cliente", "1", "find", "1"] }
+          }
+        },
+        {
+          "name": "Crear Reserva de Cliente",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"fechaInicio\": \"2026-12-01\",\n  \"fechaFin\": \"2026-12-04\",\n  \"cantidadPersonas\": 2\n}" },
+            "url": { 
+              "raw": "{{baseUrl}}/api/reserva/cliente/1?tipoId=1", 
+              "host": ["{{baseUrl}}"], 
+              "path": ["api", "reserva", "cliente", "1"],
+              "query": [{ "key": "tipoId", "value": "1" }]
+            }
+          }
+        },
+        {
+          "name": "Modificar Reserva de Cliente",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"fechaInicio\": \"2026-12-02\",\n  \"fechaFin\": \"2026-12-05\",\n  \"cantidadPersonas\": 2\n}" },
+            "url": { 
+              "raw": "{{baseUrl}}/api/reserva/cliente/1/1?tipoId=1", 
+              "host": ["{{baseUrl}}"], 
+              "path": ["api", "reserva", "cliente", "1", "1"],
+              "query": [{ "key": "tipoId", "value": "1" }]
+            }
+          }
+        },
+        {
+          "name": "Cancelar Reserva de Cliente",
+          "request": {
+            "method": "PUT",
+            "url": { "raw": "{{baseUrl}}/api/reserva/cliente/1/1/cancelar", "host": ["{{baseUrl}}"], "path": ["api", "reserva", "cliente", "1", "1", "cancelar"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "9. Testimonios",
+      "item": [
+        {
+          "name": "Listar Testimonios",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/testimonio", "host": ["{{baseUrl}}"], "path": ["api", "testimonio"] }
+          }
+        }
+      ]
+    }
+  ]
+}
