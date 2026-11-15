@@ -51,12 +51,17 @@ public class ReservaServiceIntegracionTest {
     private Long habitacionId;
     private LocalDate entrada;
     private LocalDate salida;
+    // Conteos de base antes de cada prueba: la BD de test trae datos semilla (DataLoaderTest).
+    private long reservasIniciales;
+    private long cuentasIniciales;
 
     @BeforeEach
     public void setUp() {
         LocalDate hoy = LocalDate.now();
         entrada = hoy.plusDays(10);
         salida = hoy.plusDays(13);
+        reservasIniciales = reservaRepository.count();
+        cuentasIniciales = cuentaRepository.count();
 
         TipoHabitacion tipo = tipoHabitacionRepository.save(
                 new TipoHabitacion("Tipo de prueba", "Habitacion de prueba", "foto.jpg",
@@ -95,8 +100,8 @@ public class ReservaServiceIntegracionTest {
         assertThat(cuenta.getEstado()).isEqualTo("ABIERTA");
         assertThat(cuenta.getTotal()).isEqualByComparingTo("600000");
         assertThat(cuenta.getReserva().getId()).isEqualTo(guardada.getId());
-        assertThat(reservaRepository.count()).isEqualTo(1);
-        assertThat(cuentaRepository.count()).isEqualTo(1);
+        assertThat(reservaRepository.count()).isEqualTo(reservasIniciales + 1);
+        assertThat(cuentaRepository.count()).isEqualTo(cuentasIniciales + 1);
     }
 
     @Test
@@ -122,8 +127,8 @@ public class ReservaServiceIntegracionTest {
         assertThat(modificada.getTotal()).isEqualByComparingTo("800000");
         assertThat(cuenta.getTotal()).isEqualByComparingTo("800000");
         assertThat(cuenta.getEstado()).isEqualTo("ABIERTA");
-        assertThat(reservaRepository.count()).isEqualTo(1);
-        assertThat(cuentaRepository.count()).isEqualTo(1);
+        assertThat(reservaRepository.count()).isEqualTo(reservasIniciales + 1);
+        assertThat(cuentaRepository.count()).isEqualTo(cuentasIniciales + 1);
     }
 
     @Test
@@ -141,8 +146,8 @@ public class ReservaServiceIntegracionTest {
         assertThat(cancelada.getEstado()).isEqualTo("CANCELADA");
         assertThat(cuenta.getEstado()).isEqualTo("CANCELADA");
         assertThat(cuenta.getTotal()).isEqualByComparingTo(BigDecimal.ZERO);
-        assertThat(reservaRepository.count()).isEqualTo(1);
-        assertThat(cuentaRepository.count()).isEqualTo(1);
+        assertThat(reservaRepository.count()).isEqualTo(reservasIniciales + 1);
+        assertThat(cuentaRepository.count()).isEqualTo(cuentasIniciales + 1);
     }
 
     @Test
@@ -157,8 +162,8 @@ public class ReservaServiceIntegracionTest {
                 // Assert
                 .isInstanceOf(PeticionImposible.class)
                 .hasMessage("No hay habitaciones disponibles para las fechas seleccionadas.");
-        assertThat(reservaRepository.count()).isEqualTo(1);
-        assertThat(cuentaRepository.count()).isEqualTo(1);
+        assertThat(reservaRepository.count()).isEqualTo(reservasIniciales + 1);
+        assertThat(cuentaRepository.count()).isEqualTo(cuentasIniciales + 1);
         assertThat(reservaRepository.findById(original.getId()).orElseThrow().getEstado())
                 .isEqualTo("CONFIRMADA");
     }
@@ -174,8 +179,8 @@ public class ReservaServiceIntegracionTest {
                 // Assert
                 .isInstanceOf(PeticionImposible.class)
                 .hasMessage("El tipo de habitación no admite la cantidad de personas indicada.");
-        assertThat(reservaRepository.count()).isZero();
-        assertThat(cuentaRepository.count()).isZero();
+        assertThat(reservaRepository.count()).isEqualTo(reservasIniciales);
+        assertThat(cuentaRepository.count()).isEqualTo(cuentasIniciales);
         assertThat(habitacionRepository.findById(habitacionId).orElseThrow().getEstado())
                 .isEqualTo("DISPONIBLE");
     }
