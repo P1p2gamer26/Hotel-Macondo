@@ -1,63 +1,62 @@
 package com.hotel.macondo.repository;
 
-import java.util.ArrayList;
+import com.hotel.macondo.entities.Habitacion;
+import java.time.LocalDate;
 import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
+import java.util.List;
+import java.util.Optional;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import com.hotel.macondo.entities.Habitacion;
-
-// Repositorio encargado de realizar las operaciones con la base de datos
 @Repository
-public class HabitacionRepository {
+public interface HabitacionRepository extends JpaRepository<Habitacion, Long> {
 
-    // Base de datos falsa. Es LinkedHashMap y no HashMap porque el orden de
-    // las habitaciones importa: en la landing deben salir de la mas economica
-    // a la mas costosa, igual que en el diseño.
-    private Map<Integer, Habitacion> data = new LinkedHashMap<>();
+  List<Habitacion> findAllByOrderByIdAsc();
 
-    public HabitacionRepository() {
-        data.put(1, new Habitacion(1, "Normal", "ACOGEDORA",
-                "Refugio íntimo con vista al jardín tropical. Cama queen, aire acondicionado y todo el confort que necesitas.",
-                350000, 2, "/images/HabitacionNormal.avif"));
-        data.put(2, new Habitacion(2, "Executive", "POPULAR",
-                "Espacio amplio con sala de trabajo, bañera de lujo y vistas privilegiadas al mar Caribe.",
-                580000, 3, "/images/HabitacionExecutive.avif"));
-        data.put(3, new Habitacion(3, "VIP", "EXCLUSIVA",
-                "Suite boutique con terraza privada, jacuzzi exterior y servicio de mayordomo personalizado.",
-                950000, 4, "/images/HabitacionVIP.avif"));
-        data.put(4, new Habitacion(4, "Luxury", "ÚNICO",
-                "La experiencia definitiva: villa frente al mar, piscina privada y atención sin igual las 24 horas.",
-                1800000, 6, "/images/HabitacionLuxury.avif"));
-    }
+  Optional<Habitacion> findByNombreIgnoreCase(String nombre);
 
-    public Collection<Habitacion> findAll() {
-        return data.values();
-    }
+  List<Habitacion> findByCapacidadGreaterThanEqualOrderByIdAsc(int capacidad);
 
-    public Habitacion findById(Integer id) {
-        return data.get(id);
-    }
+  long countByEstado(String estado);
 
-    public Habitacion findByNombre(String nombre) {
-        for (Habitacion habitacion : data.values()) {
-            if (habitacion.getNombre().equalsIgnoreCase(nombre)) {
-                return habitacion;
-            }
-        }
-        return null;
-    }
+  List<Habitacion> findByTipoHabitacionId(Long tipoId);
 
-    public Collection<Habitacion> findByPersonas(int personas) {
-        Collection<Habitacion> result = new ArrayList<>();
-        for (Habitacion habitacion : data.values()) {
-            if (habitacion.getCapacidad() >= personas) {
-                result.add(habitacion);
-            }
-        }
-        return result;
-    }
+  Optional<Habitacion> findFirstByTipoHabitacionIdAndEstadoOrderByIdAsc(
+      Long tipoId, String estado);
 
+  @Query(
+      """
+      SELECT h
+      FROM Habitacion h
+      JOIN FETCH h.tipoHabitacion t
+      WHERE t.id = :tipoId
+        AND UPPER(h.estado) = 'DISPONIBLE'
+        AND h.capacidad >= :cantidadPersonas
+        AND NOT EXISTS (
+          SELECT r.id
+          FROM Reserva r
+          WHERE r.habitacion = h
+            AND (:reservaExcluidaId IS NULL OR r.id <> :reservaExcluidaId)
+            AND UPPER(r.estado) IN :estadosOcupados
+            AND r.fechaInicio < :fechaSalida
+            AND r.fechaFin > :fechaEntrada
+        )
+      ORDER BY h.id
+      """)
+  List<Habitacion> buscarDisponibles(
+      @Param("tipoId") Long tipoId,
+      @Param("fechaEntrada") LocalDate fechaEntrada,
+      @Param("fechaSalida") LocalDate fechaSalida,
+      @Param("cantidadPersonas") Integer cantidadPersonas,
+      @Param("estadosOcupados") Collection<String> estadosOcupados,
+      @Param("reservaExcluidaId") Long reservaExcluidaId);
+
+  boolean existsByTipoHabitacionId(Long tipoId);
+
+  /**
+   * Busca la habitación asociada a una reserva por el ID de la reserva.
+   */
+  Habitacion findByReservasId(Long reservaId);
 }

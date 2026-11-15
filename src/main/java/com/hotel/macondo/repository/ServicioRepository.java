@@ -1,45 +1,21 @@
 package com.hotel.macondo.repository;
 
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
+import com.hotel.macondo.entities.Servicio;
+import java.util.List;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.hotel.macondo.entities.Servicio;
-
 @Repository
-public class ServicioRepository {
+public interface ServicioRepository extends JpaRepository<Servicio, Long> {
 
-    private Map<Integer, Servicio> data = new LinkedHashMap<>();
+  List<Servicio> findAllByOrderByIdAsc();
 
-    public ServicioRepository() {
-        data.put(1, new Servicio(1, "Spa & Bienestar",
-                "Rituales caribeños, masajes frente al mar y un silencio que cura. El cuerpo descansa y el tiempo se detiene.",
-                "/images/Spa.avif", false));
-        data.put(2, new Servicio(2, "Restaurante Gourmet",
-                "Sabores del Caribe colombiano elevados por nuestros chefs en un ambiente donde cada plato es una obra de arte.",
-                "/images/Restaurante.avif", true));
-        data.put(3, new Servicio(3, "Piscina Infinity",
-                "Un borde infinito que se funde con el horizonte. Nadar aquí es nadar dentro del cielo.",
-                "/images/Piscina.avif", false));
-        data.put(4, new Servicio(4, "Playa Privada",
-                "Arena blanca solo para nuestros huéspedes, con hamacas, sombrillas y cocteles a cualquier hora.",
-                "/images/PlayaPriv.avif", false));
-        data.put(5, new Servicio(5, "Tours Guiados",
-                "Recorridos por la Sierra, los manglares y los pueblos donde nació el realismo mágico.",
-                "/images/Guiado.avif", false));
-        data.put(6, new Servicio(6, "Eventos & Bodas",
-                "Celebraciones frente al mar con montaje, banquete y una noche que nadie olvidará jamás.",
-                "/images/Eventos.avif", false));
-    }
+  List<Servicio> findByActivoTrueOrderByIdAsc();
 
-    public Collection<Servicio> findAll() {
-        return data.values();
-    }
+  List<Servicio> findByActivoTrueOrderByIdAsc(Pageable pageable);
 
-    public Servicio findById(Integer id) {
-        return data.get(id);
-    }
+  List<Servicio> findByActivoTrueAndIdNotOrderByIdAsc(Long id, Pageable pageable);
 
+  long countByActivoTrue();
 }

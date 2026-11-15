@@ -1,0 +1,112 @@
+package com.hotel.macondo.controller.rest;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.hotel.macondo.dto.ConsumoServicioSolicitud;
+import com.hotel.macondo.dto.PagoSolicitud;
+import com.hotel.macondo.entities.Operador;
+import com.hotel.macondo.entities.Pago;
+import com.hotel.macondo.errors.RecursoNoEncontradoException;
+import com.hotel.macondo.service.OperadorService;
+import com.hotel.macondo.service.ReservaService;
+
+// Controlador REST para la gestión y administración del personal operador
+@RestController
+@RequestMapping("/api/operador")
+@CrossOrigin(origins = "http://localhost:4200")
+public class OperadorRestController {
+
+    @Autowired
+    private OperadorService operadorService;
+    @Autowired
+    private ReservaService reservaService;
+
+    // ==========================================
+    // GESTION DE OPERADORES
+    // ==========================================
+
+    // Retorna todos los operadores registrados en el sistema
+    // http://localhost:8080/api/operador
+    @GetMapping
+    public ResponseEntity<List<Operador>> buscarTodos() {
+        Collection<Operador> operadores = operadorService.buscarTodos();
+        List<Operador> lista = new ArrayList<>(operadores);
+        return new ResponseEntity<>(lista, HttpStatus.OK);
+    }
+
+    // Registra un nuevo operador asignándolo como activo si el valor viene nulo
+    // http://localhost:8080/api/operador
+    @PostMapping
+    public ResponseEntity<Operador> crear(@RequestBody Operador operador) {
+        if (operador.getActivo() == null) {
+            operador.setActivo(true);
+        }
+        Operador guardado = operadorService.guardar(operador);
+        return new ResponseEntity<>(guardado, HttpStatus.CREATED);
+    }
+
+    // Alterna el estado de activación del operador
+    // http://localhost:8080/api/operador/estado/{id}
+    @PutMapping("/estado/{id}")
+    public ResponseEntity<Operador> cambiarEstado(@PathVariable Long id) {
+        Operador operador = operadorService.cambiarEstado(id);
+        if (operador == null) {
+            throw new RecursoNoEncontradoException("Operador no encontrado");
+        }
+        return new ResponseEntity<>(operador, HttpStatus.OK);
+    }
+
+    // Elimina un operador por su identificador
+    // http://localhost:8080/api/operador/delete/{id}
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<Void> eliminar(@PathVariable Long id) {
+        Operador operador = operadorService.buscarPorId(id);
+        if (operador == null) {
+            throw new RecursoNoEncontradoException("Operador no encontrado");
+        }
+        operadorService.eliminar(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    // Añade servicios a la cuenta asociada al número público de reserva.
+    // http://localhost:8080/api/operador/cuenta/reserva/{numeroReserva}/servicios
+    @PostMapping("/cuenta/reserva/{numeroReserva}/servicios")
+    public void añadirServicios(
+            @PathVariable String numeroReserva,
+            @RequestBody List<ConsumoServicioSolicitud> servicios) {
+        reservaService.agregarServiciosParaOperador(numeroReserva, servicios);
+    }
+
+    // Elimina un consumo de la cuenta asociada al número público de reserva.
+    // http://localhost:8080/api/operador/cuenta/reserva/{numeroReserva}/servicios/{detalleId}
+    @DeleteMapping("/cuenta/reserva/{numeroReserva}/servicios/{detalleId}")
+    public void eliminarServicio(
+            @PathVariable String numeroReserva,
+            @PathVariable Long detalleId) {
+        reservaService.eliminarServicioParaOperador(numeroReserva, detalleId);
+    }
+
+    // Paga el total de la cuenta asociada al número público de reserva.
+    // http://localhost:8080/api/operador/cuenta/reserva/{numeroReserva}/pago
+    @PostMapping("/cuenta/reserva/{numeroReserva}/pago")
+    public ResponseEntity<Pago> pagarCuenta(@PathVariable String numeroReserva, @RequestBody PagoSolicitud solicitud) {
+        Pago pago = reservaService.pagarCuentaParaOperador(
+                numeroReserva, solicitud == null ? null : solicitud.metodoPago());
+        return new ResponseEntity<>(pago, HttpStatus.OK);
+    }
+}

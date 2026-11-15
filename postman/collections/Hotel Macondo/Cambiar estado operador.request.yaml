@@ -1,0 +1,7 @@
+$kind: http-request
+url: http://localhost:8080/api/operador/estado/{{operadorId}}
+method: PUT
+body:
+  type: json
+  content: ""
+order: 3000
