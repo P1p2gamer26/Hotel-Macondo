@@ -1,0 +1,8 @@
+workspace:
+  id: 89027c68-5f38-4c36-8b9a-a9dc97968394
+
+# Each entry here maps a local resource to one or more corresponding objects in Postman Cloud
+
+cloudResources:
+  collections:
+    ../postman/collections/Hotel Macondo: 46103277-d04a0851-d9da-4815-a95b-78d392f8dcf2
