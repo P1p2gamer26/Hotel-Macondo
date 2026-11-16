@@ -1,6 +1,7 @@
 package com.hotel.macondo.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -11,11 +12,11 @@ import jakarta.persistence.OneToOne;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import lombok.Builder;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -47,14 +48,15 @@ public class Cliente {
   private String correo;
 
   // Al borrar el cliente se borran sus reservas (ON DELETE CASCADE sobre la FK).
+  @Builder.Default
   @JsonIgnore
   @OneToMany(mappedBy = "cliente")
   @OnDelete(action = OnDeleteAction.CASCADE)
   private List<Reserva> reservas = new ArrayList<>();
 
   @JsonIgnore
-  @OneToOne(mappedBy = "cliente")
-  private Usuario usuario;
+  @OneToOne(cascade = CascadeType.ALL)
+  private UserEntity usuario;
 
   public Cliente(String nombre, String apellido, String cedula, String telefono, String correo) {
     this.nombre = nombre;
@@ -78,7 +80,7 @@ public class Cliente {
     }
   }
 
-  public void asignarUsuario(Usuario usuario) {
+  public void asignarUsuario(UserEntity usuario) {
     this.usuario = usuario;
     if (usuario != null && usuario.getCliente() != this) {
       usuario.asignarCliente(this);

@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.hotel.macondo.entities.Cliente;
-import com.hotel.macondo.entities.Usuario;
+import com.hotel.macondo.entities.UserEntity;
 import com.hotel.macondo.errors.FormularioErroneoException;
 import com.hotel.macondo.errors.PeticionImposible;
 import com.hotel.macondo.repository.ClienteRepository;
@@ -58,7 +58,7 @@ public class CuentaClienteServiceImpl implements CuentaClienteService {
     }
 
     Cliente clienteGuardado = clienteService.guardar(cliente);
-    Usuario usuarioGuardado = usuarioService.registrarCliente(clienteGuardado, contrasena);
+    UserEntity usuarioGuardado = usuarioService.registrarCliente(clienteGuardado, contrasena);
 
     if (usuarioGuardado == null) {
       clienteService.eliminar(clienteGuardado.getId());
@@ -84,7 +84,7 @@ public class CuentaClienteServiceImpl implements CuentaClienteService {
       return false;
     }
 
-    Usuario usuario = usuarioService.buscarPorCorreo(cliente.getCorreo());
+    UserEntity usuario = usuarioService.buscarPorCorreo(cliente.getCorreo());
     if (usuario == null) {
       return false;
     }
@@ -118,7 +118,7 @@ public class CuentaClienteServiceImpl implements CuentaClienteService {
       return false;
     }
 
-    Usuario usuarioActualizado = usuarioService.actualizarCorreo(correoPrevio, correoNuevo);
+    UserEntity usuarioActualizado = usuarioService.actualizarCorreo(correoPrevio, correoNuevo);
     if (usuarioActualizado == null) {
       return false;
     }

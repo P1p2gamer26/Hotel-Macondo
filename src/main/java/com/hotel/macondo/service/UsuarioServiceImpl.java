@@ -8,14 +8,19 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.hotel.macondo.entities.Cliente;
 import com.hotel.macondo.entities.Rol;
-import com.hotel.macondo.entities.Usuario;
+import com.hotel.macondo.entities.UserEntity;
 import com.hotel.macondo.errors.FormularioErroneoException;
 import com.hotel.macondo.repository.UsuarioRepository;
+import java.util.List;
+import com.hotel.macondo.repository.RolRepository;
 
 // Servicio de autenticacion, credenciales y sincronizacion de usuarios
 @Service
 @Transactional
 public class UsuarioServiceImpl implements UsuarioService {
+
+  @Autowired
+  private RolRepository rolRepository;
 
   @Autowired
   private UsuarioRepository repository;
@@ -26,12 +31,12 @@ public class UsuarioServiceImpl implements UsuarioService {
 
   // Valida credenciales contra la base de datos comparando correos normalizados
   @Override
-  public Usuario autenticar(String correo, String contrasena) {
+  public UserEntity autenticar(String correo, String contrasena) {
     if (correo == null) {
       throw new FormularioErroneoException("Ingrese un correo valido");
     }
     String correoNormalizado = normalizarCorreo(correo);
-    Usuario usuario = repository.findByCorreoIgnoreCase(correoNormalizado).orElse(null);
+    UserEntity usuario = repository.findByCorreoIgnoreCase(correoNormalizado).orElse(null);
     if (usuario == null
         || usuario.getContrasena() == null
         || !usuario.getContrasena().equals(contrasena)) {
@@ -42,7 +47,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 
   // Busca un usuario por su direccion de correo electronico
   @Override
-  public Usuario buscarPorCorreo(String correo) {
+  public UserEntity buscarPorCorreo(String correo) {
     if (correo == null) {
       return null;
     }
@@ -67,7 +72,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 
   // Crea y asocia un usuario con rol CLIENTE a la entidad cliente persistida
   @Override
-  public Usuario registrarCliente(Cliente cliente, String contrasena) {
+  public UserEntity registrarCliente(Cliente cliente, String contrasena) {
     if (cliente == null || cliente.getCorreo() == null || contrasena == null) {
       return null;
     }
@@ -77,19 +82,23 @@ public class UsuarioServiceImpl implements UsuarioService {
       return null;
     }
 
-    Usuario usuario = new Usuario(correoNormalizado, contrasena, Rol.CLIENTE);
-    usuario.asignarCliente(cliente);
-    return repository.save(usuario);
+    Rol rolCliente = rolRepository.findByName("CLIENTE")
+        .orElseGet(() -> rolRepository.save(new Rol("CLIENTE")));
+
+    UserEntity usuario = new UserEntity(correoNormalizado, contrasena, List.of(rolCliente));
+    usuario = repository.save(usuario);
+    cliente.asignarUsuario(usuario);
+    return usuario;
   }
 
   // Actualiza la clave de acceso para el correo especificado
   @Override
-  public Usuario actualizarContrasena(String correo, String nuevaContrasena) {
+  public UserEntity actualizarContrasena(String correo, String nuevaContrasena) {
     if (correo == null || nuevaContrasena == null || nuevaContrasena.isBlank()) {
       return null;
     }
 
-    Usuario usuario = repository
+    UserEntity usuario = repository
         .findByCorreoIgnoreCase(normalizarCorreo(correo))
         .orElse(null);
     if (usuario == null) {
@@ -102,12 +111,12 @@ public class UsuarioServiceImpl implements UsuarioService {
 
   // Sincroniza el correo de acceso cuando el cliente actualiza su perfil
   @Override
-  public Usuario actualizarCorreo(String correoPrevio, String correoNuevo) {
+  public UserEntity actualizarCorreo(String correoPrevio, String correoNuevo) {
     if (correoPrevio == null || correoNuevo == null) {
       return null;
     }
 
-    Usuario usuario = repository
+    UserEntity usuario = repository
         .findByCorreoIgnoreCase(normalizarCorreo(correoPrevio))
         .orElse(null);
     if (usuario == null) {

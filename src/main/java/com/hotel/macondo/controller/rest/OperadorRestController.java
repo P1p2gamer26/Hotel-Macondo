@@ -1,6 +1,5 @@
 package com.hotel.macondo.controller.rest;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -17,8 +16,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.hotel.macondo.dto.ConsumoServicioSolicitud;
-import com.hotel.macondo.dto.PagoSolicitud;
+import com.hotel.macondo.DTOs.Mapper.OperadorMapper;
+import com.hotel.macondo.DTOs.Salida.OperadorDTO;
+import com.hotel.macondo.DTOs.Entrada.ConsumoServicioSolicitud;
+import com.hotel.macondo.DTOs.Entrada.PagoSolicitud;
 import com.hotel.macondo.entities.Operador;
 import com.hotel.macondo.entities.Pago;
 import com.hotel.macondo.errors.RecursoNoEncontradoException;
@@ -43,32 +44,36 @@ public class OperadorRestController {
     // Retorna todos los operadores registrados en el sistema
     // http://localhost:8080/api/operador
     @GetMapping
-    public ResponseEntity<List<Operador>> buscarTodos() {
+    public ResponseEntity<List<OperadorDTO>> buscarTodos() {
         Collection<Operador> operadores = operadorService.buscarTodos();
-        List<Operador> lista = new ArrayList<>(operadores);
+        List<OperadorDTO> lista = operadores.stream()
+                .map(OperadorMapper.INSTANCE::convert)
+                .toList();
         return new ResponseEntity<>(lista, HttpStatus.OK);
     }
 
     // Registra un nuevo operador asignándolo como activo si el valor viene nulo
     // http://localhost:8080/api/operador
     @PostMapping
-    public ResponseEntity<Operador> crear(@RequestBody Operador operador) {
+    public ResponseEntity<OperadorDTO> crear(@RequestBody Operador operador) {
         if (operador.getActivo() == null) {
             operador.setActivo(true);
         }
         Operador guardado = operadorService.guardar(operador);
-        return new ResponseEntity<>(guardado, HttpStatus.CREATED);
+        OperadorDTO operadorDTO = OperadorMapper.INSTANCE.convert(guardado);
+        return new ResponseEntity<>(operadorDTO, HttpStatus.CREATED);
     }
 
     // Alterna el estado de activación del operador
     // http://localhost:8080/api/operador/estado/{id}
     @PutMapping("/estado/{id}")
-    public ResponseEntity<Operador> cambiarEstado(@PathVariable Long id) {
+    public ResponseEntity<OperadorDTO> cambiarEstado(@PathVariable Long id) {
         Operador operador = operadorService.cambiarEstado(id);
         if (operador == null) {
             throw new RecursoNoEncontradoException("Operador no encontrado");
         }
-        return new ResponseEntity<>(operador, HttpStatus.OK);
+        OperadorDTO operadorDTO = OperadorMapper.INSTANCE.convert(operador);
+        return new ResponseEntity<>(operadorDTO, HttpStatus.OK);
     }
 
     // Elimina un operador por su identificador

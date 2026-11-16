@@ -1,20 +1,26 @@
 package com.hotel.macondo.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import lombok.Builder;
 
 @Builder
 @Getter
@@ -23,7 +29,8 @@ import lombok.Builder;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class Usuario {
+@Table(name = "users")
+public class UserEntity {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
@@ -34,14 +41,15 @@ public class Usuario {
   @Column(nullable = false, length = 255)
   private String contrasena;
 
-  @Enumerated(EnumType.STRING)
-  @Column(nullable = false, length = 20)
-  private Rol rol;
+  @Builder.Default
+  @ManyToMany(fetch = FetchType.EAGER)
+  @JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
+  private List<Rol> roles = new ArrayList<>();
 
-  // relacion 1 a 1 controlada por logica de servicio, para evistar que un borrado
+  // relacion 1 a 1 controlada por logica de servicio, para evitar que un borrado
   // directo en usuario destruya el cliente
   @JsonIgnore
-  @OneToOne
+  @OneToOne(mappedBy = "usuario")
   private Cliente cliente;
 
   @JsonIgnore
@@ -52,10 +60,10 @@ public class Usuario {
   @OneToOne(mappedBy = "usuario")
   private Admin admin;
 
-  public Usuario(String correo, String contrasena, Rol rol) {
+  public UserEntity(String correo, String contrasena, List<Rol> roles) {
     this.correo = correo;
     this.contrasena = contrasena;
-    this.rol = rol;
+    this.roles = roles != null ? new ArrayList<>(roles) : new ArrayList<>();
   }
 
   public void asignarCliente(Cliente cliente) {

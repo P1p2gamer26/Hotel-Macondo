@@ -1,6 +1,7 @@
 package com.hotel.macondo.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -12,11 +13,11 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import lombok.Builder;
 
 @Builder
 @Getter
@@ -36,6 +37,7 @@ public class Habitacion {
   @Column(length = 100)
   private String etiqueta;
 
+  @Builder.Default
   @Column(nullable = false, precision = 12, scale = 2)
   private BigDecimal precio = BigDecimal.ZERO;
 
@@ -50,9 +52,11 @@ public class Habitacion {
 
   private Integer piso;
 
+  @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
   @ManyToOne
   private TipoHabitacion tipoHabitacion;
 
+  @Builder.Default
   @JsonIgnore
   @OneToMany(mappedBy = "habitacion")
   private List<Reserva> reservas = new ArrayList<>();

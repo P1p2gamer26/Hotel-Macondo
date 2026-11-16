@@ -1,4 +1,4 @@
-package com.hotel.macondo.dto;
+package com.hotel.macondo.DTOs.Entrada;
 
 /**
  * DTO DE ENTRADA (REQUEST) - CLIENTE (CAMBIAR CONTRASEÑA)

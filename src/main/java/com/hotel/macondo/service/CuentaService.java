@@ -4,11 +4,11 @@ import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.List;
 
+import com.hotel.macondo.DTOs.Entrada.ConsumoServicioSolicitud;
 import com.hotel.macondo.entities.Cuenta;
 import com.hotel.macondo.entities.DetalleCuenta;
 import com.hotel.macondo.entities.Pago;
 import com.hotel.macondo.entities.Servicio;
-import com.hotel.macondo.dto.ConsumoServicioSolicitud;
 
 public interface CuentaService {
 

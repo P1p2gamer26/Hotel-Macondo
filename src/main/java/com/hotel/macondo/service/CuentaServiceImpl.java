@@ -10,11 +10,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.hotel.macondo.DTOs.Entrada.ConsumoServicioSolicitud;
 import com.hotel.macondo.entities.Cuenta;
 import com.hotel.macondo.entities.DetalleCuenta;
 import com.hotel.macondo.entities.Pago;
 import com.hotel.macondo.entities.Servicio;
-import com.hotel.macondo.dto.ConsumoServicioSolicitud;
 import com.hotel.macondo.errors.FormularioErroneoException;
 import com.hotel.macondo.errors.RecursoNoEncontradoException;
 import com.hotel.macondo.repository.CuentaRepository;
@@ -77,7 +77,8 @@ public class CuentaServiceImpl implements CuentaService {
     return detalle;
   }
 
-  // Valida todos los servicios solicitados antes de guardar alguno y luego los agrega a la cuenta
+  // Valida todos los servicios solicitados antes de guardar alguno y luego los
+  // agrega a la cuenta
   @Override
   public void agregarServicios(Long cuentaId, List<ConsumoServicioSolicitud> solicitudes) {
     if (solicitudes == null || solicitudes.isEmpty()) {
@@ -171,7 +172,8 @@ public class CuentaServiceImpl implements CuentaService {
   // CÁLCULOS DE COSTOS Y SUBTOTALES (OPERADOR)
   // ==========================================
 
-  // Calcula lo que falta por pagar: total de la cuenta menos los pagos ya registrados (anticipos)
+  // Calcula lo que falta por pagar: total de la cuenta menos los pagos ya
+  // registrados (anticipos)
   @Override
   public BigDecimal calcularSaldo(Cuenta cuenta) {
     BigDecimal total = cuenta.getTotal() == null ? BigDecimal.ZERO : cuenta.getTotal();

@@ -24,7 +24,7 @@ import com.hotel.macondo.entities.Rol;
 import com.hotel.macondo.entities.Servicio;
 import com.hotel.macondo.entities.Testimonio;
 import com.hotel.macondo.entities.TipoHabitacion;
-import com.hotel.macondo.entities.Usuario;
+import com.hotel.macondo.entities.UserEntity;
 import com.hotel.macondo.repository.AdminRepository;
 import com.hotel.macondo.repository.ClienteRepository;
 import com.hotel.macondo.repository.CuentaRepository;
@@ -36,6 +36,7 @@ import com.hotel.macondo.repository.ServicioRepository;
 import com.hotel.macondo.repository.TestimonioRepository;
 import com.hotel.macondo.repository.TipoHabitacionRepository;
 import com.hotel.macondo.repository.UsuarioRepository;
+import com.hotel.macondo.repository.RolRepository;
 
 import jakarta.transaction.Transactional;
 
@@ -76,6 +77,9 @@ public class DataLoaderTest implements CommandLineRunner {
 
         @Autowired
         private PagoRepository pagoRepository;
+
+        @Autowired
+        private RolRepository rolRepository;
 
         @Override
         public void run(String... args) {
@@ -240,18 +244,23 @@ public class DataLoaderTest implements CommandLineRunner {
         }
 
         private void cargarUsuariosYPerfiles(List<Cliente> clientes) {
-                // Administrador unico del sistema
-                Usuario userAdmin = usuarioRepository.save(
-                                Usuario.builder()
+                // 1. Crear y guardar los roles en la tabla roles
+                Rol rolAdmin = rolRepository.save(new Rol("ADMINISTRADOR"));
+                Rol rolOperador = rolRepository.save(new Rol("OPERADOR"));
+                Rol rolCliente = rolRepository.save(new Rol("CLIENTE"));
+
+                // 2. Administrador unico del sistema (ejemplo con rol ADMINISTRADOR y OPERADOR)
+                UserEntity userAdmin = usuarioRepository.save(
+                                UserEntity.builder()
                                                 .correo("admin@macondo.com")
                                                 .contrasena("admin")
-                                                .rol(Rol.ADMINISTRADOR)
+                                                .roles(new ArrayList<>(List.of(rolAdmin)))
                                                 .build());
                 Admin admin = new Admin("Administrador Principal");
                 admin.asignarUsuario(userAdmin);
                 adminRepository.save(admin);
 
-                // 5 operadores de recepcion y atencion
+                // 3. 5 operadores de recepcion y atencion
                 String[][] datosOpe = {
                                 { "operador@macondo.com", "ope", "Recepción Principal" },
                                 { "operador2@macondo.com", "ope123", "Recepción Nocturna" },
@@ -261,26 +270,27 @@ public class DataLoaderTest implements CommandLineRunner {
                 };
 
                 for (String[] dop : datosOpe) {
-                        Usuario u = usuarioRepository.save(
-                                        Usuario.builder()
+                        UserEntity u = usuarioRepository.save(
+                                        UserEntity.builder()
                                                         .correo(dop[0])
                                                         .contrasena(dop[1])
-                                                        .rol(Rol.OPERADOR)
+                                                        .roles(new ArrayList<>(List.of(rolOperador)))
                                                         .build());
                         Operador op = new Operador(dop[2], true);
                         op.asignarUsuario(u);
                         operadorRepository.save(op);
                 }
 
-                // 10 usuarios asociados a los clientes con contrasena 123
+                // 4. 10 usuarios asociados a los clientes con contrasena 123
                 for (Cliente c : clientes) {
-                        Usuario u = Usuario.builder()
-                                        .correo(c.getCorreo())
-                                        .contrasena("123")
-                                        .rol(Rol.CLIENTE)
-                                        .build();
-                        u.asignarCliente(c);
-                        usuarioRepository.save(u);
+                        UserEntity u = usuarioRepository.save(
+                                        UserEntity.builder()
+                                                        .correo(c.getCorreo())
+                                                        .contrasena("123")
+                                                        .roles(new ArrayList<>(List.of(rolCliente)))
+                                                        .build());
+                        c.asignarUsuario(u);
+                        clienteRepository.save(c);
                 }
         }
 
@@ -551,7 +561,7 @@ public class DataLoaderTest implements CommandLineRunner {
                                 "MCD-PRUEBA-001",
                                 hoy.plusDays(5), hoy.plusDays(8), 2, "CONFIRMADA",
                                 clientes.get(0), habitaciones.get(0), true,
-                                List.of());
+                                List.of(servicios.get(0)));
 
                 // 202: reserva futura de otro cliente, con el máximo de 3 personas.
                 guardarReserva(
