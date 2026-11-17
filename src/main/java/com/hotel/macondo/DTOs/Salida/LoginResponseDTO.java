@@ -14,4 +14,5 @@ public class LoginResponseDTO {
     private String rol;
     private List<String> roles;
     private ClienteDTO cliente;
+    private String token;
 }

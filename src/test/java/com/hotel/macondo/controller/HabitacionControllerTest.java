@@ -14,10 +14,9 @@ import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.context.annotation.Import;
-import com.hotel.macondo.security.SecurityConfig;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -31,7 +30,7 @@ import com.hotel.macondo.entities.TipoHabitacion;
 import com.hotel.macondo.service.HabitacionService;
 
 @WebMvcTest(controllers = HabitacionRestController.class)
-@Import(SecurityConfig.class)
+@AutoConfigureMockMvc(addFilters = false)
 @ActiveProfiles("test")
 @RunWith(SpringRunner.class)
 public class HabitacionControllerTest {
