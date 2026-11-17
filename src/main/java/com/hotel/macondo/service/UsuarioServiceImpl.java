@@ -4,6 +4,7 @@ import java.util.Locale;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.hotel.macondo.entities.Cliente;
@@ -25,6 +26,9 @@ public class UsuarioServiceImpl implements UsuarioService {
   @Autowired
   private UsuarioRepository repository;
 
+  @Autowired
+  private PasswordEncoder passwordEncoder;
+
   // ==========================================
   // AUTENTICACION Y CONSULTAS
   // ==========================================
@@ -39,7 +43,8 @@ public class UsuarioServiceImpl implements UsuarioService {
     UserEntity usuario = repository.findByCorreoIgnoreCase(correoNormalizado).orElse(null);
     if (usuario == null
         || usuario.getContrasena() == null
-        || !usuario.getContrasena().equals(contrasena)) {
+        || contrasena == null
+        || !passwordEncoder.matches(contrasena, usuario.getContrasena())) {
       throw new FormularioErroneoException("Correo o contraseña incorrectos");
     }
     return usuario;
@@ -73,7 +78,7 @@ public class UsuarioServiceImpl implements UsuarioService {
   // Crea y asocia un usuario con rol CLIENTE a la entidad cliente persistida
   @Override
   public UserEntity registrarCliente(Cliente cliente, String contrasena) {
-    if (cliente == null || cliente.getCorreo() == null || contrasena == null) {
+    if (cliente == null || cliente.getCorreo() == null || !validarContrasena(contrasena)) {
       return null;
     }
 
@@ -85,7 +90,8 @@ public class UsuarioServiceImpl implements UsuarioService {
     Rol rolCliente = rolRepository.findByName("CLIENTE")
         .orElseGet(() -> rolRepository.save(new Rol("CLIENTE")));
 
-    UserEntity usuario = new UserEntity(correoNormalizado, contrasena, List.of(rolCliente));
+    UserEntity usuario = new UserEntity(correoNormalizado,
+        passwordEncoder.encode(contrasena), List.of(rolCliente));
     usuario = repository.save(usuario);
     cliente.asignarUsuario(usuario);
     return usuario;
@@ -105,7 +111,7 @@ public class UsuarioServiceImpl implements UsuarioService {
       return null;
     }
 
-    usuario.setContrasena(nuevaContrasena);
+    usuario.setContrasena(passwordEncoder.encode(nuevaContrasena));
     return repository.save(usuario);
   }
 

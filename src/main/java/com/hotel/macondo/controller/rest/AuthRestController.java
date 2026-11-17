@@ -6,6 +6,11 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,6 +24,7 @@ import com.hotel.macondo.DTOs.Salida.LoginResponseDTO;
 import com.hotel.macondo.entities.Rol;
 import com.hotel.macondo.entities.UserEntity;
 import com.hotel.macondo.service.UsuarioService;
+import com.hotel.macondo.security.JWTGenerator;
 
 // Controlador REST para la autenticación y control de acceso.
 
@@ -29,6 +35,12 @@ public class AuthRestController {
 
     @Autowired
     private UsuarioService usuarioService;
+
+    @Autowired
+    private AuthenticationManager authenticationManager;
+
+    @Autowired
+    private JWTGenerator jwtGenerator;
 
     // ==========================================
     // AUTENTICACIÓN / SESIÓN
@@ -46,7 +58,10 @@ public class AuthRestController {
         }
 
         try {
-            UserEntity usuario = usuarioService.autenticar(correo, contrasena);
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(correo, contrasena));
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            UserEntity usuario = usuarioService.buscarPorCorreo(authentication.getName());
 
             List<String> nombresRoles = usuario.getRoles().stream()
                     .map(Rol::getName)
@@ -64,10 +79,12 @@ public class AuthRestController {
                     usuario.getCorreo(),
                     rolPrincipal,
                     nombresRoles,
-                    clienteDTO);
+                    clienteDTO,
+                    jwtGenerator.generateToken(authentication));
 
             return new ResponseEntity<>(respuesta, HttpStatus.OK);
-        } catch (Exception e) {
+        } catch (AuthenticationException e) {
+            SecurityContextHolder.clearContext();
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Correo o contraseña incorrectos");
         }
     }
