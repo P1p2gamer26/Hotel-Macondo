@@ -7,6 +7,7 @@ import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.hotel.macondo.entities.Operador;
@@ -28,6 +29,9 @@ public class OperadorServiceImpl implements OperadorService {
 
   @Autowired
   private RolRepository rolRepository;
+
+  @Autowired
+  private PasswordEncoder passwordEncoder;
 
   // ==========================================
   // CONSULTAS DE OPERADORES
@@ -59,7 +63,7 @@ public class OperadorServiceImpl implements OperadorService {
       String correoGenerado = "operador." + UUID.randomUUID().toString().substring(0, 6) + "@macondo.com";
       UserEntity nuevoUsuario = UserEntity.builder()
           .correo(correoGenerado)
-          .contrasena("ope123")
+          .contrasena(passwordEncoder.encode("ope123"))
           .roles(new ArrayList<>(List.of(rolOperador)))
           .build();
       nuevoUsuario = usuarioRepository.save(nuevoUsuario);

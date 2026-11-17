@@ -16,18 +16,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.context.annotation.Import;
+import com.hotel.macondo.security.SecurityConfig;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.hotel.macondo.controller.rest.HabitacionRestController;
 import com.hotel.macondo.entities.Habitacion;
 import com.hotel.macondo.entities.TipoHabitacion;
 import com.hotel.macondo.service.HabitacionService;
 
 @WebMvcTest(controllers = HabitacionRestController.class)
+@Import(SecurityConfig.class)
 @ActiveProfiles("test")
 @RunWith(SpringRunner.class)
 public class HabitacionControllerTest {
@@ -77,12 +81,16 @@ public class HabitacionControllerTest {
                 when(habitacionService.guardar(Mockito.any(Habitacion.class), eq(1L)))
                                 .thenReturn(habitacionGuardada);
 
+                // tipoHabitacion solo se admite de entrada: no se serializa desde la entidad.
+                ObjectNode cuerpo = objectMapper.valueToTree(habitacionEntrada);
+                cuerpo.putObject("tipoHabitacion").put("id", tipo.getId());
+
                 // Act: Peticion HTTP POST simulada para enviar el JSON en el cuerpo de la
                 // peticion
                 ResultActions response = mockMvc.perform(
                                 post("/api/habitacion")
                                                 .contentType(MediaType.APPLICATION_JSON)
-                                                .content(objectMapper.writeValueAsString(habitacionEntrada)));
+                                                .content(objectMapper.writeValueAsString(cuerpo)));
 
                 // Assert: Se comprueba que se creo la habitacion y que el JSON tiene los datos
                 // esperados

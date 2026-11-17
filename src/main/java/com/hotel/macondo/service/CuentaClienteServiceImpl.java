@@ -49,6 +49,10 @@ public class CuentaClienteServiceImpl implements CuentaClienteService {
       throw new FormularioErroneoException("El formato del correo electrónico no es válido.");
     }
 
+    if (!usuarioService.validarContrasena(contrasena)) {
+      throw new FormularioErroneoException("La contraseña no puede estar vacía.");
+    }
+
     if (!usuarioService.validarCorreo(correo)) {
       throw new FormularioErroneoException("Correo electrónico ya en uso.");
     }

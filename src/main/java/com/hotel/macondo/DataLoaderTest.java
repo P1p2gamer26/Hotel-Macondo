@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.hotel.macondo.entities.Admin;
 import com.hotel.macondo.entities.Cliente;
@@ -80,6 +81,9 @@ public class DataLoaderTest implements CommandLineRunner {
 
         @Autowired
         private RolRepository rolRepository;
+
+        @Autowired
+        private PasswordEncoder passwordEncoder;
 
         @Override
         public void run(String... args) {
@@ -253,7 +257,7 @@ public class DataLoaderTest implements CommandLineRunner {
                 UserEntity userAdmin = usuarioRepository.save(
                                 UserEntity.builder()
                                                 .correo("admin@macondo.com")
-                                                .contrasena("admin")
+                                                .contrasena(passwordEncoder.encode("admin"))
                                                 .roles(new ArrayList<>(List.of(rolAdmin)))
                                                 .build());
                 Admin admin = new Admin("Administrador Principal");
@@ -273,7 +277,7 @@ public class DataLoaderTest implements CommandLineRunner {
                         UserEntity u = usuarioRepository.save(
                                         UserEntity.builder()
                                                         .correo(dop[0])
-                                                        .contrasena(dop[1])
+                                                        .contrasena(passwordEncoder.encode(dop[1]))
                                                         .roles(new ArrayList<>(List.of(rolOperador)))
                                                         .build());
                         Operador op = new Operador(dop[2], true);
@@ -286,7 +290,7 @@ public class DataLoaderTest implements CommandLineRunner {
                         UserEntity u = usuarioRepository.save(
                                         UserEntity.builder()
                                                         .correo(c.getCorreo())
-                                                        .contrasena("123")
+                                                        .contrasena(passwordEncoder.encode("123"))
                                                         .roles(new ArrayList<>(List.of(rolCliente)))
                                                         .build());
                         c.asignarUsuario(u);

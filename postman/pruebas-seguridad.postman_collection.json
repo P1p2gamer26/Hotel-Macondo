@@ -1,0 +1,1166 @@
+{
+  "info": {
+    "name": "Hotel Macondo - Pruebas de seguridad inicial y DTO",
+    "description": "Ejecutar completa, en orden, contra perfil test con datos iniciales. Solo usa endpoints existentes. Verifica registro con contraseña recibida, login, DTOs, cambio de clave, CRUD de operador y CORS. No verifica JWT ni autorización por roles: corresponden a la siguiente etapa. Crea registros con sufijo único y los elimina al terminar.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080",
+      "type": "string"
+    }
+  ],
+  "event": [
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "pm.test('No devuelve error interno', function () { pm.expect(pm.response.code).to.be.below(500); });",
+          "pm.test('La respuesta no expone contrasenas', function () {",
+          "  if (!pm.response.text() || !(pm.response.headers.get('Content-Type') || '').includes('application/json')) return;",
+          "  function revisar(valor) {",
+          "    if (!valor || typeof valor !== 'object') return;",
+          "    Object.keys(valor).forEach(function (clave) {",
+          "      pm.expect(clave.toLowerCase()).not.to.be.oneOf(['contrasena', 'contraseña', 'password']);",
+          "      revisar(valor[clave]);",
+          "    });",
+          "  }",
+          "  revisar(pm.response.json());",
+          "});"
+        ]
+      }
+    }
+  ],
+  "item": [
+    {
+      "name": "01 - Consultar habitaciones e iniciar datos de prueba",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/habitacion"
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const sufijo = String(Date.now());",
+              "pm.collectionVariables.set('pruebaSufijo', sufijo);",
+              "pm.collectionVariables.set('pruebaCedula', sufijo);",
+              "pm.collectionVariables.set('pruebaCorreo', 'laura.' + sufijo + '@macondo.com');",
+              "pm.collectionVariables.set('pruebaContrasena', 'ClaveElegida-' + sufijo);",
+              "pm.collectionVariables.set('pruebaContrasenaNueva', 'NuevaClave-' + sufijo);",
+              "pm.collectionVariables.unset('pruebaClienteId');",
+              "pm.collectionVariables.unset('pruebaOperadorId');"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+              "pm.test('Listado de habitaciones', function () { pm.expect(pm.response.json()).to.be.an('array').that.is.not.empty; pm.response.json().forEach(function (h) { pm.expect(h).not.to.have.property('reservas'); }); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "02 - Login administrador inicial",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/auth/login",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"correo\": \"admin@macondo.com\",\n  \"contrasena\": \"admin\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+              "pm.test('DTO de login y rol', function () { const datos=pm.response.json(); pm.expect(datos).to.have.all.keys('id','correo','rol','roles','cliente'); pm.expect(datos.rol).to.eql('ADMINISTRADOR'); pm.expect(datos.roles).to.include('ADMINISTRADOR'); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "03 - Login operador inicial",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/auth/login",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"correo\": \"operador@macondo.com\",\n  \"contrasena\": \"ope\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+              "pm.test('DTO de login y rol', function () { const datos=pm.response.json(); pm.expect(datos).to.have.all.keys('id','correo','rol','roles','cliente'); pm.expect(datos.rol).to.eql('OPERADOR'); pm.expect(datos.roles).to.include('OPERADOR'); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "04 - Registrar cliente con contrasena recibida",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/cliente/registro",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"cliente\": {\n    \"nombre\": \"Laura\",\n    \"apellido\": \"Postman\",\n    \"cedula\": \"{{pruebaCedula}}\",\n    \"telefono\": \"3005550101\",\n    \"correo\": \"{{pruebaCorreo}}\"\n  },\n  \"contrasena\": \"{{pruebaContrasena}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+              "pm.test('DTO de cliente sin entidades asociadas', function () { pm.expect(pm.response.json()).to.have.all.keys([\"id\",\"nombre\",\"apellido\",\"cedula\",\"telefono\",\"correo\"]); });",
+              "pm.test('Cliente creado con datos enviados', function () { const datos=pm.response.json(); pm.expect(datos.correo).to.eql(pm.collectionVariables.get('pruebaCorreo')); pm.expect(datos.id).to.be.a('number').above(0); pm.collectionVariables.set('pruebaClienteId', datos.id); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "05 - Rechazar correo duplicado",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/cliente/registro",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"cliente\": {\n    \"nombre\": \"Laura\",\n    \"apellido\": \"Postman\",\n    \"cedula\": \"{{pruebaCedula}}\",\n    \"telefono\": \"3005550101\",\n    \"correo\": \"{{pruebaCorreo}}\"\n  },\n  \"contrasena\": \"{{pruebaContrasena}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 400', function () { pm.response.to.have.status(400); });",
+              "pm.test('Mensaje de correo duplicado', function () { pm.expect(pm.response.json().mensaje).to.eql('Correo electrónico ya en uso.'); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "06 - Rechazar correo invalido",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/cliente/registro",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"cliente\": {\n    \"nombre\": \"Laura\",\n    \"apellido\": \"Postman\",\n    \"cedula\": \"{{pruebaCedula}}1\",\n    \"telefono\": \"3005550101\",\n    \"correo\": \"laura@gmail\"\n  },\n  \"contrasena\": \"{{pruebaContrasena}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 400', function () { pm.response.to.have.status(400); });",
+              "pm.test('Mensaje de formato', function () { pm.expect(pm.response.json().mensaje).to.eql('El formato del correo electrónico no es válido.'); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "07 - Rechazar registro sin contrasena",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/cliente/registro",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"cliente\": {\n    \"nombre\": \"Laura\",\n    \"apellido\": \"Postman\",\n    \"cedula\": \"{{pruebaCedula}}2\",\n    \"telefono\": \"3005550101\",\n    \"correo\": \"registro2.{{pruebaSufijo}}@macondo.com\"\n  }\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 400', function () { pm.response.to.have.status(400); });",
+              "pm.test('Mensaje de contrasena ausente', function () { pm.expect(pm.response.json().mensaje).to.eql('La contraseña no puede estar vacía.'); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "08 - Rechazar registro con contrasena en blanco",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/cliente/registro",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"cliente\": {\n    \"nombre\": \"Laura\",\n    \"apellido\": \"Postman\",\n    \"cedula\": \"{{pruebaCedula}}3\",\n    \"telefono\": \"3005550101\",\n    \"correo\": \"registro3.{{pruebaSufijo}}@macondo.com\"\n  },\n  \"contrasena\": \"   \"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 400', function () { pm.response.to.have.status(400); });",
+              "pm.test('Mensaje de contrasena vacia', function () { pm.expect(pm.response.json().mensaje).to.eql('La contraseña no puede estar vacía.'); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "09 - Login cliente registrado",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/auth/login",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"correo\": \"{{pruebaCorreo}}\",\n  \"contrasena\": \"{{pruebaContrasena}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+              "pm.test('DTO de login y rol', function () { const datos=pm.response.json(); pm.expect(datos).to.have.all.keys('id','correo','rol','roles','cliente'); pm.expect(datos.rol).to.eql('CLIENTE'); pm.expect(datos.roles).to.include('CLIENTE'); });",
+              "pm.test('Perfil del cliente asociado', function () { pm.expect(String(pm.response.json().cliente.id)).to.eql(String(pm.collectionVariables.get('pruebaClienteId'))); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "10 - Rechazar contrasena incorrecta",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/auth/login",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"correo\": \"{{pruebaCorreo}}\",\n  \"contrasena\": \"ClaveEquivocada\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 401', function () { pm.response.to.have.status(401); });",
+              "pm.test('Mensaje de credenciales', function () { pm.expect(pm.response.json().mensaje).to.eql('Correo o contraseña incorrectos'); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "11 - Rechazar usuario inexistente",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/auth/login",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"correo\": \"inexistente.{{pruebaSufijo}}@macondo.com\",\n  \"contrasena\": \"ClaveEquivocada\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 401', function () { pm.response.to.have.status(401); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "12 - Rechazar login sin contrasena",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/auth/login",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"correo\": \"{{pruebaCorreo}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 400', function () { pm.response.to.have.status(400); });",
+              "pm.test('Faltan credenciales', function () { pm.expect(pm.response.json().mensaje).to.eql('Faltan credenciales'); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "13 - Rechazar JSON mal formado",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/auth/login",
+        "body": {
+          "mode": "raw",
+          "raw": "{correo:}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 400', function () { pm.response.to.have.status(400); });",
+              "pm.test('Mensaje de formato JSON', function () { pm.expect(pm.response.json().mensaje).to.eql('Los datos enviados no tienen el formato correcto.'); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "14 - Consultar cliente creado",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/cliente/find/{{pruebaClienteId}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+              "pm.test('DTO de cliente sin entidades asociadas', function () { pm.expect(pm.response.json()).to.have.all.keys([\"id\",\"nombre\",\"apellido\",\"cedula\",\"telefono\",\"correo\"]); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "15 - Consultar cliente inexistente",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/cliente/find/9223372036854775807"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 404', function () { pm.response.to.have.status(404); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "16 - Actualizar perfil",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/cliente/{{pruebaClienteId}}/perfil",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nombre\": \"Laura Actualizada\",\n  \"apellido\": \"Postman\",\n  \"cedula\": \"{{pruebaCedula}}\",\n  \"telefono\": \"3005550199\",\n  \"correo\": \"{{pruebaCorreo}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+              "pm.test('DTO de cliente sin entidades asociadas', function () { pm.expect(pm.response.json()).to.have.all.keys([\"id\",\"nombre\",\"apellido\",\"cedula\",\"telefono\",\"correo\"]); });",
+              "pm.test('Perfil actualizado', function () { pm.expect(pm.response.json().nombre).to.eql('Laura Actualizada'); pm.expect(pm.response.json().telefono).to.eql('3005550199'); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "17 - Rechazar confirmacion de contrasena diferente",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/cliente/{{pruebaClienteId}}/password",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"contrasenaActual\": \"{{pruebaContrasena}}\",\n  \"nuevaContrasena\": \"{{pruebaContrasenaNueva}}\",\n  \"confirmarContrasena\": \"NoCoincide\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 400', function () { pm.response.to.have.status(400); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "18 - Conservar clave despues del cambio rechazado",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/auth/login",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"correo\": \"{{pruebaCorreo}}\",\n  \"contrasena\": \"{{pruebaContrasena}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+              "pm.test('DTO de login y rol', function () { const datos=pm.response.json(); pm.expect(datos).to.have.all.keys('id','correo','rol','roles','cliente'); pm.expect(datos.rol).to.eql('CLIENTE'); pm.expect(datos.roles).to.include('CLIENTE'); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "19 - Rechazar cambio con contrasena actual incorrecta",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/cliente/{{pruebaClienteId}}/password",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"contrasenaActual\": \"ClaveEquivocada\",\n  \"nuevaContrasena\": \"{{pruebaContrasenaNueva}}\",\n  \"confirmarContrasena\": \"{{pruebaContrasenaNueva}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 400', function () { pm.response.to.have.status(400); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "20 - Cambiar contrasena",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/cliente/{{pruebaClienteId}}/password",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"contrasenaActual\": \"{{pruebaContrasena}}\",\n  \"nuevaContrasena\": \"{{pruebaContrasenaNueva}}\",\n  \"confirmarContrasena\": \"{{pruebaContrasenaNueva}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 204', function () { pm.response.to.have.status(204); });",
+              "pm.test('Respuesta sin cuerpo', function () { pm.expect(pm.response.text()).to.eql(''); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "21 - Rechazar clave anterior",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/auth/login",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"correo\": \"{{pruebaCorreo}}\",\n  \"contrasena\": \"{{pruebaContrasena}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 401', function () { pm.response.to.have.status(401); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "22 - Aceptar nueva clave",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/auth/login",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"correo\": \"{{pruebaCorreo}}\",\n  \"contrasena\": \"{{pruebaContrasenaNueva}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+              "pm.test('DTO de login y rol', function () { const datos=pm.response.json(); pm.expect(datos).to.have.all.keys('id','correo','rol','roles','cliente'); pm.expect(datos.rol).to.eql('CLIENTE'); pm.expect(datos.roles).to.include('CLIENTE'); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "23 - Crear operador con contrato actual",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/operador",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nombre\": \"Operador Postman {{pruebaSufijo}}\",\n  \"activo\": true\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 201', function () { pm.response.to.have.status(201); });",
+              "pm.test('DTO del operador creado', function () { const datos=pm.response.json(); pm.expect(datos).to.have.all.keys('id','nombre','activo'); pm.expect(datos.activo).to.eql(true); pm.expect(datos.id).to.be.a('number').above(0); pm.collectionVariables.set('pruebaOperadorId', datos.id); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "24 - Listar operadores",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/operador"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+              "pm.test('Operador creado aparece en listado', function () { const operadores=pm.response.json(); pm.expect(operadores).to.be.an('array'); pm.expect(operadores.some(o=>String(o.id)===String(pm.collectionVariables.get('pruebaOperadorId')))).to.eql(true); operadores.forEach(o=>pm.expect(o).to.have.all.keys('id','nombre','activo')); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "25 - Cambiar estado operador",
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "url": "{{baseUrl}}/api/operador/estado/{{pruebaOperadorId}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+              "pm.test('Operador desactivado', function () { pm.expect(pm.response.json().activo).to.eql(false); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "26 - Eliminar operador creado",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": "{{baseUrl}}/api/operador/delete/{{pruebaOperadorId}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 204', function () { pm.response.to.have.status(204); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "27 - Rechazar eliminacion de operador inexistente",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": "{{baseUrl}}/api/operador/delete/{{pruebaOperadorId}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 404', function () { pm.response.to.have.status(404); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "28 - Consultar resumen de reservas",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/reserva"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+              "pm.test('DTO resumido de reservas', function () { pm.expect(pm.response.json()).to.be.an('array'); pm.response.json().forEach(function(r){ pm.expect(r.cliente).to.have.all.keys('id','nombre','apellido'); pm.expect(r).not.to.have.property('cuenta'); }); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "29 - Consultar detalle de reserva",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/reserva/MCD-PRUEBA-001"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+              "pm.test('Detalle necesario para operador', function () { const r=pm.response.json(); pm.expect(r.numeroReserva).to.eql('MCD-PRUEBA-001'); pm.expect(r).to.have.property('cliente'); pm.expect(r).to.have.property('habitacion'); pm.expect(r).to.have.property('cuenta'); pm.expect(r.cliente).not.to.have.property('usuario'); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "30 - Consultar activas del cliente inicial",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/reserva/cliente/1/activas"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+              "pm.test('Respuesta de listado', function () { pm.expect(pm.response.json()).to.be.an('array'); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "31 - Consultar historial del cliente inicial",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/reserva/cliente/1/historial"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+              "pm.test('Respuesta de listado', function () { pm.expect(pm.response.json()).to.be.an('array'); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "32 - Consultar pagos del cliente inicial",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/reserva/cliente/1/pagos"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+              "pm.test('Respuesta de listado', function () { pm.expect(pm.response.json()).to.be.an('array'); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "33 - Consultar catalogo de servicios",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/servicio/catalogo"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+              "pm.test('Listado disponible', function () { pm.expect(pm.response.json()).to.be.an('array'); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "34 - Consultar tipos de habitacion",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/tipo-habitacion"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+              "pm.test('Listado disponible', function () { pm.expect(pm.response.json()).to.be.an('array'); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "35 - Consultar testimonios",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/testimonio"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+              "pm.test('Listado disponible', function () { pm.expect(pm.response.json()).to.be.an('array'); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "36 - Preflight CORS de Angular",
+      "request": {
+        "method": "OPTIONS",
+        "header": [
+          {
+            "key": "Origin",
+            "value": "http://localhost:4200"
+          },
+          {
+            "key": "Access-Control-Request-Method",
+            "value": "POST"
+          },
+          {
+            "key": "Access-Control-Request-Headers",
+            "value": "Content-Type"
+          }
+        ],
+        "url": "{{baseUrl}}/api/auth/login"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+              "pm.test('Origen Angular permitido', function () { pm.expect(pm.response.headers.get('Access-Control-Allow-Origin')).to.eql('http://localhost:4200'); pm.expect(pm.response.headers.get('Access-Control-Allow-Methods')).to.include('POST'); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "37 - Preflight CORS de origen no permitido",
+      "request": {
+        "method": "OPTIONS",
+        "header": [
+          {
+            "key": "Origin",
+            "value": "https://origen-no-permitido.example"
+          },
+          {
+            "key": "Access-Control-Request-Method",
+            "value": "POST"
+          },
+          {
+            "key": "Access-Control-Request-Headers",
+            "value": "Content-Type"
+          }
+        ],
+        "url": "{{baseUrl}}/api/auth/login"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 403', function () { pm.response.to.have.status(403); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "38 - Eliminar cliente de prueba sin reservas",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": "{{baseUrl}}/api/cliente/delete/{{pruebaClienteId}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 204', function () { pm.response.to.have.status(204); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "39 - Cliente eliminado ya no existe",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/cliente/find/{{pruebaClienteId}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 404', function () { pm.response.to.have.status(404); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "40 - Usuario eliminado ya no puede iniciar sesion",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/auth/login",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"correo\": \"{{pruebaCorreo}}\",\n  \"contrasena\": \"{{pruebaContrasenaNueva}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 401', function () { pm.response.to.have.status(401); });"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
