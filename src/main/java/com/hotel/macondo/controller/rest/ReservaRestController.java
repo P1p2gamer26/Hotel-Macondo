@@ -38,7 +38,7 @@ import io.swagger.v3.oas.annotations.Operation;
  */
 @RestController
 @RequestMapping("/api/reserva")
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(origins = "https://macondo.kusare.fyi")
 public class ReservaRestController {
 
     @Autowired

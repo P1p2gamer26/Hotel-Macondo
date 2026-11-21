@@ -13,7 +13,7 @@ import com.hotel.macondo.service.TestimonioService;
 
 @RestController
 @RequestMapping("/api/testimonio")
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(origins = "https://macondo.kusare.fyi")
 public class TestimonioRestController {
 
     @Autowired

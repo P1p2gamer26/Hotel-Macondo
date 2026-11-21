@@ -25,7 +25,7 @@ import com.hotel.macondo.service.CuentaClienteService;
 
 @RestController
 @RequestMapping("/api/cliente")
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(origins = "https://macondo.kusare.fyi")
 public class ClienteRestController {
 
     @Autowired

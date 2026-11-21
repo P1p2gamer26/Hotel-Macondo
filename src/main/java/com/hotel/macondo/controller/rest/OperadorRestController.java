@@ -29,7 +29,7 @@ import com.hotel.macondo.service.ReservaService;
 // Controlador REST para la gestión y administración del personal operador
 @RestController
 @RequestMapping("/api/operador")
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(origins = "https://macondo.kusare.fyi")
 public class OperadorRestController {
 
     @Autowired

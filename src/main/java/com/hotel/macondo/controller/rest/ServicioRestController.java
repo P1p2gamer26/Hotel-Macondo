@@ -21,7 +21,7 @@ import com.hotel.macondo.service.ServicioService;
 // Controlador REST para catálogo y mantenimiento de servicios del hotel
 @RestController
 @RequestMapping("/api/servicio")
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(origins = "https://macondo.kusare.fyi")
 public class ServicioRestController {
 
     @Autowired

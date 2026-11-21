@@ -23,7 +23,7 @@ import com.hotel.macondo.service.TipoHabitacionService;
 // Controlador REST para la gestión de tipos o categorías de habitación
 @RestController
 @RequestMapping("/api/tipo-habitacion")
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(origins = "https://macondo.kusare.fyi")
 public class TipoHabitacionRestController {
 
     @Autowired

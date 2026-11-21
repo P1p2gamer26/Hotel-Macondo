@@ -30,7 +30,7 @@ import com.hotel.macondo.security.JWTGenerator;
 
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(origins = "https://macondo.kusare.fyi")
 public class AuthRestController {
 
     @Autowired

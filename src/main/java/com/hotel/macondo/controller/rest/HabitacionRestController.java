@@ -26,7 +26,7 @@ import com.hotel.macondo.service.HabitacionService;
 // Controlador REST para la gestión de habitaciones físicas del hotel
 @RestController
 @RequestMapping("/api/habitacion")
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(origins = "https://macondo.kusare.fyi")
 public class HabitacionRestController {
 
     @Autowired
