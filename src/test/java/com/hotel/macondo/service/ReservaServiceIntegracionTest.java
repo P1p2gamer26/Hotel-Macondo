@@ -51,6 +51,8 @@ public class ReservaServiceIntegracionTest {
     private Long habitacionId;
     private LocalDate entrada;
     private LocalDate salida;
+  
+    // Conteos de base antes de cada prueba: la BD de test trae datos semilla (DataLoaderTest).
     private long reservasIniciales;
     private long cuentasIniciales;
 
@@ -61,6 +63,8 @@ public class ReservaServiceIntegracionTest {
         LocalDate hoy = LocalDate.now();
         entrada = hoy.plusDays(10);
         salida = hoy.plusDays(13);
+        reservasIniciales = reservaRepository.count();
+        cuentasIniciales = cuentaRepository.count();
 
         TipoHabitacion tipo = tipoHabitacionRepository.save(
                 new TipoHabitacion("Tipo de prueba", "Habitacion de prueba", "foto.jpg",

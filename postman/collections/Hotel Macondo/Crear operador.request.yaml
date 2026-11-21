@@ -1,0 +1,11 @@
+$kind: http-request
+url: http://localhost:8080/api/operador
+method: POST
+body:
+  type: json
+  content: '{"nombre":"Ana"}'
+scripts:
+  - type: afterResponse
+    code: pm.collectionVariables.set("operadorId", pm.response.json().id);
+    language: text/javascript
+order: 2000

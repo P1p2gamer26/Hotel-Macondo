@@ -1,0 +1,4 @@
+$kind: http-request
+url: http://localhost:8080/api/operador
+method: GET
+order: 6000
