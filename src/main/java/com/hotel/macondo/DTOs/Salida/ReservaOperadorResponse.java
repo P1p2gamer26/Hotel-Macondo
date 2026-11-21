@@ -1,4 +1,4 @@
-package com.hotel.macondo.dto;
+package com.hotel.macondo.DTOs.Salida;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

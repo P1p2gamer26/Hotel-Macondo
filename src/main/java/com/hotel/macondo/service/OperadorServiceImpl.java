@@ -1,14 +1,20 @@
 package com.hotel.macondo.service;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.hotel.macondo.entities.Operador;
-import com.hotel.macondo.entities.Usuario;
+import com.hotel.macondo.entities.Rol;
+import com.hotel.macondo.entities.UserEntity;
 import com.hotel.macondo.repository.OperadorRepository;
+import com.hotel.macondo.repository.RolRepository;
 import com.hotel.macondo.repository.UsuarioRepository;
 
 @Service
@@ -20,6 +26,12 @@ public class OperadorServiceImpl implements OperadorService {
 
   @Autowired
   private UsuarioRepository usuarioRepository;
+
+  @Autowired
+  private RolRepository rolRepository;
+
+  @Autowired
+  private PasswordEncoder passwordEncoder;
 
   // ==========================================
   // CONSULTAS DE OPERADORES
@@ -44,6 +56,19 @@ public class OperadorServiceImpl implements OperadorService {
   // Guarda o actualiza los datos de un operador
   @Override
   public Operador guardar(Operador operador) {
+    if (operador.getUsuario() == null) {
+      Rol rolOperador = rolRepository.findByName("OPERADOR")
+          .orElseGet(() -> rolRepository.save(new Rol("OPERADOR")));
+
+      String correoGenerado = "operador." + UUID.randomUUID().toString().substring(0, 6) + "@macondo.com";
+      UserEntity nuevoUsuario = UserEntity.builder()
+          .correo(correoGenerado)
+          .contrasena(passwordEncoder.encode("ope123"))
+          .roles(new ArrayList<>(List.of(rolOperador)))
+          .build();
+      nuevoUsuario = usuarioRepository.save(nuevoUsuario);
+      operador.asignarUsuario(nuevoUsuario);
+    }
     return repository.save(operador);
   }
 
@@ -67,8 +92,9 @@ public class OperadorServiceImpl implements OperadorService {
       return;
     }
 
-    Usuario usuario = operador.getUsuario();
+    UserEntity usuario = operador.getUsuario();
     if (usuario != null) {
+      usuario.getRoles().clear();
       operador.setUsuario(null);
       usuarioRepository.delete(usuario);
     }

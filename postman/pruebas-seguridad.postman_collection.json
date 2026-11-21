@@ -1,0 +1,168 @@
+{
+  "info": {
+    "name": "Hotel Macondo - Contraseñas y DTO",
+    "description": "Peticiones para comprobación manual de registro, login, DTOs y cambio de contraseña. Enviar una por una con Send y revisar Status y Body. No contiene scripts. Usar el perfil test y únicamente el cliente creado para esta comprobación.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "pruebaClienteId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "01 - Registrar cliente con contrasena recibida",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/cliente/registro",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"cliente\": {\n    \"nombre\": \"Laura\",\n    \"apellido\": \"Postman\",\n    \"cedula\": \"1099000101\",\n    \"telefono\": \"3005550101\",\n    \"correo\": \"laura.postman@macondo.com\"\n  },\n  \"contrasena\": \"ClaveElegidaMacondo!\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "description": "Enviar con Send. Esperado: HTTP 200 y DTO del cliente sin contraseña. Copiar el id de esta respuesta en la variable de colección pruebaClienteId. Si el correo o la cédula ya existen, utilizar otros datos propios de prueba y mantener el mismo correo en los siguientes logins."
+      }
+    },
+    {
+      "name": "02 - Login con la contrasena registrada",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/auth/login",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"correo\": \"laura.postman@macondo.com\",\n  \"contrasena\": \"ClaveElegidaMacondo!\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "description": "Enviar con Send. Esperado: HTTP 200. Revisar que el cliente corresponda al registrado y que el JSON no incluya la contraseña, tampoco dentro de cliente."
+      }
+    },
+    {
+      "name": "03 - Rechazar contrasena incorrecta",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/auth/login",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"correo\": \"laura.postman@macondo.com\",\n  \"contrasena\": \"ClaveEquivocada\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "description": "Enviar con Send. Esperado: HTTP 401 por contraseña incorrecta."
+      }
+    },
+    {
+      "name": "04 - Cambiar contrasena",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/cliente/{{pruebaClienteId}}/password",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"contrasenaActual\": \"ClaveElegidaMacondo!\",\n  \"nuevaContrasena\": \"NuevaClaveMacondo!\",\n  \"confirmarContrasena\": \"NuevaClaveMacondo!\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "description": "Antes de enviar, establecer pruebaClienteId con el id devuelto por el registro. Esperado: HTTP 204 y cuerpo vacío."
+      }
+    },
+    {
+      "name": "05 - Rechazar contrasena anterior",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/auth/login",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"correo\": \"laura.postman@macondo.com\",\n  \"contrasena\": \"ClaveElegidaMacondo!\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "description": "Enviar después del cambio de contraseña. Esperado: HTTP 401 porque la clave anterior ya no es válida."
+      }
+    },
+    {
+      "name": "06 - Login con nueva contrasena",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/auth/login",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"correo\": \"laura.postman@macondo.com\",\n  \"contrasena\": \"NuevaClaveMacondo!\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "description": "Enviar después del cambio de contraseña. Esperado: HTTP 200 y DTO de login sin contraseña."
+      }
+    },
+    {
+      "name": "07 - Eliminar cliente de prueba (opcional)",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": "{{baseUrl}}/api/cliente/delete/{{pruebaClienteId}}",
+        "description": "Limpieza manual opcional. Verificar que pruebaClienteId corresponde exclusivamente al cliente creado en el paso 01 antes de enviar. Esperado: HTTP 204 y cuerpo vacío."
+      }
+    }
+  ]
+}

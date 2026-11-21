@@ -12,10 +12,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.hotel.macondo.dto.ConsumoServicioSolicitud;
-import com.hotel.macondo.dto.PagoClienteResponse;
-import com.hotel.macondo.dto.ReservaDetalleOperadorResponse;
-import com.hotel.macondo.dto.ReservaOperadorResponse;
+import com.hotel.macondo.DTOs.Entrada.ConsumoServicioSolicitud;
+import com.hotel.macondo.DTOs.Salida.PagoClienteResponse;
+import com.hotel.macondo.DTOs.Salida.ReservaDetalleOperadorResponse;
+import com.hotel.macondo.DTOs.Salida.ReservaOperadorResponse;
 import com.hotel.macondo.entities.Cliente;
 import com.hotel.macondo.entities.Cuenta;
 import com.hotel.macondo.entities.DetalleCuenta;
@@ -276,21 +276,24 @@ public class ReservaServiceImpl implements ReservaService {
     if (reserva.getEstado() == null || !reserva.getEstado().equalsIgnoreCase("ACTIVA")) {
       throw new PeticionImposible("Solo se puede pagar la cuenta de una reserva activa.");
     }
-    if (metodoPago == null || !List.of("EFECTIVO", "TARJETA", "TRANSFERENCIA").contains(metodoPago.trim().toUpperCase())) {
+    if (metodoPago == null
+        || !List.of("EFECTIVO", "TARJETA", "TRANSFERENCIA").contains(metodoPago.trim().toUpperCase())) {
       throw new FormularioErroneoException("Método de pago inválido.");
     }
     Cuenta cuenta = reserva.getCuenta();
     if (cuenta == null) {
       throw new RecursoNoEncontradoException("La reserva no tiene una cuenta asociada.");
     }
-    Pago pago = cuentaService.pagar(cuenta.getId(), cuentaService.calcularSaldo(cuenta), metodoPago.trim().toUpperCase());
+    Pago pago = cuentaService.pagar(cuenta.getId(), cuentaService.calcularSaldo(cuenta),
+        metodoPago.trim().toUpperCase());
     if (pago == null) {
       throw new PeticionImposible("La cuenta no se puede pagar: debe estar abierta y tener saldo.");
     }
     return pago;
   }
 
-  // Agrega servicios a la cuenta de una reserva activa desde el panel del operador
+  // Agrega servicios a la cuenta de una reserva activa desde el panel del
+  // operador
   @Override
   public void agregarServiciosParaOperador(String numeroReserva, List<ConsumoServicioSolicitud> servicios) {
     Reserva reserva = reservaRepository
@@ -302,7 +305,8 @@ public class ReservaServiceImpl implements ReservaService {
     cuentaService.agregarServicios(obtenerCuentaId(numeroReserva), servicios);
   }
 
-  // Elimina un consumo de la cuenta de una reserva activa desde el panel del operador
+  // Elimina un consumo de la cuenta de una reserva activa desde el panel del
+  // operador
   @Override
   public void eliminarServicioParaOperador(String numeroReserva, Long detalleId) {
     Reserva reserva = reservaRepository
@@ -457,7 +461,7 @@ public class ReservaServiceImpl implements ReservaService {
 
   // Retorna el identificador de la cuenta asociada al número público de reserva
   @Override
-  public Long obtenerCuentaId(String numeroReserva){
+  public Long obtenerCuentaId(String numeroReserva) {
     Reserva reserva = reservaRepository
         .findByNumeroReserva(numeroReserva)
         .orElseThrow(() -> new RecursoNoEncontradoException("No se encontró la reserva " + numeroReserva));
@@ -468,12 +472,12 @@ public class ReservaServiceImpl implements ReservaService {
     return cuenta.getId();
   }
 
-  // Busca la reserva activa con cuenta abierta de la habitación para cargarle servicios
+  // Busca la reserva activa con cuenta abierta de la habitación para cargarle
+  // servicios
   @Override
   @Transactional(readOnly = true)
   public Long obtenerIdReservaActivaPorNumeroHabitacion(String numeroHabitacion) {
-    List<Long> idsReserva =
-        reservaRepository.buscarIdsActivosConCuentaAbiertaPorNumeroHabitacion(numeroHabitacion);
+    List<Long> idsReserva = reservaRepository.buscarIdsActivosConCuentaAbiertaPorNumeroHabitacion(numeroHabitacion);
 
     if (idsReserva.isEmpty()) {
       throw new RecursoNoEncontradoException(
@@ -487,12 +491,12 @@ public class ReservaServiceImpl implements ReservaService {
     return idsReserva.get(0);
   }
 
-  // Busca la reserva activa de la habitación para el check-out, sin importar el estado de la cuenta
+  // Busca la reserva activa de la habitación para el check-out, sin importar el
+  // estado de la cuenta
   @Override
   @Transactional(readOnly = true)
   public Long obtenerIdReservaEnCheckout(String numeroHabitacion) {
-    List<Long> idsReserva =
-        reservaRepository.buscarIdsActivosPorNumeroHabitacion(numeroHabitacion);
+    List<Long> idsReserva = reservaRepository.buscarIdsActivosPorNumeroHabitacion(numeroHabitacion);
 
     if (idsReserva.isEmpty()) {
       throw new RecursoNoEncontradoException(
@@ -703,6 +707,5 @@ public class ReservaServiceImpl implements ReservaService {
       throw new PeticionImposible("La reserva ya no se encuentra activa.");
     }
   }
-
 
 }

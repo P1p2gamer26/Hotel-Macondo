@@ -10,7 +10,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -54,19 +53,6 @@ public class Caso1E2ETest {
             elemento.sendKeys(String.valueOf(c));
             pausa(msPorLetra);
         }
-    }
-
-    // Hace scroll al elemento y espera a que sea el de encima en su centro antes de hacer clic
-    private void hacerClickVisible(WebElement elemento) {
-        JavascriptExecutor js = (JavascriptExecutor) driver;
-        js.executeScript("arguments[0].scrollIntoView({block: 'center', inline: 'center'});", elemento);
-        wait.until(d -> (Boolean) js.executeScript("""
-                const elemento = arguments[0];
-                const rect = elemento.getBoundingClientRect();
-                const encima = document.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2);
-                return encima === elemento || elemento.contains(encima);
-                """, elemento));
-        elemento.click();
     }
 
     // ========================================================================
@@ -154,7 +140,7 @@ public class Caso1E2ETest {
         pausa(1000);
 
         // Envia el formulario, clic en el boton de submit
-        hacerClickVisible(driver.findElement(By.id("btnSubmit")));
+        driver.findElement(By.id("btnSubmit")).click();
 
         // Espera a que aparezca la alerta de error
         wait.until(ExpectedConditions.presenceOfElementLocated(By.id("mensajeError")));
@@ -178,7 +164,7 @@ public class Caso1E2ETest {
         pausa(800);
 
         // Reenvia el formulario con los datos ya corregidos
-        hacerClickVisible(driver.findElement(By.id("btnSubmit")));
+        driver.findElement(By.id("btnSubmit")).click();
 
         // Espera a que angular procese el registro y redirija a la vista del cliente
         wait.until(ExpectedConditions.urlContains("/cliente/"));
