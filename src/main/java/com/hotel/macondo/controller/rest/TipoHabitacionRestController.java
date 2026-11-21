@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,7 +22,6 @@ import com.hotel.macondo.service.TipoHabitacionService;
 // Controlador REST para la gestión de tipos o categorías de habitación
 @RestController
 @RequestMapping("/api/tipo-habitacion")
-@CrossOrigin(origins = "http://localhost:4200")
 public class TipoHabitacionRestController {
 
     @Autowired
