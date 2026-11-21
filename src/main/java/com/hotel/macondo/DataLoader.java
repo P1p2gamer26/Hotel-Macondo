@@ -43,7 +43,7 @@ import jakarta.transaction.Transactional;
 
 @Component
 @Transactional
-@Profile("default")
+@Profile({"default", "dev", "prod"})
 public class DataLoader implements CommandLineRunner {
 
         @Autowired

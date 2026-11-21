@@ -29,11 +29,60 @@ literario.
 
 ## Cómo ejecutar
 
-```bash
+### Desarrollo
+
+```powershell
+$env:SPRING_PROFILES_ACTIVE="dev"
 mvn spring-boot:run
 ```
 
-Y abrir http://localhost:8080
+El backend quedará disponible en `http://localhost:8080`.
+Usará la base H2 persistente `macondo-dev` y permitirá solicitudes desde
+`http://localhost:4200`.
+
+### Producción
+
+```powershell
+$env:SPRING_PROFILES_ACTIVE="prod"
+mvn spring-boot:run
+```
+
+El backend quedará disponible en `http://localhost:8080`.
+Usará la base H2 persistente `macondo-prod` y permitirá solicitudes desde
+`https://macondo.kusare.fyi`.
+
+También se puede publicar mediante Cloudflare Tunnel:
+
+| Servicio | Origen local | URL pública |
+|---|---|---|
+| Frontend | `http://localhost:4200` | `https://macondo.kusare.fyi` |
+| Backend | `http://localhost:8080` | `https://macondo-api.kusare.fyi` |
+
+## Base de datos H2
+
+Cada perfil usa una base H2 persistente en el directorio del proyecto:
+
+| Perfil | Archivo JDBC |
+|---|---|
+| `dev` | `jdbc:h2:file:./macondo-dev` |
+| `prod` | `jdbc:h2:file:./macondo-prod` |
+| `test` | `jdbc:h2:file:./testdbmacondo` |
+
+Con el backend iniciado, la consola se encuentra en:
+
+```text
+http://localhost:8080/h2
+```
+
+Credenciales:
+
+```text
+Usuario: sa
+Contraseña: vacía
+```
+
+Los perfiles `default`, `dev` y `prod` cargan datos iniciales mediante
+`DataLoader`. El perfil `test` usa `DataLoaderTest`.
 
 ## Dependencias del `pom.xml`
 
@@ -44,8 +93,8 @@ Y abrir http://localhost:8080
 
 (más `spring-boot-starter-test` para las pruebas)
 
-No hay base de datos: los repositorios guardan los datos en un `Map` en
-memoria, así el proyecto se levanta sin instalar ni configurar nada.
+Los repositorios usan Spring Data JPA con H2. No es necesario instalar otro
+servidor de base de datos para ejecutar el proyecto localmente.
 
 ## Rutas
 

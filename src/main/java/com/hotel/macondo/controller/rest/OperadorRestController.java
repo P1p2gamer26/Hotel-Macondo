@@ -6,7 +6,6 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -29,7 +28,6 @@ import com.hotel.macondo.service.ReservaService;
 // Controlador REST para la gestión y administración del personal operador
 @RestController
 @RequestMapping("/api/operador")
-@CrossOrigin(origins = "https://macondo.kusare.fyi")
 public class OperadorRestController {
 
     @Autowired
