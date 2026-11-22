@@ -68,6 +68,14 @@ public class SecurityConfig {
                         .requestMatchers("/api/operador", "/api/operador/**", "/api/habitacion",
                                 "/api/habitacion/**", "/api/tipo-habitacion", "/api/tipo-habitacion/**",
                                 "/api/servicio", "/api/servicio/**").hasAuthority("ADMINISTRADOR")
+                        .requestMatchers(HttpMethod.GET, "/api/comentario/publicados").permitAll()
+                        .requestMatchers(HttpMethod.PUT, "/api/comentario/{id}/publicar")
+                        .hasAuthority("ADMINISTRADOR")
+                        .requestMatchers(HttpMethod.POST, "/api/comentario").hasAuthority("CLIENTE")
+                        .requestMatchers(HttpMethod.GET, "/api/comentario/cliente/{clienteId}")
+                        .hasAuthority("CLIENTE")
+                        .requestMatchers(HttpMethod.PUT, "/api/comentario/{id}").hasAuthority("CLIENTE")
+                        .requestMatchers(HttpMethod.DELETE, "/api/comentario/{id}").hasAuthority("CLIENTE")
                         .anyRequest().denyAll())
                 .addFilterBefore(new JwtAuthenticationFilter(jwtGenerator, userDetailsService, authEntryPoint),
                         UsernamePasswordAuthenticationFilter.class);
