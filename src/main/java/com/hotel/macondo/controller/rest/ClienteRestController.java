@@ -19,6 +19,8 @@ import com.hotel.macondo.errors.FormularioErroneoException;
 import com.hotel.macondo.errors.PeticionImposible;
 import com.hotel.macondo.service.ClienteService;
 import com.hotel.macondo.service.CuentaClienteService;
+import com.hotel.macondo.service.FlujoCorreoCuentaService;
+import com.hotel.macondo.service.CorreoTransaccionalService;
 
 // Controlador REST para la gestión de cuentas y perfil del Cliente.
 
@@ -27,10 +29,16 @@ import com.hotel.macondo.service.CuentaClienteService;
 public class ClienteRestController {
 
     @Autowired
-    private ClienteService clienteService;
+    private CuentaClienteService cuentaClienteService;
 
     @Autowired
-    private CuentaClienteService cuentaClienteService;
+    private FlujoCorreoCuentaService flujoCorreo;
+
+    @Autowired
+    private CorreoTransaccionalService correoTransaccional;
+
+    @Autowired
+    private ClienteService clienteService;
 
     // ==========================================
     // REGISTRO Y CONSULTAS DE CLIENTE
@@ -40,6 +48,10 @@ public class ClienteRestController {
     // http://localhost:8080/api/cliente/registro
     @PostMapping("/registro")
     public ResponseEntity<ClienteDTO> registrar(@RequestBody RegistroCliente registro) {
+        if (!correoTransaccional.estaHabilitado()) {
+            throw new org.springframework.web.server.ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE,
+                    "El servicio de correo todavía no está configurado.");
+        }
         if (registro.getCliente() == null) {
             throw new FormularioErroneoException("Faltan los datos del cliente.");
         }
@@ -47,7 +59,9 @@ public class ClienteRestController {
         // cliente
         registro.getCliente().setId(null);
         cuentaClienteService.crearCuenta(registro.getCliente(), registro.getContrasena());
+        flujoCorreo.enviarVerificacion(registro.getCliente().getCorreo());
         ClienteDTO clienteDTO = ClienteMapper.INSTANCE.convert(registro.getCliente());
+        clienteDTO.setMensaje("La cuenta fue creada. Verifica tu correo para activar la cuenta antes de iniciar sesión.");
         return new ResponseEntity<>(clienteDTO, HttpStatus.OK);
     }
 
@@ -68,10 +82,18 @@ public class ClienteRestController {
     // http://localhost:8080/api/cliente/{id}/perfil
     @PostMapping("/{id}/perfil")
     public ResponseEntity<ClienteDTO> actualizarPerfil(@PathVariable("id") Long id, @RequestBody Cliente cliente) {
+        Cliente actual = clienteService.buscarPorId(id);
+        if (cliente != null && cliente.getCorreo() != null && actual != null
+                && !actual.getCorreo().equalsIgnoreCase(cliente.getCorreo().trim())
+                && !correoTransaccional.estaHabilitado()) {
+            throw new org.springframework.web.server.ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE,
+                    "El servicio de correo todavía no está configurado.");
+        }
         if (!Boolean.TRUE.equals(cuentaClienteService.actualizarPerfil(id, cliente))) {
             throw new FormularioErroneoException(
                     "No fue posible actualizar el perfil. Verifica que el correo no esté en uso.");
         }
+        flujoCorreo.enviarVerificacion(cliente.getCorreo());
         Cliente actualizado = clienteService.buscarPorId(id);
         ClienteDTO clienteDTO = ClienteMapper.INSTANCE.convert(actualizado);
         return new ResponseEntity<>(clienteDTO, HttpStatus.OK);

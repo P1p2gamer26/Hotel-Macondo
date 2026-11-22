@@ -49,6 +49,10 @@ public class CuentaClienteServiceImpl implements CuentaClienteService {
       throw new FormularioErroneoException("El formato del correo electrónico no es válido.");
     }
 
+    if (!correo.trim().matches("(?i)^[A-Z0-9._%+-]+@gmail\\.com$")) {
+      throw new FormularioErroneoException("Por ahora, el registro requiere una dirección @gmail.com real.");
+    }
+
     if (!usuarioService.validarContrasena(contrasena)) {
       throw new FormularioErroneoException("La contraseña no puede estar vacía.");
     }
@@ -117,6 +121,9 @@ public class CuentaClienteServiceImpl implements CuentaClienteService {
 
     String correoPrevio = existente.getCorreo();
     String correoNuevo = cliente.getCorreo();
+    if (!correoNuevo.trim().matches("(?i)^[A-Z0-9._%+-]+@gmail\\.com$")) {
+      throw new FormularioErroneoException("Por ahora, el correo debe ser una dirección @gmail.com real.");
+    }
     if (!correoNuevo.equalsIgnoreCase(correoPrevio)
         && !usuarioService.validarCorreo(correoNuevo)) {
       return false;
@@ -125,6 +132,10 @@ public class CuentaClienteServiceImpl implements CuentaClienteService {
     UserEntity usuarioActualizado = usuarioService.actualizarCorreo(correoPrevio, correoNuevo);
     if (usuarioActualizado == null) {
       return false;
+    }
+
+    if (!correoPrevio.equalsIgnoreCase(correoNuevo.trim())) {
+      usuarioActualizado.setCorreoVerificado(false);
     }
 
     existente.setNombre(cliente.getNombre());
