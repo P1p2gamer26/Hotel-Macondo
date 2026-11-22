@@ -65,7 +65,7 @@ public class OperadorRestController {
     // Alterna el estado de activación del operador
     // http://localhost:8080/api/operador/estado/{id}
     @PutMapping("/estado/{id}")
-    public ResponseEntity<OperadorDTO> cambiarEstado(@PathVariable Long id) {
+    public ResponseEntity<OperadorDTO> cambiarEstado(@PathVariable("id") Long id) {
         Operador operador = operadorService.cambiarEstado(id);
         if (operador == null) {
             throw new RecursoNoEncontradoException("Operador no encontrado");
@@ -77,7 +77,7 @@ public class OperadorRestController {
     // Elimina un operador por su identificador
     // http://localhost:8080/api/operador/delete/{id}
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Void> eliminar(@PathVariable Long id) {
+    public ResponseEntity<Void> eliminar(@PathVariable("id") Long id) {
         Operador operador = operadorService.buscarPorId(id);
         if (operador == null) {
             throw new RecursoNoEncontradoException("Operador no encontrado");
@@ -90,7 +90,7 @@ public class OperadorRestController {
     // http://localhost:8080/api/operador/cuenta/reserva/{numeroReserva}/servicios
     @PostMapping("/cuenta/reserva/{numeroReserva}/servicios")
     public void añadirServicios(
-            @PathVariable String numeroReserva,
+            @PathVariable("numeroReserva") String numeroReserva,
             @RequestBody List<ConsumoServicioSolicitud> servicios) {
         reservaService.agregarServiciosParaOperador(numeroReserva, servicios);
     }
@@ -99,15 +99,15 @@ public class OperadorRestController {
     // http://localhost:8080/api/operador/cuenta/reserva/{numeroReserva}/servicios/{detalleId}
     @DeleteMapping("/cuenta/reserva/{numeroReserva}/servicios/{detalleId}")
     public void eliminarServicio(
-            @PathVariable String numeroReserva,
-            @PathVariable Long detalleId) {
+            @PathVariable("numeroReserva") String numeroReserva,
+            @PathVariable("detalleId") Long detalleId) {
         reservaService.eliminarServicioParaOperador(numeroReserva, detalleId);
     }
 
     // Paga el total de la cuenta asociada al número público de reserva.
     // http://localhost:8080/api/operador/cuenta/reserva/{numeroReserva}/pago
     @PostMapping("/cuenta/reserva/{numeroReserva}/pago")
-    public ResponseEntity<Pago> pagarCuenta(@PathVariable String numeroReserva, @RequestBody PagoSolicitud solicitud) {
+    public ResponseEntity<Pago> pagarCuenta(@PathVariable("numeroReserva") String numeroReserva, @RequestBody PagoSolicitud solicitud) {
         Pago pago = reservaService.pagarCuentaParaOperador(
                 numeroReserva, solicitud == null ? null : solicitud.metodoPago());
         return new ResponseEntity<>(pago, HttpStatus.OK);

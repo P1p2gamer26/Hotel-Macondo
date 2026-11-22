@@ -89,13 +89,8 @@ se registra en la cuenta cuando llega un evento `transaction.updated` válido de
 La URL de retorno informa al cliente, pero no confirma el pago. El operador conserva
 su flujo de checkout actual.
 
-Para probar en sandbox desde VS Code, copia `.env.example` como `.env`, reemplaza
-los valores de ejemplo por las credenciales de sandbox y arranca **Hotel Macondo
-(sandbox Wompi)** desde Run and Debug (F5). `.env` está excluido de Git. La extensión
-Pack for Java de VS Code lee ese archivo mediante `.vscode/launch.json`.
-
-También puedes definirlas en PowerShell antes de iniciar el backend. No guardes los
-secretos en el repositorio:
+Para probar en sandbox, define estas variables en el proceso del backend. No guardes
+los secretos en el repositorio:
 
 ```powershell
 $env:WOMPI_ENVIRONMENT="test"

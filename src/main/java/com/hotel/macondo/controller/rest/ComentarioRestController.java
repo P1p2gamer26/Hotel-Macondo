@@ -47,26 +47,26 @@ public class ComentarioRestController {
     }
 
     @PutMapping("/{id}/publicar")
-    public ComentarioResponse publicar(@PathVariable Long id) {
+    public ComentarioResponse publicar(@PathVariable("id") Long id) {
         return comentarioService.publicar(id);
     }
 
     @GetMapping("/cliente/{clienteId}")
-    public List<ComentarioClienteResponse> porCliente(Authentication authentication, @PathVariable Long clienteId) {
+    public List<ComentarioClienteResponse> porCliente(Authentication authentication, @PathVariable("clienteId") Long clienteId) {
         exigirClientePropietario(authentication, clienteId);
         return comentarioService.porCliente(clienteId);
     }
 
     @PutMapping("/{id}")
-    public ComentarioClienteResponse editar(Authentication authentication, @PathVariable Long id,
-            @RequestParam Long clienteId, @RequestBody ComentarioEdicion edicion) {
+    public ComentarioClienteResponse editar(Authentication authentication, @PathVariable("id") Long id,
+            @RequestParam("clienteId") Long clienteId, @RequestBody ComentarioEdicion edicion) {
         exigirClientePropietario(authentication, clienteId);
         return comentarioService.editar(id, clienteId, edicion);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminar(Authentication authentication, @PathVariable Long id,
-            @RequestParam Long clienteId) {
+    public ResponseEntity<Void> eliminar(Authentication authentication, @PathVariable("id") Long id,
+            @RequestParam("clienteId") Long clienteId) {
         exigirClientePropietario(authentication, clienteId);
         comentarioService.eliminar(id, clienteId);
         return ResponseEntity.noContent().build();

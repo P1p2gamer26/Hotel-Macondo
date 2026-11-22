@@ -69,7 +69,7 @@ public class ReservaRestController {
     // http://localhost:8080/api/reserva/{numeroReserva}
     @GetMapping("/{numeroReserva}")
     public ReservaDetalleOperadorResponse obtenerDetalle(
-            @PathVariable String numeroReserva) {
+            @PathVariable("numeroReserva") String numeroReserva) {
         return reservaService.obtenerDetalleParaOperador(numeroReserva);
     }
 
@@ -78,7 +78,7 @@ public class ReservaRestController {
     // http://localhost:8080/api/reserva/habitacion/{numeroHabitacion}/actual
     @GetMapping("/habitacion/{numeroHabitacion}/actual")
     public ReservaIdentificadorResponse obtenerReservaActualPorHabitacion(
-            @PathVariable String numeroHabitacion) {
+            @PathVariable("numeroHabitacion") String numeroHabitacion) {
         return new ReservaIdentificadorResponse(
                 reservaService.obtenerIdReservaActivaPorNumeroHabitacion(numeroHabitacion));
     }
@@ -87,7 +87,7 @@ public class ReservaRestController {
     // ya esté pagada
     // http://localhost:8080/api/reserva/habitacion/{numeroHabitacion}/checkout
     @GetMapping("/habitacion/{numeroHabitacion}/checkout")
-    public ReservaIdentificadorResponse obtenerReservaCheckout(@PathVariable String numeroHabitacion) {
+    public ReservaIdentificadorResponse obtenerReservaCheckout(@PathVariable("numeroHabitacion") String numeroHabitacion) {
         return new ReservaIdentificadorResponse(
                 reservaService.obtenerIdReservaEnCheckout(numeroHabitacion));
     }
@@ -95,28 +95,28 @@ public class ReservaRestController {
     // Obtiene el detalle completo de una reserva por su identificador interno
     // http://localhost:8080/api/reserva/id/{reservaId}
     @GetMapping("/id/{reservaId}")
-    public ReservaDetalleOperadorResponse obtenerDetallePorId(@PathVariable Long reservaId) {
+    public ReservaDetalleOperadorResponse obtenerDetallePorId(@PathVariable("reservaId") Long reservaId) {
         return reservaService.obtenerDetalleParaOperador(reservaId);
     }
 
     // Permite al operador cancelar una reserva
     // http://localhost:8080/api/reserva/{numeroReserva}/cancelar
     @PutMapping("/{numeroReserva}/cancelar")
-    public ReservaOperadorResponse cancelar(@PathVariable String numeroReserva) {
+    public ReservaOperadorResponse cancelar(@PathVariable("numeroReserva") String numeroReserva) {
         return reservaService.cancelarParaOperador(numeroReserva);
     }
 
     // Activa una reserva confirmada desde el panel del operador
     // http://localhost:8080/api/reserva/{numeroReserva}/activar
     @PutMapping("/{numeroReserva}/activar")
-    public ReservaOperadorResponse activar(@PathVariable String numeroReserva) {
+    public ReservaOperadorResponse activar(@PathVariable("numeroReserva") String numeroReserva) {
         return reservaService.activarParaOperador(numeroReserva);
     }
 
     // Permite al operador finalizar una estadía con la cuenta pagada
     // http://localhost:8080/api/reserva/{numeroReserva}/finalizar
     @PutMapping("/{numeroReserva}/finalizar")
-    public ReservaOperadorResponse finalizar(@PathVariable String numeroReserva) {
+    public ReservaOperadorResponse finalizar(@PathVariable("numeroReserva") String numeroReserva) {
         return reservaService.finalizarParaOperador(numeroReserva);
     }
 
@@ -127,7 +127,7 @@ public class ReservaRestController {
     // Obtiene las reservas activas (CONFIRMADA - EN CURSO) del cliente autenticado
     // http://localhost:8080/api/reserva/cliente/{id}/activas
     @GetMapping("/cliente/{id}/activas")
-    public List<ReservaClienteDTO> activasDeCliente(@PathVariable Long id) {
+    public List<ReservaClienteDTO> activasDeCliente(@PathVariable("id") Long id) {
         Cliente cliente = clienteService.buscarPorId(id);
         return reservaService.buscarActivasDeCliente(cliente).stream()
                 .map(ReservaMapper.INSTANCE::convertToClienteDTO)
@@ -137,15 +137,15 @@ public class ReservaRestController {
     @GetMapping("/cliente/{id}/{reservaId}/detalle")
     @Operation(summary = "Obtiene los datos de estadía y cuenta del propio cliente")
     public ReservaDetalleClienteResponse detalleDeCliente(
-            @PathVariable Long id, @PathVariable Long reservaId) {
+            @PathVariable("id") Long id, @PathVariable("reservaId") Long reservaId) {
         return reservaService.obtenerDetalleParaCliente(id, reservaId);
     }
 
     @PostMapping("/cliente/{id}/{reservaId}/pago/wompi")
     @Operation(summary = "Prepara el checkout de Wompi para una cuenta de estadía activa")
     public CheckoutWompiResponse iniciarPagoWompi(
-            @PathVariable Long id,
-            @PathVariable Long reservaId,
+            @PathVariable("id") Long id,
+            @PathVariable("reservaId") Long reservaId,
             @RequestBody PagoClienteSolicitud solicitud) {
         return wompiService.iniciar(id, reservaId, solicitud == null ? null : solicitud.monto());
     }
@@ -153,7 +153,7 @@ public class ReservaRestController {
     // Obtiene el historial de reservas (FINALIZADAS - CANCELADAS) del cliente
     // http://localhost:8080/api/reserva/cliente/{id}/historial
     @GetMapping("/cliente/{id}/historial")
-    public List<ReservaClienteDTO> historialDeCliente(@PathVariable Long id) {
+    public List<ReservaClienteDTO> historialDeCliente(@PathVariable("id") Long id) {
         Cliente cliente = clienteService.buscarPorId(id);
         return reservaService.buscarHistorialDeCliente(cliente).stream()
                 .map(ReservaMapper.INSTANCE::convertToClienteDTO)
@@ -163,7 +163,7 @@ public class ReservaRestController {
     // Obtiene el historial de pagos de todas las reservas del cliente
     // http://localhost:8080/api/reserva/cliente/{id}/pagos
     @GetMapping("/cliente/{id}/pagos")
-    public List<PagoClienteResponse> pagosDeCliente(@PathVariable Long id) {
+    public List<PagoClienteResponse> pagosDeCliente(@PathVariable("id") Long id) {
         return reservaService.historialPagosDeCliente(id);
     }
 
@@ -199,7 +199,7 @@ public class ReservaRestController {
     // http://localhost:8080/api/reserva/cliente/{id}/find/{reservaId}
     @GetMapping("/cliente/{id}/find/{reservaId}")
     @Operation(summary = "Obtiene una reserva futura que pertenece al cliente para precargar su edición")
-    public ReservaClienteDTO reservaParaEditar(@PathVariable Long id, @PathVariable Long reservaId) {
+    public ReservaClienteDTO reservaParaEditar(@PathVariable("id") Long id, @PathVariable("reservaId") Long reservaId) {
         Reserva reserva = reservaService.buscarParaModificar(id, reservaId);
         return ReservaMapper.INSTANCE.convertToClienteDTO(reserva);
     }
@@ -244,7 +244,7 @@ public class ReservaRestController {
     // http://localhost:8080/api/reserva/cliente/{id}/{reservaId}/cancelar
     @PutMapping("/cliente/{id}/{reservaId}/cancelar")
     @Operation(summary = "Cancela una reserva futura del cliente conservando su historial")
-    public ReservaClienteDTO cancelarReservaDeCliente(@PathVariable Long id, @PathVariable Long reservaId) {
+    public ReservaClienteDTO cancelarReservaDeCliente(@PathVariable("id") Long id, @PathVariable("reservaId") Long reservaId) {
         Reserva cancelada = reservaService.cancelar(id, reservaId);
         return ReservaMapper.INSTANCE.convertToClienteDTO(cancelada);
     }

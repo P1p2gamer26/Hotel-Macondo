@@ -45,7 +45,7 @@ public class TipoHabitacionRestController {
     // Busca un tipo de habitación por su identificador
     // http://localhost:8080/api/tipo-habitacion/find/{id}
     @GetMapping("/find/{id}")
-    public TipoHabitacion buscarPorId(@PathVariable Long id) {
+    public TipoHabitacion buscarPorId(@PathVariable("id") Long id) {
         return tipoHabitacionService.buscarPorId(id);
     }
 
@@ -71,7 +71,7 @@ public class TipoHabitacionRestController {
     // Si existen habitaciones ligadas a esta categoría, bloquea la acción
     // http://localhost:8080/api/tipo-habitacion/delete/{id}
     @DeleteMapping("/delete/{id}")
-    public void eliminar(@PathVariable Long id) {
+    public void eliminar(@PathVariable("id") Long id) {
         if (habitacionService.existeHabitacionConTipo(id)) {
             throw new PeticionImposible(
                     "No se puede eliminar el tipo porque tiene habitaciones asociadas.");

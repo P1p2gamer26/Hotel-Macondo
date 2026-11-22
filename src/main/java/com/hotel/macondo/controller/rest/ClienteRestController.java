@@ -54,7 +54,7 @@ public class ClienteRestController {
     // Busca un cliente por su identificador único
     // http://localhost:8080/api/cliente/find/{id}
     @GetMapping("/find/{id}")
-    public ResponseEntity<ClienteDTO> findById(@PathVariable Long id) {
+    public ResponseEntity<ClienteDTO> findById(@PathVariable("id") Long id) {
         Cliente cliente = clienteService.buscarPorId(id);
         ClienteDTO clienteDTO = ClienteMapper.INSTANCE.convert(cliente);
         return new ResponseEntity<>(clienteDTO, HttpStatus.OK);
@@ -67,7 +67,7 @@ public class ClienteRestController {
     // Actualiza la información personal de contacto del cliente
     // http://localhost:8080/api/cliente/{id}/perfil
     @PostMapping("/{id}/perfil")
-    public ResponseEntity<ClienteDTO> actualizarPerfil(@PathVariable Long id, @RequestBody Cliente cliente) {
+    public ResponseEntity<ClienteDTO> actualizarPerfil(@PathVariable("id") Long id, @RequestBody Cliente cliente) {
         if (!Boolean.TRUE.equals(cuentaClienteService.actualizarPerfil(id, cliente))) {
             throw new FormularioErroneoException(
                     "No fue posible actualizar el perfil. Verifica que el correo no esté en uso.");
@@ -81,7 +81,7 @@ public class ClienteRestController {
     // http://localhost:8080/api/cliente/{id}/password
     @PostMapping("/{id}/password")
     public ResponseEntity<Void> actualizarContrasena(
-            @PathVariable Long id,
+            @PathVariable("id") Long id,
             @RequestBody CambioContrasenaRequest cambio) {
         if (cambio == null) {
             throw new FormularioErroneoException("Faltan los datos para cambiar la contraseña.");
@@ -101,7 +101,7 @@ public class ClienteRestController {
     // reservas
     // http://localhost:8080/api/cliente/delete/{id}
     @PostMapping("/delete/{id}")
-    public ResponseEntity<Void> eliminarCuenta(@PathVariable Long id) {
+    public ResponseEntity<Void> eliminarCuenta(@PathVariable("id") Long id) {
         if (!Boolean.TRUE.equals(cuentaClienteService.eliminarCuenta(id))) {
             throw new PeticionImposible(
                     "No se puede eliminar la cuenta: el cliente registra reservas en su historial.");

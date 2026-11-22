@@ -46,7 +46,7 @@ public class ServicioRestController {
     // Retorna servicios relacionados para la vista de detalle
     // http://localhost:8080/api/servicio/relacionados/{id}
     @GetMapping("/relacionados/{id}")
-    public List<Servicio> relacionados(@PathVariable Long id) {
+    public List<Servicio> relacionados(@PathVariable("id") Long id) {
         return servicioService.obtenerRelacionados(id, 2);
     }
 
@@ -66,7 +66,7 @@ public class ServicioRestController {
     // Incluye servicios inactivos para permitir LA edición del administrador
     // http://localhost:8080/api/servicio/find/{id}
     @GetMapping("/find/{id}")
-    public Servicio buscarPorId(@PathVariable Long id) {
+    public Servicio buscarPorId(@PathVariable("id") Long id) {
         return servicioService.buscarPorIdIncluyendoInactivos(id);
     }
 
@@ -87,7 +87,7 @@ public class ServicioRestController {
     // Alterna el estado activo o inactivo de un servicio
     // http://localhost:8080/api/servicio/estado/{id}
     @PutMapping("/estado/{id}")
-    public Servicio cambiarEstado(@PathVariable Long id) {
+    public Servicio cambiarEstado(@PathVariable("id") Long id) {
         Servicio servicio = servicioService.cambiarEstado(id);
         if (servicio == null) {
             throw new RecursoNoEncontradoException("Servicio no encontrado");
