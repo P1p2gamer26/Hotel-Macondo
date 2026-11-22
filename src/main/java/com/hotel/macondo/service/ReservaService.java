@@ -59,6 +59,10 @@ public interface ReservaService {
                         String fechaSalida,
                         Integer cantidadPersonas);
 
+        /** Genera una reserva aplicando opcionalmente un código promocional. */
+        Reserva crear(Long clienteId, Long tipoId, String fechaEntrada, String fechaSalida,
+                        Integer cantidadPersonas, String codigoPromocional);
+
         /**
          * Unidades disponibles al modificar una reserva, excluyendo la unidad que
          * esa misma reserva ocupa actualmente.

@@ -45,6 +45,7 @@ public class SecurityConfig {
                                 "/api/tipo-habitacion/find/{id}", "/api/servicio/catalogo",
                                 "/api/servicio/recomendaciones", "/api/servicio/relacionados/{id}",
                                 "/api/servicio/find/{id}").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/promociones/publicas", "/api/promociones/calcular").permitAll()
 
                         // Estas reglas van antes de las rutas generales de reservas y operadores.
                         .requestMatchers(HttpMethod.GET, "/api/cliente/find/{id}")
@@ -63,6 +64,7 @@ public class SecurityConfig {
 
                         .requestMatchers("/api/operador/cuenta/**", "/api/reserva", "/api/reserva/**")
                         .hasAnyAuthority("ADMINISTRADOR", "OPERADOR")
+                        .requestMatchers("/api/promociones", "/api/promociones/**").hasAuthority("ADMINISTRADOR")
                         .requestMatchers(HttpMethod.GET, "/api/habitacion", "/api/habitacion/**",
                                 "/api/servicio").hasAnyAuthority("ADMINISTRADOR", "OPERADOR")
                         .requestMatchers(HttpMethod.PUT, "/api/habitacion/estado/{id}")

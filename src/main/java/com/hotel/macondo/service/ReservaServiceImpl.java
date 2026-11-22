@@ -39,6 +39,9 @@ import com.hotel.macondo.utils.FechaUtils;
 @Transactional
 public class ReservaServiceImpl implements ReservaService {
 
+  @Autowired
+  private PromocionService promocionService;
+
   private static final List<String> ESTADOS_QUE_OCUPAN_HABITACION = List.of("ACTIVA", "CONFIRMADA", "PENDIENTE");
 
   @Autowired
@@ -140,6 +143,12 @@ public class ReservaServiceImpl implements ReservaService {
       String fechaEntrada,
       String fechaSalida,
       Integer cantidadPersonas) {
+    return crear(clienteId, tipoId, fechaEntrada, fechaSalida, cantidadPersonas, null);
+  }
+
+  @Override
+  public Reserva crear(Long clienteId, Long tipoId, String fechaEntrada, String fechaSalida,
+      Integer cantidadPersonas, String codigoPromocional) {
     LocalDate entrada = FechaUtils.convertirFecha(fechaEntrada, "entrada");
     LocalDate salida = FechaUtils.convertirFecha(fechaSalida, "salida");
     Cliente cliente = buscarCliente(clienteId);
@@ -149,7 +158,8 @@ public class ReservaServiceImpl implements ReservaService {
 
     Habitacion habitacion = obtenerPrimeraDisponible(tipoId, entrada, salida, cantidadPersonas, null);
     BigDecimal precioNoche = tipo.getPrecioNoche();
-    BigDecimal total = calcularTotal(precioNoche, entrada, salida);
+    var precio = promocionService.calcular(codigoPromocional, entrada, salida, precioNoche);
+    BigDecimal total = precio.total();
 
     Reserva reserva = new Reserva(
         generarNumeroReserva(),
@@ -159,6 +169,8 @@ public class ReservaServiceImpl implements ReservaService {
         "CONFIRMADA",
         precioNoche,
         total);
+    reserva.setCodigoPromocional(precio.codigo());
+    reserva.setDescuentoPromocional(precio.descuento());
     reserva.asignarCliente(cliente);
     reserva.asignarHabitacion(habitacion);
     reservaRepository.save(reserva);
@@ -195,13 +207,16 @@ public class ReservaServiceImpl implements ReservaService {
         cantidadPersonas,
         reserva.getId());
     BigDecimal precioNoche = tipo.getPrecioNoche();
-    BigDecimal total = calcularTotal(precioNoche, entrada, salida);
+    var precio = promocionService.calcular(reserva.getCodigoPromocional(), entrada, salida, precioNoche);
+    BigDecimal total = precio.total();
 
     reserva.setFechaInicio(entrada);
     reserva.setFechaFin(salida);
     reserva.setCantidadPersonas(cantidadPersonas);
     reserva.setPrecioNoche(precioNoche);
     reserva.setTotal(total);
+    reserva.setCodigoPromocional(precio.codigo());
+    reserva.setDescuentoPromocional(precio.descuento());
     reserva.asignarHabitacion(habitacion);
     actualizarCuentaAbierta(reserva);
 

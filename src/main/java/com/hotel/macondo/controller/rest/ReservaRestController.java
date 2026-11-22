@@ -219,7 +219,7 @@ public class ReservaRestController {
                 id, tipoId,
                 FechaUtils.toIsoString(datos.getFechaInicio()),
                 FechaUtils.toIsoString(datos.getFechaFin()),
-                datos.getCantidadPersonas());
+                datos.getCantidadPersonas(), datos.getCodigoPromocional());
         return ReservaMapper.INSTANCE.convertToClienteDTO(creada);
     }
 

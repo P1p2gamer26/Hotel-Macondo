@@ -14,5 +14,7 @@ public class ReservaClienteDTO {
     private String estado;
     private BigDecimal precioNoche;
     private BigDecimal total;
+    private String codigoPromocional;
+    private BigDecimal descuentoPromocional;
     private HabitacionDTO habitacion;
 }
