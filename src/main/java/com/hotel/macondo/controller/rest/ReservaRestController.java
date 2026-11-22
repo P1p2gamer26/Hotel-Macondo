@@ -18,6 +18,7 @@ import com.hotel.macondo.DTOs.Mapper.HabitacionMapper;
 import com.hotel.macondo.DTOs.Mapper.ReservaMapper;
 import com.hotel.macondo.DTOs.Salida.HabitacionDTO;
 import com.hotel.macondo.DTOs.Salida.PagoClienteResponse;
+import com.hotel.macondo.DTOs.Salida.CheckoutWompiResponse;
 import com.hotel.macondo.DTOs.Entrada.PagoClienteSolicitud;
 import com.hotel.macondo.DTOs.Salida.ReservaClienteDTO;
 import com.hotel.macondo.DTOs.Salida.ReservaDetalleClienteResponse;
@@ -29,6 +30,7 @@ import com.hotel.macondo.entities.Habitacion;
 import com.hotel.macondo.entities.Reserva;
 import com.hotel.macondo.service.ClienteService;
 import com.hotel.macondo.service.ReservaService;
+import com.hotel.macondo.service.WompiService;
 import com.hotel.macondo.utils.FechaUtils;
 import io.swagger.v3.oas.annotations.Operation;
 
@@ -46,6 +48,9 @@ public class ReservaRestController {
 
     @Autowired
     private ClienteService clienteService;
+
+    @Autowired
+    private WompiService wompiService;
 
     // ==========================================
     // PANEL DE OPERADOR
@@ -136,18 +141,13 @@ public class ReservaRestController {
         return reservaService.obtenerDetalleParaCliente(id, reservaId);
     }
 
-    @PostMapping("/cliente/{id}/{reservaId}/pago")
-    @Operation(summary = "Registra un pago simulado de la cuenta de una estadía activa")
-    public PagoClienteResponse pagarCuentaDeCliente(
+    @PostMapping("/cliente/{id}/{reservaId}/pago/wompi")
+    @Operation(summary = "Prepara el checkout de Wompi para una cuenta de estadía activa")
+    public CheckoutWompiResponse iniciarPagoWompi(
             @PathVariable Long id,
             @PathVariable Long reservaId,
             @RequestBody PagoClienteSolicitud solicitud) {
-        var pago = reservaService.pagarCuentaParaCliente(
-                id, reservaId,
-                solicitud == null ? null : solicitud.monto(),
-                solicitud == null ? null : solicitud.metodoPago());
-        return new PagoClienteResponse(pago.getId(), pago.getCuenta().getReserva().getNumeroReserva(),
-                pago.getMonto(), pago.getMetodoPago(), pago.getFechaPago(), pago.getEstado());
+        return wompiService.iniciar(id, reservaId, solicitud == null ? null : solicitud.monto());
     }
 
     // Obtiene el historial de reservas (FINALIZADAS - CANCELADAS) del cliente

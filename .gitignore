@@ -31,6 +31,14 @@ build/
 
 ### VS Code ###
 .vscode/
+!.vscode/
+.vscode/*
+!.vscode/launch.json
+
+### Local secrets ###
+.env
+.env.*
+!.env.example
 
 ### H2 ###
 *.mv.db

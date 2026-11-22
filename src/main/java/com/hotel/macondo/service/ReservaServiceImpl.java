@@ -644,6 +644,10 @@ public class ReservaServiceImpl implements ReservaService {
   }
 
   private Reserva marcarReservaCancelada(Reserva reserva) {
+    if (reserva.getCuenta() != null && reserva.getCuenta().getPagos().stream()
+        .anyMatch(pago -> "CONFIRMADO".equalsIgnoreCase(pago.getEstado()))) {
+      throw new PeticionImposible("No se puede cancelar una reserva con pagos confirmados.");
+    }
     reserva.setEstado("CANCELADA");
     Cuenta cuenta = reserva.getCuenta();
     if (cuenta != null && "ABIERTA".equalsIgnoreCase(cuenta.getEstado())) {

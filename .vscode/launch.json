@@ -1,0 +1,14 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "java",
+      "name": "Hotel Macondo (sandbox Wompi)",
+      "request": "launch",
+      "mainClass": "com.hotel.macondo.MacondoApplication",
+      "projectName": "macondo",
+      "cwd": "${workspaceFolder}",
+      "envFile": "${workspaceFolder}/.env"
+    }
+  ]
+}
