@@ -18,7 +18,9 @@ import com.hotel.macondo.DTOs.Mapper.HabitacionMapper;
 import com.hotel.macondo.DTOs.Mapper.ReservaMapper;
 import com.hotel.macondo.DTOs.Salida.HabitacionDTO;
 import com.hotel.macondo.DTOs.Salida.PagoClienteResponse;
+import com.hotel.macondo.DTOs.Entrada.PagoClienteSolicitud;
 import com.hotel.macondo.DTOs.Salida.ReservaClienteDTO;
+import com.hotel.macondo.DTOs.Salida.ReservaDetalleClienteResponse;
 import com.hotel.macondo.DTOs.Salida.ReservaDetalleOperadorResponse;
 import com.hotel.macondo.DTOs.Salida.ReservaOperadorResponse;
 import com.hotel.macondo.DTOs.Entrada.ReservaIdentificadorResponse;
@@ -127,6 +129,27 @@ public class ReservaRestController {
                 .toList();
     }
 
+    @GetMapping("/cliente/{id}/{reservaId}/detalle")
+    @Operation(summary = "Obtiene los datos de estadía y cuenta del propio cliente")
+    public ReservaDetalleClienteResponse detalleDeCliente(
+            @PathVariable Long id, @PathVariable Long reservaId) {
+        return reservaService.obtenerDetalleParaCliente(id, reservaId);
+    }
+
+    @PostMapping("/cliente/{id}/{reservaId}/pago")
+    @Operation(summary = "Registra un pago simulado de la cuenta de una estadía activa")
+    public PagoClienteResponse pagarCuentaDeCliente(
+            @PathVariable Long id,
+            @PathVariable Long reservaId,
+            @RequestBody PagoClienteSolicitud solicitud) {
+        var pago = reservaService.pagarCuentaParaCliente(
+                id, reservaId,
+                solicitud == null ? null : solicitud.monto(),
+                solicitud == null ? null : solicitud.metodoPago());
+        return new PagoClienteResponse(pago.getId(), pago.getCuenta().getReserva().getNumeroReserva(),
+                pago.getMonto(), pago.getMetodoPago(), pago.getFechaPago(), pago.getEstado());
+    }
+
     // Obtiene el historial de reservas (FINALIZADAS - CANCELADAS) del cliente
     // http://localhost:8080/api/reserva/cliente/{id}/historial
     @GetMapping("/cliente/{id}/historial")
@@ -150,12 +173,12 @@ public class ReservaRestController {
     @GetMapping("/cliente/{id}/disponibilidad")
     @Operation(summary = "Consulta disponibilidad real para crear o modificar una reserva del cliente")
     public List<HabitacionDTO> disponibilidadDeCliente(
-            @PathVariable Long id,
-            @RequestParam Long tipoId,
-            @RequestParam(required = false) String fechaEntrada,
-            @RequestParam(required = false) String fechaSalida,
-            @RequestParam Integer cantidadPersonas,
-            @RequestParam(required = false) Long reservaId) {
+            @PathVariable("id") Long id,
+            @RequestParam(name = "tipoId") Long tipoId,
+            @RequestParam(name = "fechaEntrada", required = false) String fechaEntrada,
+            @RequestParam(name = "fechaSalida", required = false) String fechaSalida,
+            @RequestParam(name = "cantidadPersonas") Integer cantidadPersonas,
+            @RequestParam(name = "reservaId", required = false) Long reservaId) {
         clienteService.buscarPorId(id);
         List<Habitacion> disponibles;
         if (reservaId != null) {
@@ -187,8 +210,8 @@ public class ReservaRestController {
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Crea una reserva, asigna una habitación disponible y abre su cuenta")
     public ReservaClienteDTO crearReservaDeCliente(
-            @PathVariable Long id,
-            @RequestParam Long tipoId,
+            @PathVariable("id") Long id,
+            @RequestParam(name = "tipoId") Long tipoId,
             @RequestBody Reserva datos) {
         // Solo se utilizan los campos editables. El servicio genera identidad, estado y
         // precios.
@@ -205,9 +228,9 @@ public class ReservaRestController {
     @PutMapping("/cliente/{id}/{reservaId}")
     @Operation(summary = "Modifica una reserva futura del cliente y vuelve a validar su disponibilidad")
     public ReservaClienteDTO modificarReservaDeCliente(
-            @PathVariable Long id,
-            @PathVariable Long reservaId,
-            @RequestParam Long tipoId,
+            @PathVariable("id") Long id,
+            @PathVariable("reservaId") Long reservaId,
+            @RequestParam(name = "tipoId") Long tipoId,
             @RequestBody Reserva datos) {
         Reserva modificada = reservaService.modificar(
                 id, reservaId, tipoId,

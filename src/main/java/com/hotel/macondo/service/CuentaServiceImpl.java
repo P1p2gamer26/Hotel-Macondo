@@ -52,14 +52,13 @@ public class CuentaServiceImpl implements CuentaService {
   // CONSUMOS ADICIONALES (OPERADOR)
   // ==========================================
 
-  // Carga un nuevo servicio a una cuenta que permanezca abierta
-  // y recalcula el monto total acumulado
+  // Carga un servicio incluso si el saldo anterior ya estaba pagado. Los pagos
+  // se conservan y la nueva obligación vuelve a dejar la cuenta abierta.
   @Override
   public DetalleCuenta agregarServicio(
       Long cuentaId, Servicio servicio, int cantidad) {
     Cuenta cuenta = repository.findById(cuentaId).orElse(null);
     if (cuenta == null
-        || !"ABIERTA".equals(cuenta.getEstado())
         || servicio == null
         || !servicio.isActivo()
         || servicio.getPrecio() == null
@@ -73,6 +72,7 @@ public class CuentaServiceImpl implements CuentaService {
 
     detalleCuentaRepository.save(detalle);
     cuenta.setTotal(calcularTotal(cuenta));
+    cuenta.setEstado("ABIERTA");
     repository.save(cuenta);
     return detalle;
   }
@@ -87,10 +87,6 @@ public class CuentaServiceImpl implements CuentaService {
 
     Cuenta cuenta = repository.findById(cuentaId)
         .orElseThrow(() -> new RecursoNoEncontradoException("Cuenta no encontrada"));
-    if (!"ABIERTA".equals(cuenta.getEstado())) {
-      throw new FormularioErroneoException("La cuenta no está abierta.");
-    }
-
     List<Servicio> servicios = new ArrayList<>();
     for (ConsumoServicioSolicitud solicitud : solicitudes) {
       if (solicitud == null
@@ -124,7 +120,7 @@ public class CuentaServiceImpl implements CuentaService {
   @Override
   public boolean eliminarDetalle(Long cuentaId, Long detalleId) {
     Cuenta cuenta = repository.findById(cuentaId).orElse(null);
-    if (cuenta == null || !"ABIERTA".equals(cuenta.getEstado())) {
+    if (cuenta == null || !"ABIERTA".equals(cuenta.getEstado()) || !cuenta.getPagos().isEmpty()) {
       return false;
     }
 
@@ -149,11 +145,12 @@ public class CuentaServiceImpl implements CuentaService {
   @Override
   public Pago pagar(Long cuentaId, BigDecimal monto, String metodoPago) {
     Cuenta cuenta = repository.findById(cuentaId).orElse(null);
+    BigDecimal saldo = cuenta == null ? BigDecimal.ZERO : calcularSaldo(cuenta);
     if (cuenta == null
-        || !"ABIERTA".equals(cuenta.getEstado())
-        || calcularSaldo(cuenta).compareTo(BigDecimal.ZERO) <= 0
+        || saldo.compareTo(BigDecimal.ZERO) <= 0
         || monto == null
-        || monto.compareTo(calcularSaldo(cuenta)) != 0
+        || monto.compareTo(BigDecimal.ZERO) <= 0
+        || monto.compareTo(saldo) > 0
         || metodoPago == null
         || metodoPago.isBlank()) {
       return null;
@@ -162,7 +159,7 @@ public class CuentaServiceImpl implements CuentaService {
     Pago pago = new Pago(monto, metodoPago, LocalDateTime.now(), "CONFIRMADO");
     cuenta.agregarPago(pago);
 
-    cuenta.setEstado("PAGADA");
+    cuenta.setEstado(monto.compareTo(saldo) == 0 ? "PAGADA" : "ABIERTA");
     pagoRepository.save(pago);
     repository.save(cuenta);
     return pago;

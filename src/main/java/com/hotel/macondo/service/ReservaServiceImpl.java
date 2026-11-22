@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.hotel.macondo.DTOs.Entrada.ConsumoServicioSolicitud;
 import com.hotel.macondo.DTOs.Salida.PagoClienteResponse;
+import com.hotel.macondo.DTOs.Salida.ReservaDetalleClienteResponse;
 import com.hotel.macondo.DTOs.Salida.ReservaDetalleOperadorResponse;
 import com.hotel.macondo.DTOs.Salida.ReservaOperadorResponse;
 import com.hotel.macondo.entities.Cliente;
@@ -375,6 +376,65 @@ public class ReservaServiceImpl implements ReservaService {
   @Transactional(readOnly = true)
   public ReservaDetalleOperadorResponse obtenerDetalleParaOperador(String numeroReserva) {
     return convertirDetalleOperador(obtenerDetalle(numeroReserva));
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  public ReservaDetalleClienteResponse obtenerDetalleParaCliente(Long clienteId, Long reservaId) {
+    Reserva reserva = reservaRepository.buscarDetalleCompletoPorId(reservaId)
+        .orElseThrow(() -> new RecursoNoEncontradoException("No se encontró la reserva."));
+    if (reserva.getCliente() == null || !reserva.getCliente().getId().equals(clienteId)) {
+      throw new RecursoNoEncontradoException("No se encontró la reserva.");
+    }
+    Cuenta cuenta = reserva.getCuenta();
+    if (cuenta == null) {
+      return new ReservaDetalleClienteResponse(reserva.getId(), reserva.getNumeroReserva(),
+          reserva.getFechaInicio(), reserva.getFechaFin(), reserva.getCantidadPersonas(), reserva.getEstado(),
+          reserva.getPrecioNoche(), reserva.getTotal(),
+          reserva.getHabitacion() == null ? null : reserva.getHabitacion().getNumero(),
+          reserva.getHabitacion() == null || reserva.getHabitacion().getTipoHabitacion() == null
+              ? null : reserva.getHabitacion().getTipoHabitacion().getNombre(), null);
+    }
+    cuenta.getPagos().size();
+    var cuentaDetalle = new ReservaDetalleClienteResponse.CuentaDetalle(
+        cuenta.getId(), cuenta.getEstado(), cuenta.getTotal(), cuentaService.calcularSaldo(cuenta),
+        cuenta.getFechaApertura(),
+        cuenta.getDetalles().stream().map(d -> new ReservaDetalleClienteResponse.ConsumoDetalle(
+            d.getId(), d.getCantidad(), d.getPrecio(), d.getFechaRegistro(),
+            d.getServicio() == null ? null : d.getServicio().getNombre())).toList(),
+        cuenta.getPagos().stream().map(p -> new ReservaDetalleClienteResponse.PagoDetalle(
+            p.getId(), p.getMonto(), p.getMetodoPago(), p.getFechaPago(), p.getEstado())).toList());
+    return new ReservaDetalleClienteResponse(reserva.getId(), reserva.getNumeroReserva(),
+        reserva.getFechaInicio(), reserva.getFechaFin(), reserva.getCantidadPersonas(), reserva.getEstado(),
+        reserva.getPrecioNoche(), reserva.getTotal(),
+        reserva.getHabitacion() == null ? null : reserva.getHabitacion().getNumero(),
+        reserva.getHabitacion() == null || reserva.getHabitacion().getTipoHabitacion() == null
+            ? null : reserva.getHabitacion().getTipoHabitacion().getNombre(), cuentaDetalle);
+  }
+
+  @Override
+  public Pago pagarCuentaParaCliente(Long clienteId, Long reservaId, BigDecimal monto, String metodoPago) {
+    Reserva reserva = reservaRepository.findById(reservaId)
+        .orElseThrow(() -> new RecursoNoEncontradoException("No se encontró la reserva."));
+    if (reserva.getCliente() == null || !reserva.getCliente().getId().equals(clienteId)) {
+      throw new RecursoNoEncontradoException("No se encontró la reserva.");
+    }
+    if (!"ACTIVA".equalsIgnoreCase(reserva.getEstado())) {
+      throw new PeticionImposible("Solo se pueden pagar cuentas de estadías en curso.");
+    }
+    if (metodoPago == null || !List.of("TARJETA_PRUEBA", "TRANSFERENCIA_PRUEBA")
+        .contains(metodoPago.trim().toUpperCase())) {
+      throw new FormularioErroneoException("Selecciona un medio de pago de prueba válido.");
+    }
+    Cuenta cuenta = reserva.getCuenta();
+    if (cuenta == null) {
+      throw new RecursoNoEncontradoException("La estadía no tiene una cuenta asociada.");
+    }
+    Pago pago = cuentaService.pagar(cuenta.getId(), monto, metodoPago.trim().toUpperCase());
+    if (pago == null) {
+      throw new PeticionImposible("El monto debe ser mayor que cero y no superar el saldo pendiente.");
+    }
+    return pago;
   }
 
   @Override

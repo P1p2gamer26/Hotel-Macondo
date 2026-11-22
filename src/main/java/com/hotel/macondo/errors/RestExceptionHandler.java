@@ -31,6 +31,14 @@ public class RestExceptionHandler {
     /** Parámetros de ruta o consulta ausentes o con un tipo incorrecto. */
     @ExceptionHandler({MissingServletRequestParameterException.class, MethodArgumentTypeMismatchException.class})
     public ResponseEntity<Map<String, String>> handleParametrosInvalidos(Exception ex) {
+        if (ex instanceof MissingServletRequestParameterException missing) {
+            return responder(HttpStatus.BAD_REQUEST,
+                    "Falta el parámetro obligatorio '" + missing.getParameterName() + "'.");
+        }
+        if (ex instanceof MethodArgumentTypeMismatchException mismatch) {
+            return responder(HttpStatus.BAD_REQUEST,
+                    "El parámetro '" + mismatch.getName() + "' tiene un valor o formato inválido.");
+        }
         return responder(HttpStatus.BAD_REQUEST, "Faltan parámetros obligatorios o contienen valores inválidos.");
     }
 
