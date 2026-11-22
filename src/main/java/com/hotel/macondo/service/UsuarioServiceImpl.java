@@ -92,6 +92,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     UserEntity usuario = new UserEntity(correoNormalizado,
         passwordEncoder.encode(contrasena), List.of(rolCliente));
+    usuario.setCorreoVerificado(false);
     usuario = repository.save(usuario);
     cliente.asignarUsuario(usuario);
     return usuario;

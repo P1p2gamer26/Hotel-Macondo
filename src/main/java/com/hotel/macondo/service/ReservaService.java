@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.hotel.macondo.DTOs.Entrada.ConsumoServicioSolicitud;
 import com.hotel.macondo.DTOs.Salida.PagoClienteResponse;
+import com.hotel.macondo.DTOs.Salida.ReservaDetalleClienteResponse;
 import com.hotel.macondo.DTOs.Salida.ReservaDetalleOperadorResponse;
 import com.hotel.macondo.DTOs.Salida.ReservaOperadorResponse;
 import com.hotel.macondo.entities.Cliente;
@@ -30,6 +31,12 @@ public interface ReservaService {
         /** Obtiene el detalle completo de una reserva para el panel del operador. */
         ReservaDetalleOperadorResponse obtenerDetalleParaOperador(String numeroReserva);
 
+        /** Obtiene el detalle de una reserva propia y su cuenta para el portal del cliente. */
+        ReservaDetalleClienteResponse obtenerDetalleParaCliente(Long clienteId, Long reservaId);
+
+        /** Registra un pago de prueba por una parte o por todo el saldo de una estadía activa. */
+        Pago pagarCuentaParaCliente(Long clienteId, Long reservaId, java.math.BigDecimal monto, String metodoPago);
+
         /** Obtiene el detalle completo de una reserva por su identificador interno. */
         ReservaDetalleOperadorResponse obtenerDetalleParaOperador(Long reservaId);
 
@@ -51,6 +58,10 @@ public interface ReservaService {
                         String fechaEntrada,
                         String fechaSalida,
                         Integer cantidadPersonas);
+
+        /** Genera una reserva aplicando opcionalmente un código promocional. */
+        Reserva crear(Long clienteId, Long tipoId, String fechaEntrada, String fechaSalida,
+                        Integer cantidadPersonas, String codigoPromocional);
 
         /**
          * Unidades disponibles al modificar una reserva, excluyendo la unidad que

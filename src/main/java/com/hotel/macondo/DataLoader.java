@@ -20,6 +20,7 @@ import com.hotel.macondo.entities.DetalleCuenta;
 import com.hotel.macondo.entities.Habitacion;
 import com.hotel.macondo.entities.Operador;
 import com.hotel.macondo.entities.Pago;
+import com.hotel.macondo.entities.Promocion;
 import com.hotel.macondo.entities.Reserva;
 import com.hotel.macondo.entities.Rol;
 import com.hotel.macondo.entities.Servicio;
@@ -32,6 +33,7 @@ import com.hotel.macondo.repository.CuentaRepository;
 import com.hotel.macondo.repository.HabitacionRepository;
 import com.hotel.macondo.repository.OperadorRepository;
 import com.hotel.macondo.repository.PagoRepository;
+import com.hotel.macondo.repository.PromocionRepository;
 import com.hotel.macondo.repository.ReservaRepository;
 import com.hotel.macondo.repository.ServicioRepository;
 import com.hotel.macondo.repository.TestimonioRepository;
@@ -80,6 +82,9 @@ public class DataLoader implements CommandLineRunner {
         private PagoRepository pagoRepository;
 
         @Autowired
+        private PromocionRepository promocionRepository;
+
+        @Autowired
         private RolRepository rolRepository;
 
         @Autowired
@@ -93,6 +98,8 @@ public class DataLoader implements CommandLineRunner {
                 List<Habitacion> habitaciones = cargarHabitacionesPrueba(tipos);
                 List<Servicio> servicios = cargarServicios();
 
+                cargarPromociones();
+
                 cargarTestimonios();
 
                 List<Cliente> clientes = cargarClientes();
@@ -100,6 +107,33 @@ public class DataLoader implements CommandLineRunner {
 
                 // cargarReservas(clientes, habitaciones, servicios);
                 cargarReservasPrueba(clientes, habitaciones, servicios);
+        }
+
+        /** Crea ofertas de demostración una sola vez y conserva sus ediciones posteriores. */
+        private void cargarPromociones() {
+                LocalDate hoy = LocalDate.now();
+                crearPromocionSiNoExiste("MACONDO10", "Escapada Macondo", "10% de descuento en el alojamiento para cualquier estadía.",
+                                Promocion.TipoDescuento.PORCENTAJE, BigDecimal.valueOf(10), hoy, hoy.plusDays(365), 1);
+                crearPromocionSiNoExiste("ESTADIA3", "Quédate y disfruta", "Ahorra 15% al reservar tres noches o más.",
+                                Promocion.TipoDescuento.PORCENTAJE, BigDecimal.valueOf(15), hoy, hoy.plusDays(365), 3);
+                crearPromocionSiNoExiste("RUTA100K", "Un detalle para el viaje", "Descuento de $100.000 COP en estadías de dos noches o más.",
+                                Promocion.TipoDescuento.VALOR_FIJO, BigDecimal.valueOf(100000), hoy, hoy.plusDays(365), 2);
+        }
+
+        private void crearPromocionSiNoExiste(String codigo, String nombre, String descripcion,
+                        Promocion.TipoDescuento tipo, BigDecimal valor, LocalDate inicio, LocalDate fin, int nochesMinimas) {
+                if (promocionRepository.findByCodigoIgnoreCase(codigo).isPresent()) return;
+                Promocion promocion = new Promocion();
+                promocion.setCodigo(codigo);
+                promocion.setNombre(nombre);
+                promocion.setDescripcion(descripcion);
+                promocion.setTipoDescuento(tipo);
+                promocion.setValorDescuento(valor);
+                promocion.setFechaInicio(inicio);
+                promocion.setFechaFin(fin);
+                promocion.setNochesMinimas(nochesMinimas);
+                promocion.setActiva(true);
+                promocionRepository.save(promocion);
         }
 
         private List<TipoHabitacion> cargarTiposHabitacion() {

@@ -38,11 +38,14 @@ public class SecurityConfig {
                         .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
                         .requestMatchers("/h2/**").permitAll()
                         .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/auth/login", "/api/cliente/registro").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/auth/**", "/api/cliente/registro").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/auth/verificacion/confirmar").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/pagos/wompi/eventos").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/testimonio", "/api/tipo-habitacion",
                                 "/api/tipo-habitacion/find/{id}", "/api/servicio/catalogo",
                                 "/api/servicio/recomendaciones", "/api/servicio/relacionados/{id}",
                                 "/api/servicio/find/{id}").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/promociones/publicas", "/api/promociones/calcular").permitAll()
 
                         // Estas reglas van antes de las rutas generales de reservas y operadores.
                         .requestMatchers(HttpMethod.GET, "/api/cliente/find/{id}")
@@ -61,6 +64,7 @@ public class SecurityConfig {
 
                         .requestMatchers("/api/operador/cuenta/**", "/api/reserva", "/api/reserva/**")
                         .hasAnyAuthority("ADMINISTRADOR", "OPERADOR")
+                        .requestMatchers("/api/promociones", "/api/promociones/**").hasAuthority("ADMINISTRADOR")
                         .requestMatchers(HttpMethod.GET, "/api/habitacion", "/api/habitacion/**",
                                 "/api/servicio").hasAnyAuthority("ADMINISTRADOR", "OPERADOR")
                         .requestMatchers(HttpMethod.PUT, "/api/habitacion/estado/{id}")
@@ -68,6 +72,14 @@ public class SecurityConfig {
                         .requestMatchers("/api/operador", "/api/operador/**", "/api/habitacion",
                                 "/api/habitacion/**", "/api/tipo-habitacion", "/api/tipo-habitacion/**",
                                 "/api/servicio", "/api/servicio/**").hasAuthority("ADMINISTRADOR")
+                        .requestMatchers(HttpMethod.GET, "/api/comentario/publicados").permitAll()
+                        .requestMatchers(HttpMethod.PUT, "/api/comentario/{id}/publicar")
+                        .hasAuthority("ADMINISTRADOR")
+                        .requestMatchers(HttpMethod.POST, "/api/comentario").hasAuthority("CLIENTE")
+                        .requestMatchers(HttpMethod.GET, "/api/comentario/cliente/{clienteId}")
+                        .hasAuthority("CLIENTE")
+                        .requestMatchers(HttpMethod.PUT, "/api/comentario/{id}").hasAuthority("CLIENTE")
+                        .requestMatchers(HttpMethod.DELETE, "/api/comentario/{id}").hasAuthority("CLIENTE")
                         .anyRequest().denyAll())
                 .addFilterBefore(new JwtAuthenticationFilter(jwtGenerator, userDetailsService, authEntryPoint),
                         UsernamePasswordAuthenticationFilter.class);

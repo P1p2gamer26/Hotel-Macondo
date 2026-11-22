@@ -50,6 +50,12 @@ public class Reserva {
   @Column(nullable = false, precision = 12, scale = 2)
   private BigDecimal total;
 
+  @Column(length = 40)
+  private String codigoPromocional;
+
+  @Column(precision = 12, scale = 2)
+  private BigDecimal descuentoPromocional = BigDecimal.ZERO;
+
   @JsonIgnore
   @ManyToOne
   private Cliente cliente;

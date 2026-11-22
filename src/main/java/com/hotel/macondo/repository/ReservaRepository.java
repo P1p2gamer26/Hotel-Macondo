@@ -100,7 +100,9 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
       """)
   List<Reserva> buscarPorHabitacion(@Param("idHabitacion") Long idHabitacion);
 
-  // Ids de reservas activas con cuenta abierta de una habitación por su número
+  // Ids de reservas activas con cuenta asociada de una habitación por su número.
+  // La cuenta se conserva accesible aunque su saldo actual ya esté pagado, para
+  // permitir registrar nuevos servicios durante la misma estadía.
   @Query(
       """
       SELECT r.id
@@ -109,7 +111,6 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
       JOIN r.cuenta c
       WHERE h.numero = :numeroHabitacion
         AND UPPER(r.estado) = 'ACTIVA'
-        AND UPPER(c.estado) = 'ABIERTA'
       """)
   List<Long> buscarIdsActivosConCuentaAbiertaPorNumeroHabitacion(
       @Param("numeroHabitacion") String numeroHabitacion);

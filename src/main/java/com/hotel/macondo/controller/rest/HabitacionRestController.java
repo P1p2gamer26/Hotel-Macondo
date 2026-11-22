@@ -47,7 +47,7 @@ public class HabitacionRestController {
     // Busca una habitación por su identificador
     // http://localhost:8080/api/habitacion/find/{id}
     @GetMapping("/find/{id}")
-    public HabitacionDTO buscarPorId(@PathVariable Long id) {
+    public HabitacionDTO buscarPorId(@PathVariable("id") Long id) {
         Habitacion habitacion = habitacionService.buscarPorId(id);
         return HabitacionMapper.INSTANCE.convert(habitacion);
     }
@@ -56,7 +56,7 @@ public class HabitacionRestController {
     // Retorna null si la reserva aún no tiene una habitación vinculada
     // http://localhost:8080/api/habitacion/reserva/{reservaId}
     @GetMapping("/reserva/{reservaId}")
-    public HabitacionDTO buscarPorReserva(@PathVariable Long reservaId) {
+    public HabitacionDTO buscarPorReserva(@PathVariable("reservaId") Long reservaId) {
         Habitacion habitacion = habitacionService.buscarPorReserva(reservaId);
         return HabitacionMapper.INSTANCE.convert(habitacion);
     }
@@ -89,7 +89,7 @@ public class HabitacionRestController {
     // Cambia el estado operativo de la habitación entre disponible y no disponible
     // http://localhost:8080/api/habitacion/estado/{id}
     @PutMapping("/estado/{id}")
-    public HabitacionDTO cambiarEstado(@PathVariable Long id) {
+    public HabitacionDTO cambiarEstado(@PathVariable("id") Long id) {
         Habitacion habitacion = habitacionService.cambiarEstado(id);
         if (habitacion == null) {
             throw new RecursoNoEncontradoException("No se encontro habitacion con id " + id);
@@ -101,7 +101,7 @@ public class HabitacionRestController {
     // Pasa a inactiva si registra reservas
     // http://localhost:8080/api/habitacion/delete/{id}
     @DeleteMapping("/delete/{id}")
-    public void eliminar(@PathVariable Long id) {
+    public void eliminar(@PathVariable("id") Long id) {
         habitacionService.eliminar(id);
     }
 
