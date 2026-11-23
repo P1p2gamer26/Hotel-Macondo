@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.hotel.macondo.DTOs.Mapper.OperadorMapper;
 import com.hotel.macondo.DTOs.Salida.OperadorDTO;
 import com.hotel.macondo.DTOs.Entrada.ConsumoServicioSolicitud;
+import com.hotel.macondo.DTOs.Entrada.OperadorCuentaSolicitud;
 import com.hotel.macondo.DTOs.Entrada.PagoSolicitud;
 import com.hotel.macondo.entities.Operador;
 import com.hotel.macondo.entities.Pago;
@@ -60,6 +61,12 @@ public class OperadorRestController {
         Operador guardado = operadorService.guardar(operador);
         OperadorDTO operadorDTO = OperadorMapper.INSTANCE.convert(guardado);
         return new ResponseEntity<>(operadorDTO, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/cuentas")
+    public ResponseEntity<OperadorDTO> crearCuenta(@RequestBody OperadorCuentaSolicitud solicitud) {
+        Operador guardado = operadorService.crearCuenta(solicitud);
+        return ResponseEntity.status(HttpStatus.CREATED).body(OperadorMapper.INSTANCE.convert(guardado));
     }
 
     // Alterna el estado de activación del operador

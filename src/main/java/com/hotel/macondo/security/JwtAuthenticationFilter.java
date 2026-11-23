@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -38,6 +39,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             try {
                 String correo = jwtGenerator.getUsernameFromJWT(authorization.substring(7));
                 UserDetails usuario = userDetailsService.loadUserByUsername(correo);
+                if (!usuario.isEnabled()) {
+                    throw new DisabledException("Acceso desactivado");
+                }
                 UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(usuario, null, usuario.getAuthorities());
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));

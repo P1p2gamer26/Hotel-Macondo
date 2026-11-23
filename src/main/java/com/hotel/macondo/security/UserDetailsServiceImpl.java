@@ -35,8 +35,12 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                 .findByCorreoIgnoreCase(correo.trim().toLowerCase(Locale.ROOT))
                 .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
 
-        return new User(usuario.getCorreo(), usuario.getContrasena(),
-                mapRolesToAuthorities(usuario.getRoles()));
+        boolean accesoActivo = usuario.getOperador() == null || Boolean.TRUE.equals(usuario.getOperador().getActivo());
+        return User.withUsername(usuario.getCorreo())
+                .password(usuario.getContrasena())
+                .authorities(mapRolesToAuthorities(usuario.getRoles()))
+                .disabled(!accesoActivo)
+                .build();
     }
 
     private Collection<GrantedAuthority> mapRolesToAuthorities(List<Rol> roles) {

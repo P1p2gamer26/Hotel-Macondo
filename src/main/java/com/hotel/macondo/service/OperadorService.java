@@ -2,6 +2,7 @@ package com.hotel.macondo.service;
 
 import java.util.Collection;
 
+import com.hotel.macondo.DTOs.Entrada.OperadorCuentaSolicitud;
 import com.hotel.macondo.entities.Operador;
 
 public interface OperadorService {
@@ -14,6 +15,8 @@ public interface OperadorService {
 
     /** Crea o actualiza un operador. */
     Operador guardar(Operador operador);
+
+    Operador crearCuenta(OperadorCuentaSolicitud solicitud);
 
     /**
      * Invierte el estado (activo/inactivo) de un operador. Retorna null si el
