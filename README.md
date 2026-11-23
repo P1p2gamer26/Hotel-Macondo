@@ -40,6 +40,47 @@ El backend quedará disponible en `http://localhost:8080`.
 Usará la base H2 persistente `macondo-dev` y permitirá solicitudes desde
 `http://localhost:4200`.
 
+### Asistente de chat
+
+El backend consulta Ollama con el modelo `llama3.2` por defecto. Descarga el
+modelo una vez con `ollama pull llama3.2` y asegúrate de que Ollama esté
+ejecutándose. La URL predeterminada es `http://localhost:11434`; si Ollama está
+en otro host, configura `OLLAMA_URL` en el proceso del backend. También puedes
+cambiar el modelo mediante `OLLAMA_MODEL`.
+
+El frontend solo necesita acceder al backend (`/api/chat`); no expongas el
+puerto de Ollama a Internet. En producción, usa la dirección interna del host o
+servicio donde se ejecute Ollama.
+
+En cada consulta informativa, el backend agrega al contexto el catálogo activo de
+servicios y los tipos de habitación actuales. La disponibilidad se consulta
+directamente en el servicio de reservas (no la redacta el modelo): indica las
+fechas de entrada y salida completas en formato `AAAA-MM-DD` y el número total
+de huéspedes. Si la fecha es ambigua o faltan datos, el chat los solicitará sin
+afirmar disponibilidad.
+
+El chatbot no crea ni confirma reservas y nunca debe solicitar datos de tarjeta,
+CVV, vencimiento, contraseñas o datos bancarios. Los pagos y reservas se
+completan exclusivamente en los flujos oficiales del sitio; el chat ofrece
+botones para abrir la sección correspondiente.
+
+Las preguntas sobre reservar, registrarse, cancelar una reserva y hacer checkout
+incluyen acciones de navegación para abrir la sección correspondiente. La
+cancelación lleva a las reservas del cliente o al inicio de sesión; el acceso al
+checkout operativo solo se muestra a personal autorizado.
+
+Ejemplo de solicitud:
+
+```json
+{
+  "mensaje": "¿Y tienen piscina?",
+  "historial": [
+    { "role": "user", "content": "¿Qué servicios ofrece el hotel?" },
+    { "role": "assistant", "content": "El hotel cuenta con varios servicios para sus huéspedes." }
+  ]
+}
+```
+
 ### Producción
 
 ```powershell
