@@ -6,5 +6,6 @@ import lombok.Data;
 public class OperadorDTO {
     private Long id;
     private String nombre;
+    private String correo;
     private Boolean activo;
 }

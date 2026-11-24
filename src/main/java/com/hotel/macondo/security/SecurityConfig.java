@@ -39,6 +39,7 @@ public class SecurityConfig {
                         .requestMatchers("/h2/**").permitAll()
                         .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/auth/**", "/api/cliente/registro").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/chat").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/auth/verificacion/confirmar").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/pagos/mercadopago/eventos").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/testimonio", "/api/tipo-habitacion",
