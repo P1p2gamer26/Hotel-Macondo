@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
@@ -90,6 +91,9 @@ public class DataLoader implements CommandLineRunner {
         @Autowired
         private PasswordEncoder passwordEncoder;
 
+        @Value("${app.demo-dashboard.enabled:false}")
+        private boolean demoDashboardEnabled;
+
         @Override
         public void run(String... args) {
                 List<TipoHabitacion> tipos = cargarTiposHabitacion();
@@ -107,6 +111,9 @@ public class DataLoader implements CommandLineRunner {
 
                 // cargarReservas(clientes, habitaciones, servicios);
                 cargarReservasPrueba(clientes, habitaciones, servicios);
+                if (demoDashboardEnabled) {
+                        cargarReservasPanel(clientes, habitaciones);
+                }
         }
 
         /** Crea ofertas de demostración una sola vez y conserva sus ediciones posteriores. */
@@ -152,7 +159,7 @@ public class DataLoader implements CommandLineRunner {
                                 TipoHabitacion.builder()
                                                 .nombre("Superior")
                                                 .descripcion("Espacio distinguido con detalles artesanales en oro, balcón y sala de lectura.")
-                                                .imagen("/images/HabitacionExecutive.avif")
+                                                .imagen("/images/HabitacionSuperior.jpg")
                                                 .precioNoche(BigDecimal.valueOf(450000))
                                                 .capacidadPersonas(3)
                                                 .build()));
@@ -628,6 +635,32 @@ public class DataLoader implements CommandLineRunner {
                 // - Con 4 personas: no hay disponibilidad por superar la capacidad del tipo.
         }
 
+        private void cargarReservasPanel(List<Cliente> clientes, List<Habitacion> habitaciones) {
+                LocalDate hoy = LocalDate.now();
+                int[][] estancias = {
+                                {-3, 1}, {-2, 2}, {-2, 4}, {-1, 4}, {0, 2},
+                                {1, 4}, {1, 6}, {2, 5}, {2, 6}, {3, 7}, {4, 8}
+                };
+                for (int i = 0; i < estancias.length; i++) {
+                        String numero = "MCD-DEMO-PANEL-" + (i + 1);
+                        if (reservaRepository.existsByNumeroReserva(numero)) {
+                                continue;
+                        }
+                        int entrada = estancias[i][0];
+                        guardarReserva(numero, hoy.plusDays(entrada), hoy.plusDays(estancias[i][1]),
+                                        2, entrada <= 0 ? "ACTIVA" : "CONFIRMADA",
+                                        clientes.get(i % clientes.size()), habitaciones.get(i + 5), false, List.of());
+                }
+                String numeroConCupon = "MCD-DEMO-CUPON";
+                if (!reservaRepository.existsByNumeroReserva(numeroConCupon)) {
+                        Habitacion habitacion = habitaciones.get(0);
+                        BigDecimal descuento = habitacion.getTipoHabitacion().getPrecioNoche()
+                                        .multiply(BigDecimal.valueOf(3)).movePointLeft(1);
+                        guardarReserva(numeroConCupon, hoy.minusDays(4), hoy.minusDays(1), 2, "FINALIZADA",
+                                        clientes.get(0), habitacion, true, List.of(), "MACONDO10", descuento);
+                }
+        }
+
         private void guardarReserva(
                         String numeroReserva,
                         LocalDate fechaEntrada,
@@ -638,9 +671,26 @@ public class DataLoader implements CommandLineRunner {
                         Habitacion habitacion,
                         boolean generarPago,
                         List<Servicio> serviciosConsumidos) {
+                guardarReserva(numeroReserva, fechaEntrada, fechaSalida, cantidadPersonas, estado,
+                                cliente, habitacion, generarPago, serviciosConsumidos, null, BigDecimal.ZERO);
+        }
+
+        private void guardarReserva(
+                        String numeroReserva,
+                        LocalDate fechaEntrada,
+                        LocalDate fechaSalida,
+                        Integer cantidadPersonas,
+                        String estado,
+                        Cliente cliente,
+                        Habitacion habitacion,
+                        boolean generarPago,
+                        List<Servicio> serviciosConsumidos,
+                        String codigoPromocional,
+                        BigDecimal descuentoPromocional) {
                 BigDecimal precioNoche = habitacion.getTipoHabitacion().getPrecioNoche();
                 long noches = ChronoUnit.DAYS.between(fechaEntrada, fechaSalida);
-                BigDecimal totalHabitacion = precioNoche.multiply(BigDecimal.valueOf(noches));
+                BigDecimal totalHabitacion = precioNoche.multiply(BigDecimal.valueOf(noches))
+                                .subtract(descuentoPromocional);
 
                 Reserva reserva = new Reserva(
                                 numeroReserva,
@@ -650,6 +700,8 @@ public class DataLoader implements CommandLineRunner {
                                 estado,
                                 precioNoche,
                                 totalHabitacion);
+                reserva.setCodigoPromocional(codigoPromocional);
+                reserva.setDescuentoPromocional(descuentoPromocional);
                 reserva.asignarCliente(cliente);
                 reserva.asignarHabitacion(habitacion);
                 reservaRepository.save(reserva);

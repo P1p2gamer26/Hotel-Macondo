@@ -405,7 +405,8 @@ public class ReservaServiceImpl implements ReservaService {
     if (cuenta == null) {
       return new ReservaDetalleClienteResponse(reserva.getId(), reserva.getNumeroReserva(),
           reserva.getFechaInicio(), reserva.getFechaFin(), reserva.getCantidadPersonas(), reserva.getEstado(),
-          reserva.getPrecioNoche(), reserva.getTotal(),
+          reserva.getPrecioNoche(), reserva.getTotal(), reserva.getCodigoPromocional(),
+          reserva.getDescuentoPromocional(),
           reserva.getHabitacion() == null ? null : reserva.getHabitacion().getNumero(),
           reserva.getHabitacion() == null || reserva.getHabitacion().getTipoHabitacion() == null
               ? null : reserva.getHabitacion().getTipoHabitacion().getNombre(), null);
@@ -421,7 +422,8 @@ public class ReservaServiceImpl implements ReservaService {
             p.getId(), p.getMonto(), p.getMetodoPago(), p.getFechaPago(), p.getEstado())).toList());
     return new ReservaDetalleClienteResponse(reserva.getId(), reserva.getNumeroReserva(),
         reserva.getFechaInicio(), reserva.getFechaFin(), reserva.getCantidadPersonas(), reserva.getEstado(),
-        reserva.getPrecioNoche(), reserva.getTotal(),
+        reserva.getPrecioNoche(), reserva.getTotal(), reserva.getCodigoPromocional(),
+        reserva.getDescuentoPromocional(),
         reserva.getHabitacion() == null ? null : reserva.getHabitacion().getNumero(),
         reserva.getHabitacion() == null || reserva.getHabitacion().getTipoHabitacion() == null
             ? null : reserva.getHabitacion().getTipoHabitacion().getNombre(), cuentaDetalle);
