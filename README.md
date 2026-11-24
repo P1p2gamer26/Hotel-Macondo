@@ -81,33 +81,32 @@ Usuario: sa
 Contraseña: vacía
 ```
 
-## Pagos de prueba con Wompi
+## Pagos de prueba con Mercado Pago
 
 El cliente puede pagar una parte o el saldo de una estadía activa desde su detalle.
-El backend crea un intento pendiente y calcula la firma de integridad; el pago solo
-se registra en la cuenta cuando llega un evento `transaction.updated` válido de Wompi.
-La URL de retorno informa al cliente, pero no confirma el pago. El operador conserva
-su flujo de checkout actual.
+El backend crea una orden de Checkout Pro y registra el pago solo tras consultar el
+estado real de la orden en Mercado Pago. También procesa notificaciones `order`
+validadas con la firma del webhook. El retorno del checkout nunca se acepta como
+prueba de pago por sí solo.
 
-Para probar en sandbox, define estas variables en el proceso del backend. No guardes
-los secretos en el repositorio:
+Agrega el Access Token de prueba al archivo `src/main/resources/application.properties`
+del backend y reinicia la aplicación.
 
-```powershell
-$env:WOMPI_ENVIRONMENT="test"
-$env:WOMPI_PUBLIC_KEY="pub_test_..."
-$env:WOMPI_INTEGRITY_SECRET="test_integrity_..."
-$env:WOMPI_EVENTS_SECRET="test_events_..."
-$env:WOMPI_FRONTEND_BASE_URL="http://localhost:4200"
-$env:SPRING_PROFILES_ACTIVE="dev"
-mvn spring-boot:run
+```properties
+mercadopago.access-token=APP_USR-<access-token-de-prueba>
+mercadopago.webhook-secret=
 ```
 
-Configura en el Dashboard de Wompi Sandbox la URL pública HTTPS de eventos
-`https://<tu-backend>/api/pagos/wompi/eventos`. En desarrollo local, el webhook
-requiere exponer el backend mediante un túnel HTTPS. En producción, usa llaves y
-secreto de eventos de producción, `WOMPI_ENVIRONMENT=prod` y el dominio del frontend.
-Una reserva con pagos confirmados no se puede cancelar desde el portal ni desde el
-panel del operador.
+Agrega la firma secreta de Sandbox al configurar el webhook. Para la prueba local
+con tarjeta, el backend confirma la orden cuando el cliente regresa del checkout;
+la URL HTTPS pública se necesita para recibir notificaciones webhook.
+
+Para recibir webhooks, configura el evento `Order` con la URL HTTPS pública
+`https://<tu-backend>/api/pagos/mercadopago/eventos` y agrega la firma secreta.
+Las variables `MP_ACCESS_TOKEN` y `MP_WEBHOOK_SECRET` tienen prioridad cuando
+están definidas y permiten configurar las credenciales de producción.
+Una reserva con pagos confirmados no se puede cancelar desde el portal ni desde
+el panel del operador.
 
 Los perfiles `default`, `dev` y `prod` cargan datos iniciales mediante
 `DataLoader`. El perfil `test` usa `DataLoaderTest`.
