@@ -15,6 +15,8 @@ public record ReservaDetalleClienteResponse(
     String estado,
     BigDecimal precioNoche,
     BigDecimal total,
+    String codigoPromocional,
+    BigDecimal descuentoPromocional,
     String habitacion,
     String tipoHabitacion,
     CuentaDetalle cuenta) {
