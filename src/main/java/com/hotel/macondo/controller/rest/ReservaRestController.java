@@ -18,7 +18,8 @@ import com.hotel.macondo.DTOs.Mapper.HabitacionMapper;
 import com.hotel.macondo.DTOs.Mapper.ReservaMapper;
 import com.hotel.macondo.DTOs.Salida.HabitacionDTO;
 import com.hotel.macondo.DTOs.Salida.PagoClienteResponse;
-import com.hotel.macondo.DTOs.Salida.CheckoutWompiResponse;
+import com.hotel.macondo.DTOs.Salida.CheckoutPagoResponse;
+import com.hotel.macondo.DTOs.Salida.ConfirmacionPagoResponse;
 import com.hotel.macondo.DTOs.Entrada.PagoClienteSolicitud;
 import com.hotel.macondo.DTOs.Salida.ReservaClienteDTO;
 import com.hotel.macondo.DTOs.Salida.ReservaDetalleClienteResponse;
@@ -30,7 +31,7 @@ import com.hotel.macondo.entities.Habitacion;
 import com.hotel.macondo.entities.Reserva;
 import com.hotel.macondo.service.ClienteService;
 import com.hotel.macondo.service.ReservaService;
-import com.hotel.macondo.service.WompiService;
+import com.hotel.macondo.service.MercadoPagoService;
 import com.hotel.macondo.utils.FechaUtils;
 import io.swagger.v3.oas.annotations.Operation;
 
@@ -50,7 +51,7 @@ public class ReservaRestController {
     private ClienteService clienteService;
 
     @Autowired
-    private WompiService wompiService;
+    private MercadoPagoService mercadoPagoService;
 
     // ==========================================
     // PANEL DE OPERADOR
@@ -141,13 +142,23 @@ public class ReservaRestController {
         return reservaService.obtenerDetalleParaCliente(id, reservaId);
     }
 
-    @PostMapping("/cliente/{id}/{reservaId}/pago/wompi")
-    @Operation(summary = "Prepara el checkout de Wompi para una cuenta de estadía activa")
-    public CheckoutWompiResponse iniciarPagoWompi(
+    @PostMapping("/cliente/{id}/{reservaId}/pago/mercadopago")
+    @Operation(summary = "Prepara el checkout de Mercado Pago para una cuenta de estadía activa")
+    public CheckoutPagoResponse iniciarPagoMercadoPago(
             @PathVariable("id") Long id,
             @PathVariable("reservaId") Long reservaId,
             @RequestBody PagoClienteSolicitud solicitud) {
-        return wompiService.iniciar(id, reservaId, solicitud == null ? null : solicitud.monto());
+        return mercadoPagoService.iniciar(id, reservaId, solicitud == null ? null : solicitud.monto());
+    }
+
+    @PostMapping("/cliente/{id}/{reservaId}/pago/mercadopago/confirmar")
+    @Operation(summary = "Confirma con Mercado Pago el resultado de una orden al regresar del checkout")
+    public ConfirmacionPagoResponse confirmarPagoMercadoPago(
+            @PathVariable("id") Long id,
+            @PathVariable("reservaId") Long reservaId,
+            @RequestBody java.util.Map<String, String> solicitud) {
+        return mercadoPagoService.confirmarRetorno(id, reservaId,
+                solicitud == null ? null : solicitud.get("orderId"));
     }
 
     // Obtiene el historial de reservas (FINALIZADAS - CANCELADAS) del cliente
